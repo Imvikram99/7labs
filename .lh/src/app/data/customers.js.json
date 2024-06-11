@@ -1,0 +1,30 @@
+{
+    "sourceFile": "src/app/data/customers.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 3,
+            "patches": [
+                {
+                    "date": 1717841618128,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1717842088718,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,5 +1,5 @@\n-const customers = [\n+export const customers = [\n     {\n       id: 1,\n       name: 'Customer 1',\n       invoices: [\n"
+                },
+                {
+                    "date": 1717842113462,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,5 +1,5 @@\n-export const customers = [\n+const customers = [\n     {\n       id: 1,\n       name: 'Customer 1',\n       invoices: [\n"
+                },
+                {
+                    "date": 1717843128721,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -15,5 +15,7 @@\n       ],\n     },\n     // more customers...\n   ];\n+\n+  export default customers;\n   \n\\ No newline at end of file\n"
+                }
+            ],
+            "date": 1717841618128,
+            "name": "Commit-0",
+            "content": "const customers = [\n    {\n      id: 1,\n      name: 'Customer 1',\n      invoices: [\n        {\n          id: 1,\n          date: '2022-01-01',\n          products: [\n            { name: 'Product 1', quantity: 2, price: 10, taxRate: 0.1 },\n            { name: 'Product 2', quantity: 1, price: 20, taxRate: 0.2 },\n          ],\n        },\n        // more invoices...\n      ],\n    },\n    // more customers...\n  ];\n  "
+        }
+    ]
+}

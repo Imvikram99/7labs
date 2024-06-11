@@ -1,0 +1,186 @@
+{
+    "sourceFile": "src/app/data/SpecificApis.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 42,
+            "patches": [
+                {
+                    "date": 1717908184755,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1717908537886,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -3,9 +3,9 @@\n \n class SpecificApis {\n   async fetchPatientList() {\n     try {\n-      const response = await apiService.get('/patients');\n+      const response = await apiService.f('/patients');\n       return response.data;\n     } catch (error) {\n       console.error('Error fetching patient list:', error);\n       throw error;\n"
+                },
+                {
+                    "date": 1717908545913,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -3,9 +3,9 @@\n \n class SpecificApis {\n   async fetchPatientList() {\n     try {\n-      const response = await apiService.f('/patients');\n+      const response = await apiService.fetchData('/patients');\n       return response.data;\n     } catch (error) {\n       console.error('Error fetching patient list:', error);\n       throw error;\n"
+                },
+                {
+                    "date": 1717908556565,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -23,9 +23,9 @@\n   }\n \n   async verifyReports() {\n     try {\n-      const response = await apiService.get('/reports/verify');\n+      const response = await apiService.f('/reports/verify');\n       return response.data;\n     } catch (error) {\n       console.error('Error verifying reports:', error);\n       throw error;\n"
+                },
+                {
+                    "date": 1717908580111,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -13,9 +13,9 @@\n   }\n \n   async enterReports(reportData) {\n     try {\n-      const response = await apiService.post('/reports', reportData);\n+      const response = await apiService.postData('/reports', reportData);\n       return response.data;\n     } catch (error) {\n       console.error('Error entering reports:', error);\n       throw error;\n@@ -23,9 +23,9 @@\n   }\n \n   async verifyReports() {\n     try {\n-      const response = await apiService.f('/reports/verify');\n+      const response = await apiService.fetchData('/reports/verify');\n       return response.data;\n     } catch (error) {\n       console.error('Error verifying reports:', error);\n       throw error;\n"
+                },
+                {
+                    "date": 1717908701421,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -31,8 +31,66 @@\n       throw error;\n     }\n   }\n \n-  // Continue with other specific API functions...\n+  async analyzeFinances() {\n+    try {\n+      const response = await apiService.fetchData('/finances');\n+      return response.data;\n+    } catch (error) {\n+      console.error('Error analyzing finances:', error);\n+      throw error;\n+    }\n+  }\n+\n+  async fetchTestList() {\n+    try {\n+      const response = await apiService.fetchData('/tests');\n+      return response.data;\n+    } catch (error) {\n+      console.error('Error fetching test list:', error);\n+      throw error;\n+    }\n+  }\n+\n+  async fetchOrganisationList() {\n+    try {\n+      const response = await apiService.fetchData('/organisations');\n+      return response.data;\n+    } catch (error) {\n+      console.error('Error fetching organisation list:', error);\n+      throw error;\n+    }\n+  }\n+\n+  async fetchEmployeeList() {\n+    try {\n+      const response = await apiService.fetchData('/employees');\n+      return response.data;\n+    } catch (error) {\n+      console.error('Error fetching employee list:', error);\n+      throw error;\n+    }\n+  }\n+\n+  async fetchCenterInfo() {\n+    try {\n+      const response = await apiService.fetchData('/centers');\n+      return response.data;\n+    } catch (error) {\n+      console.error('Error fetching center information:', error);\n+      throw error;\n+    }\n+  }\n+\n+  async fetchLabProfile() {\n+    try {\n+      const response = await apiService.fetchData('/labprofile');\n+      return response.data;\n+    } catch (error) {\n+      console.error('Error fetching lab profile:', error);\n+      throw error;\n+    }\n+  }\n }\n \n export const specificApis = new SpecificApis();\n"
+                },
+                {
+                    "date": 1718000072165,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -21,8 +21,18 @@\n       throw error;\n     }\n   }\n \n+  async enterReports(reportData) {\n+    try {\n+      const response = await apiService.postData('/reports', reportData);\n+      return response.data;\n+    } catch (error) {\n+      console.error('Error entering reports:', error);\n+      throw error;\n+    }\n+  }\n+\n   async verifyReports() {\n     try {\n       const response = await apiService.fetchData('/reports/verify');\n       return response.data;\n"
+                },
+                {
+                    "date": 1718000082583,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -21,9 +21,9 @@\n       throw error;\n     }\n   }\n \n-  async enterReports(reportData) {\n+  async (reportData) {\n     try {\n       const response = await apiService.postData('/reports', reportData);\n       return response.data;\n     } catch (error) {\n"
+                },
+                {
+                    "date": 1718000093914,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -21,9 +21,9 @@\n       throw error;\n     }\n   }\n \n-  async (reportData) {\n+  async registerPatient(register) {\n     try {\n       const response = await apiService.postData('/reports', reportData);\n       return response.data;\n     } catch (error) {\n"
+                },
+                {
+                    "date": 1718000101144,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -21,9 +21,9 @@\n       throw error;\n     }\n   }\n \n-  async registerPatient(register) {\n+  async registerPatient(patient) {\n     try {\n       const response = await apiService.postData('/reports', reportData);\n       return response.data;\n     } catch (error) {\n"
+                },
+                {
+                    "date": 1718000153162,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -21,11 +21,11 @@\n       throw error;\n     }\n   }\n \n-  async registerPatient(patient) {\n+  async registerPatient(patientData) {\n     try {\n-      const response = await apiService.postData('/reports', reportData);\n+      const response = await apiService.postData('api/v1/lab/patient/register', reportData);\n       return response.data;\n     } catch (error) {\n       console.error('Error entering reports:', error);\n       throw error;\n"
+                },
+                {
+                    "date": 1718000162366,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -23,9 +23,9 @@\n   }\n \n   async registerPatient(patientData) {\n     try {\n-      const response = await apiService.postData('api/v1/lab/patient/register', reportData);\n+      const response = await apiService.postData('api/v1/lab/patient/register', patientData);\n       return response.data;\n     } catch (error) {\n       console.error('Error entering reports:', error);\n       throw error;\n"
+                },
+                {
+                    "date": 1718001118262,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,9 +1,9 @@\n // SpecificApis.js\n import { apiService } from './ApiService';\n \n class SpecificApis {\n-  async fetchPatientList() {\n+  async fetchPatientList(search) {\n     try {\n       const response = await apiService.fetchData('/patients');\n       return response.data;\n     } catch (error) {\n"
+                },
+                {
+                    "date": 1718001124300,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,9 +1,9 @@\n // SpecificApis.js\n import { apiService } from './ApiService';\n \n class SpecificApis {\n-  async fetchPatientList(search) {\n+  async fetchPatientList(searchQuery,s) {\n     try {\n       const response = await apiService.fetchData('/patients');\n       return response.data;\n     } catch (error) {\n"
+                },
+                {
+                    "date": 1718001133051,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,9 +1,9 @@\n // SpecificApis.js\n import { apiService } from './ApiService';\n \n class SpecificApis {\n-  async fetchPatientList(searchQuery,s) {\n+  async fetchPatientList(searchQuery) {\n     try {\n       const response = await apiService.fetchData('/patients');\n       return response.data;\n     } catch (error) {\n"
+                },
+                {
+                    "date": 1718001219373,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -3,10 +3,10 @@\n \n class SpecificApis {\n   async fetchPatientList(searchQuery) {\n     try {\n-      const response = await apiService.fetchData('/patients');\n-      return response.data;\n+        const response = await apiService.fetchData(`/api/v1/lab/patient?searchQuery=${encodeURIComponent(searchQuery)}&searchQueryType=${encodeURIComponent(searchQueryType)}`, {\n+            return response.data;\n     } catch (error) {\n       console.error('Error fetching patient list:', error);\n       throw error;\n     }\n"
+                },
+                {
+                    "date": 1718001241268,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -3,9 +3,9 @@\n \n class SpecificApis {\n   async fetchPatientList(searchQuery) {\n     try {\n-        const response = await apiService.fetchData(`/api/v1/lab/patient?searchQuery=${encodeURIComponent(searchQuery)}&searchQueryType=${encodeURIComponent(searchQueryType)}`, {\n+        const response = await apiService.fetchData(`/api/v1/lab/patient?searchQuery=${encodeURIComponent(searchQuery)}&searchQueryType=${encodeURIComponent(searchQueryType)}`});, {\n             return response.data;\n     } catch (error) {\n       console.error('Error fetching patient list:', error);\n       throw error;\n"
+                },
+                {
+                    "date": 1718001250673,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -3,9 +3,9 @@\n \n class SpecificApis {\n   async fetchPatientList(searchQuery) {\n     try {\n-        const response = await apiService.fetchData(`/api/v1/lab/patient?searchQuery=${encodeURIComponent(searchQuery)}&searchQueryType=${encodeURIComponent(searchQueryType)}`});, {\n+        const response = await apiService.fetchData(`/api/v1/lab/patient?searchQuery=${encodeURIComponent(searchQuery)}&searchQueryType=${encodeURIComponent(searchQueryType)}`, {});\n             return response.data;\n     } catch (error) {\n       console.error('Error fetching patient list:', error);\n       throw error;\n"
+                },
+                {
+                    "date": 1718001256688,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -4,9 +4,9 @@\n class SpecificApis {\n   async fetchPatientList(searchQuery) {\n     try {\n         const response = await apiService.fetchData(`/api/v1/lab/patient?searchQuery=${encodeURIComponent(searchQuery)}&searchQueryType=${encodeURIComponent(searchQueryType)}`, {});\n-            return response.data;\n+        return response.data;\n     } catch (error) {\n       console.error('Error fetching patient list:', error);\n       throw error;\n     }\n"
+                },
+                {
+                    "date": 1718001269809,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,9 +1,9 @@\n // SpecificApis.js\n import { apiService } from './ApiService';\n \n class SpecificApis {\n-  async fetchPatientList(searchQuery) {\n+  async fetchPatientList(searchQuery,s) {\n     try {\n         const response = await apiService.fetchData(`/api/v1/lab/patient?searchQuery=${encodeURIComponent(searchQuery)}&searchQueryType=${encodeURIComponent(searchQueryType)}`, {});\n         return response.data;\n     } catch (error) {\n"
+                },
+                {
+                    "date": 1718001611775,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,11 +1,11 @@\n // SpecificApis.js\n import { apiService } from './ApiService';\n \n class SpecificApis {\n-  async fetchPatientList(searchQuery,s) {\n+  async fetchPatientList(searchQuery,searchQueryType) {\n     try {\n-        const response = await apiService.fetchData(`/api/v1/lab/patient?searchQuery=${encodeURIComponent(searchQuery)}&searchQueryType=${encodeURIComponent(searchQueryType)}`, {});\n+        const response = await apiService.fetchData(`/api/v1/lab/patient?searchQuery=${encodeURIComponent(searchQuery)}&searchQueryType=${encodeURIComponent(searchQueryType)}`);\n         return response.data;\n     } catch (error) {\n       console.error('Error fetching patient list:', error);\n       throw error;\n"
+                },
+                {
+                    "date": 1718034293206,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -73,9 +73,9 @@\n   }\n \n   async fetchEmployeeList() {\n     try {\n-      const response = await apiService.fetchData('/employees');\n+      const response = await apiService.fetchData('api/v1/lab//employees');\n       return response.data;\n     } catch (error) {\n       console.error('Error fetching employee list:', error);\n       throw error;\n"
+                },
+                {
+                    "date": 1718036799867,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -73,15 +73,24 @@\n   }\n \n   async fetchEmployeeList() {\n     try {\n-      const response = await apiService.fetchData('api/v1/lab//employees');\n+      const response = await apiService.fetchData('api/v1/lab/employees');\n       return response.data;\n     } catch (error) {\n       console.error('Error fetching employee list:', error);\n       throw error;\n     }\n   }\n+  async fetchEmployeeList() {\n+    try {\n+      const response = await apiService.fetchData('api/v1/lab/employees');\n+      return response.data;\n+    } catch (error) {\n+      console.error('Error fetching employee list:', error);\n+      throw error;\n+    }\n+  }\n \n   async fetchCenterInfo() {\n     try {\n       const response = await apiService.fetchData('/centers');\n"
+                },
+                {
+                    "date": 1718036810122,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -80,9 +80,9 @@\n       console.error('Error fetching employee list:', error);\n       throw error;\n     }\n   }\n-  async fetchEmployeeList() {\n+  async addEmployee() {\n     try {\n       const response = await apiService.fetchData('api/v1/lab/employees');\n       return response.data;\n     } catch (error) {\n"
+                },
+                {
+                    "date": 1718036819729,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -82,12 +82,12 @@\n     }\n   }\n   async addEmployee() {\n     try {\n-      const response = await apiService.fetchData('api/v1/lab/employees');\n+      const response = await apiService.postData('api/v1/lab/employees');\n       return response.data;\n     } catch (error) {\n-      console.error('Error fetching employee list:', error);\n+      console.error('Error adding employee list:', error);\n       throw error;\n     }\n   }\n \n"
+                },
+                {
+                    "date": 1718038702403,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -80,14 +80,14 @@\n       console.error('Error fetching employee list:', error);\n       throw error;\n     }\n   }\n-  async addEmployee() {\n+  async addEmployee(employee) {\n     try {\n       const response = await apiService.postData('api/v1/lab/employees');\n       return response.data;\n     } catch (error) {\n-      console.error('Error adding employee list:', error);\n+      console.error('Error adding employee :', error);\n       throw error;\n     }\n   }\n \n"
+                },
+                {
+                    "date": 1718038709197,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -80,11 +80,11 @@\n       console.error('Error fetching employee list:', error);\n       throw error;\n     }\n   }\n-  async addEmployee(employee) {\n+  async addEmployee(employeeData) {\n     try {\n-      const response = await apiService.postData('api/v1/lab/employees');\n+      const response = await apiService.postData('api/v1/lab/employees',employeeData);\n       return response.data;\n     } catch (error) {\n       console.error('Error adding employee :', error);\n       throw error;\n"
+                },
+                {
+                    "date": 1718071461135,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -53,9 +53,9 @@\n   }\n \n   async fetchTestList() {\n     try {\n-      const response = await apiService.fetchData('/tests');\n+      const response = await apiService.fetchData('api/v1/lab//tests');\n       return response.data;\n     } catch (error) {\n       console.error('Error fetching test list:', error);\n       throw error;\n"
+                },
+                {
+                    "date": 1718072169926,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -53,9 +53,9 @@\n   }\n \n   async fetchTestList() {\n     try {\n-      const response = await apiService.fetchData('api/v1/lab//tests');\n+      const response = await apiService.fetchData('api/v1/lab/labtests');\n       return response.data;\n     } catch (error) {\n       console.error('Error fetching test list:', error);\n       throw error;\n"
+                },
+                {
+                    "date": 1718076384291,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -53,15 +53,16 @@\n   }\n \n   async fetchTestList() {\n     try {\n-      const response = await apiService.fetchData('api/v1/lab/labtests');\n+      const response = await apiService.fetchData('api/v1/lab/labtest');\n       return response.data;\n     } catch (error) {\n       console.error('Error fetching test list:', error);\n       throw error;\n     }\n   }\n+  \n \n   async fetchOrganisationList() {\n     try {\n       const response = await apiService.fetchData('/organisations');\n"
+                },
+                {
+                    "date": 1718076391779,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -60,9 +60,17 @@\n       console.error('Error fetching test list:', error);\n       throw error;\n     }\n   }\n-  \n+  async addTest() {\n+    try {\n+      const response = await apiService.fetchData('api/v1/lab/labtest');\n+      return response.data;\n+    } catch (error) {\n+      console.error('Error fetching test list:', error);\n+      throw error;\n+    }\n+  }\n \n   async fetchOrganisationList() {\n     try {\n       const response = await apiService.fetchData('/organisations');\n"
+                },
+                {
+                    "date": 1718076397028,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -62,9 +62,9 @@\n     }\n   }\n   async addTest() {\n     try {\n-      const response = await apiService.fetchData('api/v1/lab/labtest');\n+      const response = await apiService.postData('api/v1/lab/labtest');\n       return response.data;\n     } catch (error) {\n       console.error('Error fetching test list:', error);\n       throw error;\n"
+                },
+                {
+                    "date": 1718076402372,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -60,9 +60,9 @@\n       console.error('Error fetching test list:', error);\n       throw error;\n     }\n   }\n-  async addTest() {\n+  async addTest(testData) {\n     try {\n       const response = await apiService.postData('api/v1/lab/labtest');\n       return response.data;\n     } catch (error) {\n"
+                },
+                {
+                    "date": 1718076407786,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -62,9 +62,9 @@\n     }\n   }\n   async addTest(testData) {\n     try {\n-      const response = await apiService.postData('api/v1/lab/labtest');\n+      const response = await apiService.postData('api/v1/lab/labtest',testData);\n       return response.data;\n     } catch (error) {\n       console.error('Error fetching test list:', error);\n       throw error;\n"
+                },
+                {
+                    "date": 1718083578826,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -101,9 +101,9 @@\n   }\n \n   async fetchCenterInfo() {\n     try {\n-      const response = await apiService.fetchData('/centers');\n+      const response = await apiService.fetchData('api/v1/lab/centers');\n       return response.data;\n     } catch (error) {\n       console.error('Error fetching center information:', error);\n       throw error;\n"
+                },
+                {
+                    "date": 1718083589480,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -101,9 +101,9 @@\n   }\n \n   async fetchCenterInfo() {\n     try {\n-      const response = await apiService.fetchData('api/v1/lab/centers');\n+      const response = await apiService.fetchData('api/v1/lab/labcenter');\n       return response.data;\n     } catch (error) {\n       console.error('Error fetching center information:', error);\n       throw error;\n"
+                },
+                {
+                    "date": 1718083596704,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -99,9 +99,9 @@\n       throw error;\n     }\n   }\n \n-  async fetchCenterInfo() {\n+  async fetchC() {\n     try {\n       const response = await apiService.fetchData('api/v1/lab/labcenter');\n       return response.data;\n     } catch (error) {\n"
+                },
+                {
+                    "date": 1718083602004,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -99,9 +99,9 @@\n       throw error;\n     }\n   }\n \n-  async fetchC() {\n+  async fetchCenters() {\n     try {\n       const response = await apiService.fetchData('api/v1/lab/labcenter');\n       return response.data;\n     } catch (error) {\n"
+                },
+                {
+                    "date": 1718083611503,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -109,8 +109,18 @@\n       throw error;\n     }\n   }\n \n+  async fetchCenters() {\n+    try {\n+      const response = await apiService.fetchData('api/v1/lab/labcenter');\n+      return response.data;\n+    } catch (error) {\n+      console.error('Error fetching center information:', error);\n+      throw error;\n+    }\n+  }\n+\n   async fetchLabProfile() {\n     try {\n       const response = await apiService.fetchData('/labprofile');\n       return response.data;\n"
+                },
+                {
+                    "date": 1718083780088,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -109,9 +109,9 @@\n       throw error;\n     }\n   }\n \n-  async fetchCenters() {\n+  async add() {\n     try {\n       const response = await apiService.fetchData('api/v1/lab/labcenter');\n       return response.data;\n     } catch (error) {\n"
+                },
+                {
+                    "date": 1718083789961,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -109,11 +109,11 @@\n       throw error;\n     }\n   }\n \n-  async add() {\n+  async addLabCenter() {\n     try {\n-      const response = await apiService.fetchData('api/v1/lab/labcenter');\n+      const response = await apiService.postData('api/v1/lab/labcenter');\n       return response.data;\n     } catch (error) {\n       console.error('Error fetching center information:', error);\n       throw error;\n"
+                },
+                {
+                    "date": 1718084169648,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -109,9 +109,9 @@\n       throw error;\n     }\n   }\n \n-  async addLabCenter() {\n+  async addLabCenter(labcenterData) {\n     try {\n       const response = await apiService.postData('api/v1/lab/labcenter');\n       return response.data;\n     } catch (error) {\n"
+                },
+                {
+                    "date": 1718084175321,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -111,9 +111,9 @@\n   }\n \n   async addLabCenter(labcenterData) {\n     try {\n-      const response = await apiService.postData('api/v1/lab/labcenter');\n+      const response = await apiService.postData('api/v1/lab/labcenter',labcenterData);\n       return response.data;\n     } catch (error) {\n       console.error('Error fetching center information:', error);\n       throw error;\n"
+                }
+            ],
+            "date": 1717908184755,
+            "name": "Commit-0",
+            "content": "// SpecificApis.js\nimport { apiService } from './ApiService';\n\nclass SpecificApis {\n  async fetchPatientList() {\n    try {\n      const response = await apiService.get('/patients');\n      return response.data;\n    } catch (error) {\n      console.error('Error fetching patient list:', error);\n      throw error;\n    }\n  }\n\n  async enterReports(reportData) {\n    try {\n      const response = await apiService.post('/reports', reportData);\n      return response.data;\n    } catch (error) {\n      console.error('Error entering reports:', error);\n      throw error;\n    }\n  }\n\n  async verifyReports() {\n    try {\n      const response = await apiService.get('/reports/verify');\n      return response.data;\n    } catch (error) {\n      console.error('Error verifying reports:', error);\n      throw error;\n    }\n  }\n\n  // Continue with other specific API functions...\n}\n\nexport const specificApis = new SpecificApis();\n"
+        }
+    ]
+}

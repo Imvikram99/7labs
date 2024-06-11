@@ -1,0 +1,90 @@
+{
+    "sourceFile": "src/app/components/InvoicePDF.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 18,
+            "patches": [
+                {
+                    "date": 1717841412860,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1717844207565,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,4 +1,5 @@\n+'use client';\n import React from 'react';\n import jsPDF from 'jspdf';\n import 'jspdf-autotable';\n \n"
+                },
+                {
+                    "date": 1717844726426,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,5 +1,6 @@\n 'use client';\n+\n import React from 'react';\n import jsPDF from 'jspdf';\n import 'jspdf-autotable';\n \n"
+                },
+                {
+                    "date": 1717844883827,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,5 @@\n 'use client';\n-\n import React from 'react';\n import jsPDF from 'jspdf';\n import 'jspdf-autotable';\n \n"
+                },
+                {
+                    "date": 1717844892108,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,5 @@\n-'use client';\n-import React from 'react';\n+'use client';import React from 'react';\n import jsPDF from 'jspdf';\n import 'jspdf-autotable';\n \n const InvoicePDF = ({ invoice }) => {\n"
+                },
+                {
+                    "date": 1717844898309,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,5 +1,6 @@\n-'use client';import React from 'react';\n+'use client';\n+import React from 'react';\n import jsPDF from 'jspdf';\n import 'jspdf-autotable';\n \n const InvoicePDF = ({ invoice }) => {\n"
+                },
+                {
+                    "date": 1717847662112,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,13 +1,14 @@\n 'use client';\n+\n import React from 'react';\n import jsPDF from 'jspdf';\n import 'jspdf-autotable';\n \n-const InvoicePDF = ({ invoice }) => {\n+const InvoicePDF = ({ customer, invoice }) => {\n   const generatePDF = () => {\n     const doc = new jsPDF();\n-    doc.text(`Invoice for ${invoice.customer.name}`, 10, 10);\n+    doc.text(`Invoice for ${customer.name}`, 10, 10);\n     doc.text(`Invoice date: ${invoice.date}`, 10, 20);\n \n     const tableData = invoice.products.map(product => [\n       product.name,\n"
+                },
+                {
+                    "date": 1717847863501,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -19,11 +19,28 @@\n       (product.quantity * product.price) * product.taxRate,\n     ]);\n \n     doc.autoTable({\n-      head: ['Product', 'Quantity', 'Price', 'Tax Rate', 'Total Price', 'Total Tax'],\n+      head: [['Product', 'Quantity', 'Price', 'Tax Rate', 'Total Price', 'Total Tax']],\n       body: tableData,\n       startY: 30,\n+      styles: {\n+        fontSize: 8,\n+        cellPadding: 2,\n+        fillColor: [255, 255, 255],\n+        textColor: [0, 0, 0],\n+        lineColor: [0, 0, 0],\n+        lineWidth: 0.1,\n+        overflow: 'linebreak',\n+        halign: 'left',\n+        valign: 'middle',\n+        fontStyle: 'normal',\n+      },\n+      headStyles: {\n+        fillColor: [200, 200, 200],\n+        textColor: [0, 0, 0],\n+        fontStyle: 'bold',\n+      },\n     });\n \n     doc.save(`invoice-${invoice.id}.pdf`);\n   };\n"
+                },
+                {
+                    "date": 1717848480594,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -6,11 +6,27 @@\n \n const InvoicePDF = ({ customer, invoice }) => {\n   const generatePDF = () => {\n     const doc = new jsPDF();\n-    doc.text(`Invoice for ${customer.name}`, 10, 10);\n-    doc.text(`Invoice date: ${invoice.date}`, 10, 20);\n \n+    // Add header\n+    doc.setFontSize(16);\n+    doc.text('Service Provider Name', 10, 10);\n+    doc.setFontSize(12);\n+    doc.text('Service Provider Address', 10, 20);\n+    doc.text('Service Provider Phone', 10, 30);\n+    doc.text('Service Provider Email', 10, 40);\n+\n+    // Add customer details\n+    doc.setFontSize(16);\n+    doc.text(`Invoice for ${customer.name}`, 140, 10);\n+    doc.setFontSize(12);\n+    doc.text(`Invoice date: ${invoice.date}`, 140, 20);\n+    doc.text(`Customer address: ${customer.address}`, 140, 30);\n+    doc.text(`Customer phone: ${customer.phone}`, 140, 40);\n+    doc.text(`Customer email: ${customer.email}`, 140, 50);\n+\n+    // Add table\n     const tableData = invoice.products.map(product => [\n       product.name,\n       product.quantity,\n       product.price,\n@@ -21,9 +37,9 @@\n \n     doc.autoTable({\n       head: [['Product', 'Quantity', 'Price', 'Tax Rate', 'Total Price', 'Total Tax']],\n       body: tableData,\n-      startY: 30,\n+      startY: 60,\n       styles: {\n         fontSize: 8,\n         cellPadding: 2,\n         fillColor: [255, 255, 255],\n@@ -41,8 +57,15 @@\n         fontStyle: 'bold',\n       },\n     });\n \n+    // Add footer\n+    const footerText = 'Return policy: ...';\n+    const footerY = doc.internal.pageSize.height - 20;\n+    const footerX = doc.internal.pageSize.width / 2;\n+    doc.setFontSize(10);\n+    doc.text(footerText, footerX, footerY, { align: 'center' });\n+\n     doc.save(`invoice-${invoice.id}.pdf`);\n   };\n \n   return <button onClick={generatePDF}>Generate PDF</button>;\n"
+                },
+                {
+                    "date": 1717848617854,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -34,11 +34,14 @@\n       product.quantity * product.price,\n       (product.quantity * product.price) * product.taxRate,\n     ]);\n \n+    const tableHeaders = [['Product', 'Quantity', 'Price', 'Tax Rate', 'Total Price', 'Total Tax']];\n+    const tableBody = [...tableHeaders, ...tableData];\n+\n     doc.autoTable({\n-      head: [['Product', 'Quantity', 'Price', 'Tax Rate', 'Total Price', 'Total Tax']],\n-      body: tableData,\n+      head: tableHeaders,\n+      body: tableBody,\n       startY: 60,\n       styles: {\n         fontSize: 8,\n         cellPadding: 2,\n@@ -55,8 +58,14 @@\n         fillColor: [200, 200, 200],\n         textColor: [0, 0, 0],\n         fontStyle: 'bold',\n       },\n+      foot: [['', '', '', '', 'Total:', invoice.products.reduce((total, product) => total + product.quantity * product.price, 0)]],\n+      footStyles: {\n+        fillColor: [200, 200, 200],\n+        textColor: [0, 0, 0],\n+        fontStyle: 'bold',\n+      },\n     });\n \n     // Add footer\n     const footerText = 'Return policy: ...';\n"
+                },
+                {
+                    "date": 1717848799696,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -17,14 +17,14 @@\n     doc.text('Service Provider Email', 10, 40);\n \n     // Add customer details\n     doc.setFontSize(16);\n-    doc.text(`Invoice for ${customer.name}`, 140, 10);\n+    doc.text('Customer Details', 10, 50);\n     doc.setFontSize(12);\n-    doc.text(`Invoice date: ${invoice.date}`, 140, 20);\n-    doc.text(`Customer address: ${customer.address}`, 140, 30);\n-    doc.text(`Customer phone: ${customer.phone}`, 140, 40);\n-    doc.text(`Customer email: ${customer.email}`, 140, 50);\n+    doc.text(`Name: ${customer.name}`, 10, 60);\n+    doc.text(`Address: ${customer.address}`, 10, 70);\n+    doc.text(`Phone: ${customer.phone}`, 10, 80);\n+    doc.text(`Email: ${customer.email}`, 10, 90);\n \n     // Add table\n     const tableData = invoice.products.map(product => [\n       product.name,\n@@ -40,9 +40,9 @@\n \n     doc.autoTable({\n       head: tableHeaders,\n       body: tableBody,\n-      startY: 60,\n+      startY: 100,\n       styles: {\n         fontSize: 8,\n         cellPadding: 2,\n         fillColor: [255, 255, 255],\n"
+                },
+                {
+                    "date": 1717850045400,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -7,25 +7,38 @@\n const InvoicePDF = ({ customer, invoice }) => {\n   const generatePDF = () => {\n     const doc = new jsPDF();\n \n-    // Add header\n+    // Add service provider logo\n+    const logo = new Image();\n+    logo.src = '/path/to/logo.png';\n+    doc.addImage(logo, 'PNG', 10, 10, 30, 30);\n+\n+    // Add service provider details\n     doc.setFontSize(16);\n-    doc.text('Service Provider Name', 10, 10);\n+    doc.text('Service Provider Name', 50, 20);\n     doc.setFontSize(12);\n-    doc.text('Service Provider Address', 10, 20);\n-    doc.text('Service Provider Phone', 10, 30);\n-    doc.text('Service Provider Email', 10, 40);\n+    doc.text('Service Provider Address', 50, 30);\n+    doc.text('Service Provider Phone', 50, 40);\n+    doc.text('Service Provider Email', 50, 50);\n \n+    // Add horizontal line below service provider details\n+    doc.setLineWidth(0.5);\n+    doc.line(10, 60, doc.internal.pageSize.width - 10, 60);\n+\n     // Add customer details\n     doc.setFontSize(16);\n-    doc.text('Customer Details', 10, 50);\n+    doc.text('Customer Details', 10, 70);\n     doc.setFontSize(12);\n-    doc.text(`Name: ${customer.name}`, 10, 60);\n-    doc.text(`Address: ${customer.address}`, 10, 70);\n-    doc.text(`Phone: ${customer.phone}`, 10, 80);\n-    doc.text(`Email: ${customer.email}`, 10, 90);\n+    doc.text(`Name: ${customer.name}`, 10, 80);\n+    doc.text(`Address: ${customer.address}`, 10, 90);\n+    doc.text(`Phone: ${customer.phone}`, 10, 100);\n+    doc.text(`Email: ${customer.email}`, 10, 110);\n \n+    // Add horizontal line below customer details\n+    doc.setLineWidth(0.5);\n+    doc.line(10, 120, doc.internal.pageSize.width - 10, 120);\n+\n     // Add table\n     const tableData = invoice.products.map(product => [\n       product.name,\n       product.quantity,\n@@ -40,9 +53,9 @@\n \n     doc.autoTable({\n       head: tableHeaders,\n       body: tableBody,\n-      startY: 100,\n+      startY: 130,\n       styles: {\n         fontSize: 8,\n         cellPadding: 2,\n         fillColor: [255, 255, 255],\n"
+                },
+                {
+                    "date": 1717850104596,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -9,9 +9,9 @@\n     const doc = new jsPDF();\n \n     // Add service provider logo\n     const logo = new Image();\n-    logo.src = '/path/to/logo.png';\n+    // logo.src = '/path/to/logo.png';\n     doc.addImage(logo, 'PNG', 10, 10, 30, 30);\n \n     // Add service provider details\n     doc.setFontSize(16);\n"
+                },
+                {
+                    "date": 1717850127622,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -10,9 +10,9 @@\n \n     // Add service provider logo\n     const logo = new Image();\n     // logo.src = '/path/to/logo.png';\n-    doc.addImage(logo, 'PNG', 10, 10, 30, 30);\n+    // doc.addImage(logo, 'PNG', 10, 10, 30, 30);\n \n     // Add service provider details\n     doc.setFontSize(16);\n     doc.text('Service Provider Name', 50, 20);\n"
+                },
+                {
+                    "date": 1717894115100,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -8,9 +8,9 @@\n   const generatePDF = () => {\n     const doc = new jsPDF();\n \n     // Add service provider logo\n-    const logo = new Image();\n+    // const logo = new Image();\n     // logo.src = '/path/to/logo.png';\n     // doc.addImage(logo, 'PNG', 10, 10, 30, 30);\n \n     // Add service provider details\n@@ -67,9 +67,9 @@\n         valign: 'middle',\n         fontStyle: 'normal',\n       },\n       headStyles: {\n-        fillColor: [200, 200, 200],\n+        fillColor: [100, 200, 200],\n         textColor: [0, 0, 0],\n         fontStyle: 'bold',\n       },\n       foot: [['', '', '', '', 'Total:', invoice.products.reduce((total, product) => total + product.quantity * product.price, 0)]],\n"
+                },
+                {
+                    "date": 1717894148880,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -67,9 +67,9 @@\n         valign: 'middle',\n         fontStyle: 'normal',\n       },\n       headStyles: {\n-        fillColor: [100, 200, 200],\n+        fillColor: [100, 400, 200],\n         textColor: [0, 0, 0],\n         fontStyle: 'bold',\n       },\n       foot: [['', '', '', '', 'Total:', invoice.products.reduce((total, product) => total + product.quantity * product.price, 0)]],\n"
+                },
+                {
+                    "date": 1717894170657,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -74,9 +74,9 @@\n       },\n       foot: [['', '', '', '', 'Total:', invoice.products.reduce((total, product) => total + product.quantity * product.price, 0)]],\n       footStyles: {\n         fillColor: [200, 200, 200],\n-        textColor: [0, 0, 0],\n+        textColor: [10, 0, 0],\n         fontStyle: 'bold',\n       },\n     });\n \n"
+                },
+                {
+                    "date": 1717894177627,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -68,15 +68,15 @@\n         fontStyle: 'normal',\n       },\n       headStyles: {\n         fillColor: [100, 400, 200],\n-        textColor: [0, 0, 0],\n+        textColor: [0, 70, 0],\n         fontStyle: 'bold',\n       },\n       foot: [['', '', '', '', 'Total:', invoice.products.reduce((total, product) => total + product.quantity * product.price, 0)]],\n       footStyles: {\n         fillColor: [200, 200, 200],\n-        textColor: [10, 0, 0],\n+        textColor: [10, 20, 0],\n         fontStyle: 'bold',\n       },\n     });\n \n"
+                },
+                {
+                    "date": 1717895636386,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -44,9 +44,9 @@\n       product.quantity,\n       product.price,\n       product.taxRate,\n       product.quantity * product.price,\n-      (product.quantity * product.price) * product.taxRate,\n+      (product.quantity * product.price) * product.taxRate ,\n     ]);\n \n     const tableHeaders = [['Product', 'Quantity', 'Price', 'Tax Rate', 'Total Price', 'Total Tax']];\n     const tableBody = [...tableHeaders, ...tableData];\n"
+                }
+            ],
+            "date": 1717841412860,
+            "name": "Commit-0",
+            "content": "import React from 'react';\nimport jsPDF from 'jspdf';\nimport 'jspdf-autotable';\n\nconst InvoicePDF = ({ invoice }) => {\n  const generatePDF = () => {\n    const doc = new jsPDF();\n    doc.text(`Invoice for ${invoice.customer.name}`, 10, 10);\n    doc.text(`Invoice date: ${invoice.date}`, 10, 20);\n\n    const tableData = invoice.products.map(product => [\n      product.name,\n      product.quantity,\n      product.price,\n      product.taxRate,\n      product.quantity * product.price,\n      (product.quantity * product.price) * product.taxRate,\n    ]);\n\n    doc.autoTable({\n      head: ['Product', 'Quantity', 'Price', 'Tax Rate', 'Total Price', 'Total Tax'],\n      body: tableData,\n      startY: 30,\n    });\n\n    doc.save(`invoice-${invoice.id}.pdf`);\n  };\n\n  return <button onClick={generatePDF}>Generate PDF</button>;\n};\n\nexport default InvoicePDF;\n"
+        }
+    ]
+}

@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/app/components/FinancialAnalysis.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1717912406043,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1717912406043,
+            "name": "Commit-0",
+            "content": "'use client';\n\nimport React, { useState, useEffect } from 'react';\nimport { specificApis } from '../data/SpecificApis'; // Import API handling class\n\nexport default function FinancialAnalysis() {\n  const [financialData, setFinancialData] = useState([]);\n  const [loading, setLoading] = useState(true);\n\n  useEffect(() => {\n    async function fetchFinancialData() {\n      try {\n        const fetchedData = await specificApis.analyzeFinances();\n        setFinancialData(fetchedData);\n        setLoading(false);\n      } catch (error) {\n        console.error('Failed to analyze finances:', error);\n        setLoading(false);\n      }\n    }\n\n    fetchFinancialData();\n  }, []);\n\n  return (\n    <main className=\"flex min-h-screen flex-col items-center justify-center bg-gray-100 w-full\">\n      <div className=\"bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 w-full max-w-4xl\">\n        <h1 className=\"text-xl font-bold text-gray-700 mb-4\">Financial Analysis</h1>\n        {loading ? (\n          <div>Loading...</div>\n        ) : (\n          <table className=\"table-auto w-full\">\n            <thead>\n              <tr className=\"bg-gray-200\">\n                <th className=\"px-4 py-2 text-left text-gray-600\">Month</th>\n                <th className=\"px-4 py-2 text-left text-gray-600\">Revenue</th>\n                <th className=\"px-4 py-2 text-left text-gray-600\">Expenses</th>\n                <th className=\"px-4 py-2 text-left text-gray-600\">Profit</th>\n              </tr>\n            </thead>\n            <tbody>\n              {financialData.map((item, index) => (\n                <tr key={index} className=\"bg-gray-50 hover:bg-gray-100\">\n                  <td className=\"border px-4 py-2\">{item.month}</td>\n                  <td className=\"border px-4 py-2\">{item.revenue}</td>\n                  <td className=\"border px-4 py-2\">{item.expenses}</td>\n                  <td className=\"border px-4 py-2\">{item.profit}</td>\n                </tr>\n              ))}\n            </tbody>\n          </table>\n        )}\n      </div>\n    </main>\n  );\n}\n"
+        }
+    ]
+}

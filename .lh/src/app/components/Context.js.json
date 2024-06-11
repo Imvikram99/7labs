@@ -1,0 +1,22 @@
+{
+    "sourceFile": "src/app/components/Context.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1718026099544,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1718026105006,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -4,4 +4,41 @@\n const FormDataContext = createContext();\n \n // Custom hook to use the context\n export const useFormData = () => useContext(FormDataContext);\n+export const FormDataProvider = ({ children }) => {\n+    const [formData, setFormData] = useState({\n+      // Initial form data structure\n+      patientId: '',\n+      designation: '',\n+      firstName: '',\n+      lastName: '',\n+      phone: '',\n+      gender: '',\n+      email: '',\n+      addressLine1: '',\n+      addressLine2: '',\n+      addressLine3: '',\n+      pincode: '',\n+      age: '',\n+      ageType: 'Years',\n+      sampleCollector: '',\n+      organisation: '',\n+      sampleCollectedAt: '',\n+      referralType: '',\n+      doctorHospitalName: '',\n+      degree: '',\n+      complements: '',\n+      searchQuery: '',\n+    });\n+  \n+    const updateFormData = (newData) => {\n+      setFormData(prev => ({ ...prev, ...newData }));\n+    };\n+  \n+    return (\n+      <FormDataContext.Provider value={{ formData, updateFormData }}>\n+        {children}\n+      </FormDataContext.Provider>\n+    );\n+  };\n+  \n\\ No newline at end of file\n"
+                }
+            ],
+            "date": 1718026099544,
+            "name": "Commit-0",
+            "content": "import React, { createContext, useContext, useState } from 'react';\n\n// Creating the context\nconst FormDataContext = createContext();\n\n// Custom hook to use the context\nexport const useFormData = () => useContext(FormDataContext);\n"
+        }
+    ]
+}

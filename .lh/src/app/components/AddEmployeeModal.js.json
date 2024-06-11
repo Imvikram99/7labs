@@ -1,0 +1,26 @@
+{
+    "sourceFile": "src/app/components/AddEmployeeModal.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 2,
+            "patches": [
+                {
+                    "date": 1718037584011,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1718038060070,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -5,9 +5,15 @@\n     firstName: '',\n     lastName: '',\n     email: '',\n     phone: '',\n-    designation: ''\n+    designation: '',\n+    addressLine1: '',\n+    addressLine2: '',\n+    addressLine3: '',\n+    pincode: '',\n+    dob: '',\n+    joiningDate: ''\n   });\n \n   const handleChange = (e) => {\n     setFormData({ ...formData, [e.target.name]: e.target.value });\n@@ -24,13 +30,20 @@\n     <div className=\"fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center p-4\">\n       <div className=\"bg-white rounded-lg p-6\">\n         <h2 className=\"text-xl font-bold\">Add New Employee</h2>\n         <form onSubmit={handleSubmit}>\n+          {/* Include form inputs for all fields */}\n           <input type=\"text\" name=\"firstName\" value={formData.firstName} onChange={handleChange} placeholder=\"First Name\" required />\n           <input type=\"text\" name=\"lastName\" value={formData.lastName} onChange={handleChange} placeholder=\"Last Name\" required />\n           <input type=\"email\" name=\"email\" value={formData.email} onChange={handleChange} placeholder=\"Email\" required />\n           <input type=\"text\" name=\"phone\" value={formData.phone} onChange={handleChange} placeholder=\"Phone\" required />\n           <input type=\"text\" name=\"designation\" value={formData.designation} onChange={handleChange} placeholder=\"Designation\" required />\n+          <input type=\"text\" name=\"addressLine1\" value={formData.addressLine1} onChange={handleChange} placeholder=\"Address Line 1\" />\n+          <input type=\"text\" name=\"addressLine2\" value={formData.addressLine2} onChange={handleChange} placeholder=\"Address Line 2\" />\n+          <input type=\"text\" name=\"addressLine3\" value={formData.addressLine3} onChange={handleChange} placeholder=\"Address Line 3\" />\n+          <input type=\"text\" name=\"pincode\" value={formData.pincode} onChange={handleChange} placeholder=\"Pincode\" />\n+          <input type=\"date\" name=\"dob\" value={formData.dob} onChange={handleChange} placeholder=\"Date of Birth\" />\n+          <input type=\"date\" name=\"joiningDate\" value={formData.joiningDate} onChange={handleChange} placeholder=\"Joining Date\" />\n           <button type=\"submit\" className=\"bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded\">Save</button>\n           <button onClick={onClose} className=\"bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded ml-2\">Cancel</button>\n         </form>\n       </div>\n"
+                },
+                {
+                    "date": 1718038523094,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -49,4 +49,5 @@\n       </div>\n     </div>\n   );\n }\n+export default AddEmployeeModal;\n\\ No newline at end of file\n"
+                }
+            ],
+            "date": 1718037584011,
+            "name": "Commit-0",
+            "content": "import React, { useState } from 'react';\n\nfunction AddEmployeeModal({ isOpen, onClose, onSave }) {\n  const [formData, setFormData] = useState({\n    firstName: '',\n    lastName: '',\n    email: '',\n    phone: '',\n    designation: ''\n  });\n\n  const handleChange = (e) => {\n    setFormData({ ...formData, [e.target.name]: e.target.value });\n  };\n\n  const handleSubmit = async (e) => {\n    e.preventDefault();\n    onSave(formData);\n  };\n\n  if (!isOpen) return null;\n\n  return (\n    <div className=\"fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center p-4\">\n      <div className=\"bg-white rounded-lg p-6\">\n        <h2 className=\"text-xl font-bold\">Add New Employee</h2>\n        <form onSubmit={handleSubmit}>\n          <input type=\"text\" name=\"firstName\" value={formData.firstName} onChange={handleChange} placeholder=\"First Name\" required />\n          <input type=\"text\" name=\"lastName\" value={formData.lastName} onChange={handleChange} placeholder=\"Last Name\" required />\n          <input type=\"email\" name=\"email\" value={formData.email} onChange={handleChange} placeholder=\"Email\" required />\n          <input type=\"text\" name=\"phone\" value={formData.phone} onChange={handleChange} placeholder=\"Phone\" required />\n          <input type=\"text\" name=\"designation\" value={formData.designation} onChange={handleChange} placeholder=\"Designation\" required />\n          <button type=\"submit\" className=\"bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded\">Save</button>\n          <button onClick={onClose} className=\"bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded ml-2\">Cancel</button>\n        </form>\n      </div>\n    </div>\n  );\n}\n"
+        }
+    ]
+}

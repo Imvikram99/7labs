@@ -1,0 +1,38 @@
+{
+    "sourceFile": "src/app/data/ApiService.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 5,
+            "patches": [
+                {
+                    "date": 1717907811455,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1717998166825,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -3,9 +3,9 @@\n import axios from 'axios';\n \n class ApiService {\n   constructor() {\n-    const apiKey = \"Your_Api_Key_Here\"; // Set your API key\n+    const apiKey = \"test123\"; // Set your API key\n     const tenantId = \"Your_Tenant_Id_Here\"; // Set your tenant ID\n \n     // Create an Axios instance\n     this.client = axios.create({\n"
+                },
+                {
+                    "date": 1717998180436,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -4,9 +4,9 @@\n \n class ApiService {\n   constructor() {\n     const apiKey = \"test123\"; // Set your API key\n-    const tenantId = \"Your_Tenant_Id_Here\"; // Set your tenant ID\n+    const tenantId = \"Your_Tenat_Id_Here\"; // Set your tenant ID\n \n     // Create an Axios instance\n     this.client = axios.create({\n       baseURL: 'https://api.example.com', // Set the base URL for all requests\n"
+                },
+                {
+                    "date": 1717998191008,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -4,13 +4,13 @@\n \n class ApiService {\n   constructor() {\n     const apiKey = \"test123\"; // Set your API key\n-    const tenantId = \"Your_Tenat_Id_Here\"; // Set your tenant ID\n+    const tenantId = \"PYTHONMAN\"; // Set your tenant ID\n \n     // Create an Axios instance\n     this.client = axios.create({\n-      baseURL: 'https://api.example.com', // Set the base URL for all requests\n+      baseURL: 'http://api.example.com', // Set the base URL for all requests\n       headers: {\n         'Content-Type': 'application/json',\n         'X-API-KEY': apiKey,\n         'Tenant-ID': tenantId,\n"
+                },
+                {
+                    "date": 1717998201912,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -8,9 +8,9 @@\n     const tenantId = \"PYTHONMAN\"; // Set your tenant ID\n \n     // Create an Axios instance\n     this.client = axios.create({\n-      baseURL: 'http://api.example.com', // Set the base URL for all requests\n+      baseURL: 'http://localhost:8080', // Set the base URL for all requests\n       headers: {\n         'Content-Type': 'application/json',\n         'X-API-KEY': apiKey,\n         'Tenant-ID': tenantId,\n"
+                },
+                {
+                    "date": 1718000629347,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -12,9 +12,9 @@\n       baseURL: 'http://localhost:8080', // Set the base URL for all requests\n       headers: {\n         'Content-Type': 'application/json',\n         'X-API-KEY': apiKey,\n-        'Tenant-ID': tenantId,\n+        'X-PARTNER-ID': tenantId,\n       }\n     });\n \n     // Set up response and request interceptors if needed\n"
+                }
+            ],
+            "date": 1717907811455,
+            "name": "Commit-0",
+            "content": "// API.js - Axios setup for all API calls with common headers.\n\nimport axios from 'axios';\n\nclass ApiService {\n  constructor() {\n    const apiKey = \"Your_Api_Key_Here\"; // Set your API key\n    const tenantId = \"Your_Tenant_Id_Here\"; // Set your tenant ID\n\n    // Create an Axios instance\n    this.client = axios.create({\n      baseURL: 'https://api.example.com', // Set the base URL for all requests\n      headers: {\n        'Content-Type': 'application/json',\n        'X-API-KEY': apiKey,\n        'Tenant-ID': tenantId,\n      }\n    });\n\n    // Set up response and request interceptors if needed\n    this.client.interceptors.response.use(this.handleSuccess, this.handleError);\n    this.client.interceptors.request.use(request => {\n      // You can modify the request here (e.g., append additional headers)\n      return request;\n    });\n  }\n\n  handleSuccess(response) {\n    return response;\n  }\n\n  handleError(error) {\n    // Handle errors (e.g., logging or sending error reports to a service)\n    return Promise.reject(error);\n  }\n\n  fetchData(url) {\n    return this.client.get(url);\n  }\n\n  postData(url, data) {\n    return this.client.post(url, data);\n  }\n}\n\nexport const apiService = new ApiService(); // Export an instance to be used across the application\n"
+        }
+    ]
+}
