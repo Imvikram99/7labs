@@ -9,7 +9,7 @@ class ApiService {
 
     // Create an Axios instance
     this.client = axios.create({
-      baseURL: 'http://ec2-13-233-207-62.ap-south-1.compute.amazonaws.com:8080', // Set the base URL for all requests
+      baseURL: 'https://lb1.apipulse.dev', // Set the base URL for all requests
       headers: {
         'Content-Type': 'application/json',
         'X-API-KEY': apiKey,
