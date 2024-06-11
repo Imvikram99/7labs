@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 122,
+            "activePatchIndex": 123,
             "patches": [
                 {
                     "date": 1717858570283,
@@ -496,6 +496,10 @@
                 {
                     "date": 1718026270832,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -21,9 +21,9 @@\n   FiBell,\n   FiUserPlus,\n   FiFilePlus,\n } from 'react-icons/fi';\n-import { useFormData } from './c'\n+import { useFormData } from './context'\n \n import PatientList from './PatientList';\n import VerifyReports from './VerifyReports';\n import FinancialAnalysis from './FinancialAnalysis';\n@@ -37,8 +37,9 @@\n \n export default function SidebarWithHeader() {\n   const { isOpen, onOpen, onClose } = useDisclosure();\n   const [activeComponent, setActiveComponent] = useState(null);\n+  const { formData, updateFormData } = useFormData();\n \n   useEffect(() => {\n     setActiveComponent(components['Create New Bill'])\n   }, []);\n"
+                },
+                {
+                    "date": 1718091301224,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -34,9 +34,9 @@\n import LabProfile from './LabProfile';\n import NewBill from './NewBill';\n import RegisterCustomer from './RegisterCustomer';\n \n-export default function SidebarWithHeader() {\n+export default function SidebarWithHeader({ children }) {\n   const { isOpen, onOpen, onClose } = useDisclosure();\n   const [activeComponent, setActiveComponent] = useState(null);\n   const { formData, updateFormData } = useFormData();\n \n"
                 }
             ],
             "date": 1717858570283,
