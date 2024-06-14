@@ -86,6 +86,7 @@ const InvoicePDF = ({ customer, invoice }) => {
     const footerX = doc.internal.pageSize.width / 2;
     doc.setFontSize(10);
     doc.text(footerText, footerX, footerY, { align: 'center' });
+    doc
     doc.save(`invoice-${invoice.id}.pdf`);
   };
 

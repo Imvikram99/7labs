@@ -10,7 +10,7 @@ const InvoicePDF = ({ customer, invoice }) => {
 
     // Add service provider logo
     const logo = new Image();
-    logo.src = 'https://dummyimage.com/300.png/09f/fff';
+    logo.src = '/path/to/logo.png';
     doc.addImage(logo, 'PNG', 10, 10, 30, 30);
 
     // Add service provider details
@@ -86,6 +86,7 @@ const InvoicePDF = ({ customer, invoice }) => {
     const footerX = doc.internal.pageSize.width / 2;
     doc.setFontSize(10);
     doc.text(footerText, footerX, footerY, { align: 'center' });
+
     doc.save(`invoice-${invoice.id}.pdf`);
   };
 

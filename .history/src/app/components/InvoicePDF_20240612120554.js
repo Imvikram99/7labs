@@ -9,9 +9,9 @@ const InvoicePDF = ({ customer, invoice }) => {
     const doc = new jsPDF();
 
     // Add service provider logo
-    const logo = new Image();
-    logo.src = 'https://dummyimage.com/300.png/09f/fff';
-    doc.addImage(logo, 'PNG', 10, 10, 30, 30);
+    // const logo = new Image();
+    // logo.src = '/path/to/logo.png';
+    // doc.addImage(logo, 'PNG', 10, 10, 30, 30);
 
     // Add service provider details
     doc.setFontSize(16);
@@ -33,7 +33,7 @@ const InvoicePDF = ({ customer, invoice }) => {
     doc.text(`Address: ${customer.address}`, 10, 90);
     doc.text(`Phone: ${customer.phone}`, 10, 100);
     doc.text(`Email: ${customer.email}`, 10, 110);
-    
+    doc.
     // Add horizontal line below customer details
     doc.setLineWidth(0.5);
     doc.line(10, 120, doc.internal.pageSize.width - 10, 120);
@@ -86,6 +86,7 @@ const InvoicePDF = ({ customer, invoice }) => {
     const footerX = doc.internal.pageSize.width / 2;
     doc.setFontSize(10);
     doc.text(footerText, footerX, footerY, { align: 'center' });
+
     doc.save(`invoice-${invoice.id}.pdf`);
   };
 

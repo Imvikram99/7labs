@@ -5,14 +5,28 @@ import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 
 const InvoicePDF = ({ customer, invoice }) => {
-  const generatePDF = () => {
+  const generatePDF = async () => {
     const doc = new jsPDF();
 
-    // Add service provider logo
-    const logo = new Image();
-    logo.src = 'https://dummyimage.com/300.png/09f/fff';
-    doc.addImage(logo, 'PNG', 10, 10, 30, 30);
+    // Fetch and add an online image
+    const imageURL = 'https://commondatastorage.googleapis.com/codeskulptor-assets/lathrop/asteroid_blend.png';
+    const image = await fetch(imageURL);
+    const imageBlob = await image.blob();
+    const reader = new FileReader();
+    reader.readAsDataURL(imageBarb);
+    reader.onloadend = () => {
+      const base64data = reader.result;
 
+      // Add image to PDF
+      doc.addImage(base64data, 'PNG', 10, 10, 30, 30);
+
+      // Continue adding other elements to the PDF after the image
+      addPDFContent(doc);
+      doc.save(`invoice-${invoice.id}.pdf`);
+    };
+  };
+
+  const addPDFContent = (doc) => {
     // Add service provider details
     doc.setFontSize(16);
     doc.text('Service Provider Name', 50, 20);
@@ -33,7 +47,7 @@ const InvoicePDF = ({ customer, invoice }) => {
     doc.text(`Address: ${customer.address}`, 10, 90);
     doc.text(`Phone: ${customer.phone}`, 10, 100);
     doc.text(`Email: ${customer.email}`, 10, 110);
-    
+
     // Add horizontal line below customer details
     doc.setLineWidth(0.5);
     doc.line(10, 120, doc.internal.pageSize.width - 10, 120);
@@ -45,7 +59,7 @@ const InvoicePDF = ({ customer, invoice }) => {
       product.price,
       product.taxRate,
       product.quantity * product.price,
-      (product.quantity * product.price) * product.taxRate / 100,
+      (product.quantity * product.price) * product.taxMode / 100,
     ]);
 
     const tableHeaders = [['Product', 'Quantity', 'Price', 'Tax Rate', 'Total Price', 'Total Tax']];
@@ -68,15 +82,15 @@ const InvoicePDF = ({ customer, invoice }) => {
         fontStyle: 'normal',
       },
       headStyles: {
-        fillColor: [100, 400, 200],
-        textColor: [0, 70, 0],
+        fillColor: [100, 100, 100],
+        textColor: [0, 0, 0],
         fontStyle: 'bold',
       },
       foot: [['', '', '', '', 'Total:', invoice.products.reduce((total, product) => total + product.quantity * product.price, 0)]],
       footStyles: {
-        fillColor: [200, 200, 200],
-        textColor: [10, 20, 0],
-        fontStyle: 'bold',
+          fillColor: [200, 200, 200],
+          textColor: [0, 0, 0],
+          fontStyle: 'bold',
       },
     });
 
@@ -86,10 +100,9 @@ const InvoicePDF = ({ customer, invoice }) => {
     const footerX = doc.internal.pageSize.width / 2;
     doc.setFontSize(10);
     doc.text(footerText, footerX, footerY, { align: 'center' });
-    doc.save(`invoice-${invoice.id}.pdf`);
   };
 
   return <button onClick={generatePDF}>Generate PDF</button>;
 };
 
-export default InvoicePDF;
+export  default InvoicePDF;
