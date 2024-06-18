@@ -132,7 +132,7 @@ class SpecificApis {
 
   async getBookings(date, centerCode) {
     try {
-      const response = await apiService.fetchData(`api/v1/lab/bookings?date=${encodeURIComponent(date)}&centerCode=${encodeURIComponent(centerCode)}`);
+      const response = await apiService.fetchData(`api/v1/lab//bookings?date=${encodeURIComponent(date)}&centerCode=${encodeURIComponent(centerCode)}`);
       return response.data;
     } catch (error) {
       console.error('Error fetching bookings:', error);
@@ -142,7 +142,7 @@ class SpecificApis {
 
   async createBooking(bookingSlipRequest, updatePatient) {
     try {
-      const response = await apiService.postData('api/v1/lab/bookings', bookingSlipRequest, {
+      const response = await apiService.postData('/bookings', bookingSlipRequest, {
         params: { updatePatient }
       });
       return response.data;
@@ -154,7 +154,7 @@ class SpecificApis {
 
   async updateTestResult(receiptId, testId, updatedTestReport) {
     try {
-      const response = await apiService.putData(`api/v1/lab/bookings/${receiptId}/tests/${testId}`, updatedTestReport);
+      const response = await apiService.putData(`/bookings/${receiptId}/tests/${testId}`, updatedTestReport);
       return response.data;
     } catch (error) {
       console.error('Error updating test result:', error);

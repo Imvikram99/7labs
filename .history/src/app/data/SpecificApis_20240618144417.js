@@ -129,41 +129,18 @@ class SpecificApis {
       throw error;
     }
   }
-
-  async getBookings(date, centerCode) {
+  async fetchBookings = async () => {
+    setLoading(true);
     try {
-      const response = await apiService.fetchData(`api/v1/lab/bookings?date=${encodeURIComponent(date)}&centerCode=${encodeURIComponent(centerCode)}`);
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching bookings:', error);
-      throw error;
+        const data = await specificApis.fetchData(`/bookings?date=${encodeURIComponent(date)}&centerCode=${encodeURIComponent(centerCode)}`);
+        setBookings(data);
+    } catch (err) {
+        setError('Failed to fetch bookings');
+        console.error(err);
+    } finally {
+        setLoading(false);
     }
-  }
-
-  async createBooking(bookingSlipRequest, updatePatient) {
-    try {
-      const response = await apiService.postData('api/v1/lab/bookings', bookingSlipRequest, {
-        params: { updatePatient }
-      });
-      return response.data;
-    } catch (error) {
-              console.error('Error creating booking:', error);
-      throw error;
-    }
-  }
-
-  async updateTestResult(receiptId, testId, updatedTestReport) {
-    try {
-      const response = await apiService.putData(`api/v1/lab/bookings/${receiptId}/tests/${testId}`, updatedTestReport);
-      return response.data;
-    } catch (error) {
-      console.error('Error updating test result:', error);
-      throw error;
-    }
-  }
-  
+};
 }
-
-
 
 export const specificApis = new SpecificApis();

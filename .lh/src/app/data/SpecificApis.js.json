@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 42,
+            "activePatchIndex": 43,
             "patches": [
                 {
                     "date": 1717908184755,
@@ -176,6 +176,10 @@
                 {
                     "date": 1718084175321,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -111,9 +111,9 @@\n   }\n \n   async addLabCenter(labcenterData) {\n     try {\n-      const response = await apiService.postData('api/v1/lab/labcenter');\n+      const response = await apiService.postData('api/v1/lab/labcenter',labcenterData);\n       return response.data;\n     } catch (error) {\n       console.error('Error fetching center information:', error);\n       throw error;\n"
+                },
+                {
+                    "date": 1718702051845,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -128,8 +128,19 @@\n       console.error('Error fetching lab profile:', error);\n       throw error;\n     }\n   }\n-  \n+  const fetchBookings = async () => {\n+    setLoading(true);\n+    try {\n+        const data = await specificApis.fetchData(`/bookings?date=${encodeURIComponent(date)}&centerCode=${encodeURIComponent(centerCode)}`);\n+        setBookings(data);\n+    } catch (err) {\n+        setError('Failed to fetch bookings');\n+        console.error(err);\n+    } finally {\n+        setLoading(false);\n+    }\n+};\n }\n \n export const specificApis = new SpecificApis();\n"
                 }
             ],
             "date": 1717908184755,
