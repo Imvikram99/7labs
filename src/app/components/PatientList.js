@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import { specificApis } from '../data/SpecificApis'; // Import API handling class
+import React, { useState, useEffect } from "react";
+import { specificApis } from "../data/SpecificApis"; // Import API handling class
 
 export default function PatientList() {
   const [patients, setPatients] = useState([]);
@@ -11,10 +11,11 @@ export default function PatientList() {
     async function fetchPatients() {
       try {
         const fetchedPatients = await specificApis.fetchPatientList();
+        console.log(fetchedPatients, "fetchedPatients");
         setPatients(fetchedPatients);
         setLoading(false);
       } catch (error) {
-        console.error('Failed to fetch patients:', error);
+        console.error("Failed to fetch patients:", error);
         setLoading(false);
       }
     }
@@ -38,13 +39,14 @@ export default function PatientList() {
               </tr>
             </thead>
             <tbody>
-              {patients.map((patient, index) => (
-                <tr key={index} className="bg-gray-50 hover:bg-gray-100">
-                  <td className="border px-4 py-2">{patient.name}</td>
-                  <td className="border px-4 py-2">{patient.dob}</td>
-                  <td className="border px-4 py-2">{patient.address}</td>
-                </tr>
-              ))}
+              {patients.length > 0 &&
+                patients?.map((patient, index) => (
+                  <tr key={index} className="bg-gray-50 hover:bg-gray-100">
+                    <td className="border px-4 py-2">{patient.name}</td>
+                    <td className="border px-4 py-2">{patient.dob}</td>
+                    <td className="border px-4 py-2">{patient.address}</td>
+                  </tr>
+                ))}
             </tbody>
           </table>
         )}
