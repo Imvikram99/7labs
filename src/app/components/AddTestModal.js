@@ -21,7 +21,7 @@ function AddTestModal({ isOpen, onClose, onSave }) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-pink-500 bg-opacity-50 flex justify-center items-center">
+    <div className="fixed inset-0  bg-opacity-50 flex justify-center items-center">
       <div className="bg-white p-5 rounded-lg shadow-lg w-full max-w-md">
         <h2 className="text-xl font-bold text-gray-700 mb-4">Add New Test</h2>
         <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
