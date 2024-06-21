@@ -30,7 +30,7 @@ const Report = () => {
         singleReferenceValues: {
           singleReferenceValueId: "",
           code: "",
-          allPossibleValues: [],
+          allPossibleValues: ["Low", "Normal", "High"],
           referenceValue: "",
           unit: "",
         },
@@ -56,7 +56,7 @@ const Report = () => {
             singleReferenceValues: {
               singleReferenceValueId: "",
               code: "",
-              allPossibleValues: [],
+              allPossibleValues: ["Low", "Normal", "High"],
               referenceValue: "",
               unit: "",
             },
@@ -72,10 +72,16 @@ const Report = () => {
     cost: "",
   });
 
-  const handleInputChange = (e, index, subIndex = null, path = "", level = "main") => {
+  const handleInputChange = (
+    e,
+    index,
+    subIndex = null,
+    path = "",
+    level = "main"
+  ) => {
     const { name, value } = e.target;
     const updatedTests = [...formData.tests];
-  
+
     if (level === "main") {
       if (path === "referenceValues" && subIndex !== null) {
         if (!updatedTests[index].referenceValues) {
@@ -86,8 +92,10 @@ const Report = () => {
             testResultUnit: { name: "" },
           };
         }
-        if (name === "testResultUnit.name") {
-          updatedTests[index].referenceValues[subIndex].testResultUnit.name = value;
+        if (name === "testResultUnit") {
+          updatedTests[index].referenceValues[subIndex].testResultUnit = {
+            name: value,
+          };
         } else {
           updatedTests[index].referenceValues[subIndex][name] = value;
         }
@@ -118,19 +126,21 @@ const Report = () => {
             testResultUnit: { name: "" },
           };
         }
-        if (name === "testResultUnit.name") {
-          updatedTests[index].subTests[subIndex].referenceValues[0].testResultUnit.name = value;
+        if (name === "testResultUnit") {
+          updatedTests[index].subTests[
+            subIndex
+          ].referenceValues[0].testResultUnit = { name: value };
         } else {
-          updatedTests[index].subTests[subIndex].referenceValues[0][name] = value;
+          updatedTests[index].subTests[subIndex].referenceValues[0][name] =
+            value;
         }
       } else {
         updatedTests[index].subTests[subIndex][name] = value;
       }
     }
-  
+
     setFormData({ ...formData, tests: updatedTests });
   };
-  
 
   // Handle form submission
   const handleFormSubmit = async (e) => {
@@ -428,7 +438,7 @@ const Report = () => {
                 />
               </div>
 
-              <div>
+              {/* <div>
                 <label className="block text-sm font-medium text-gray-700">
                   Single Reference Values - Possible Values
                 </label>
@@ -436,12 +446,12 @@ const Report = () => {
                   type="text"
                   name="allPossibleValues"
                   value={test.singleReferenceValues.allPossibleValues}
-                  onChange={(e) =>
-                    handleInputChange(e, index, 0, "singleReferenceValues")
-                  }
+                  // onChange={(e) =>
+                  //   handleInputChange(e, index, 0, "singleReferenceValues")
+                  // }
                   className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2"
                 />
-              </div>
+              </div> */}
             </div>
 
             {test.referenceValues.map((refVal, subIndex) => (
@@ -534,7 +544,7 @@ const Report = () => {
                     </label>
                     <input
                       type="text"
-                      name="testResultUnit.name"
+                      name="testResultUnit"
                       value={refVal.testResultUnit.name}
                       onChange={(e) =>
                         handleInputChange(e, index, subIndex, "referenceValues")
@@ -722,7 +732,7 @@ const Report = () => {
                           </label>
                           <input
                             type="text"
-                            name="testResultUnit.name"
+                            name="testResultUnit"
                             value={subRefVal.testResultUnit.name}
                             onChange={(e) =>
                               handleInputChange(
