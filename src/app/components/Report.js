@@ -1,7 +1,63 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 const Report = () => {
+  const arr = ["BLOOD", "URINE", "STOOL", "RADIO"];
+  const testResultTypeArr = [
+    "SINGLE_PARAMETER",
+    "BLOOD_MULTIPLE_PARAMETER",
+    "MULTIPLE_NESTED_PARAMETER",
+    "DOCUMENT",
+    "MATRIX",
+  ];
+  const [testPanelData, setTestPanelData] = useState(null);
+  const [testUnitData, setTestUnitData] = useState(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const panelResponse = await fetch(
+          "http://ec2-13-233-207-62.ap-south-1.compute.amazonaws.com:8080/api/v1/lab/testpanel",
+          {
+            method: "GET",
+            headers: {
+              "X-API-KEY": "test123",
+              "X-PARTNER-ID": "PYTHONMAN2",
+              "Content-Type": "application/json",
+            },
+            // body: JSON.stringify({
+            //   name: 'testcategory'
+            // })
+          }
+        );
+        const panelData = await panelResponse.json();
+        setTestPanelData(panelData);
+
+        const unitResponse = await fetch(
+          "http://ec2-13-233-207-62.ap-south-1.compute.amazonaws.com:8080/api/v1/lab/testpanel/testunit",
+          {
+            method: "GET",
+            headers: {
+              "X-API-KEY": "test123",
+              "X-PARTNER-ID": "PYTHONMAN2",
+              "Content-Type": "application/json",
+            },
+            // body: JSON.stringify({
+            //   name: 'testcategory'
+            // })
+          }
+        );
+        const unitData = await unitResponse.json();
+        setTestUnitData(unitData);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  console.log(testUnitData, testPanelData, "dataaaaa");
   const [formData, setFormData] = useState({
     name: "",
     shortName: "",
@@ -164,6 +220,53 @@ const Report = () => {
   };
 
   // Add a new test
+  // const addTest = () => {
+  //   setFormData({
+  //     ...formData,
+  //     tests: [
+  //       ...formData.tests,
+  //       {
+  //         id: "",
+  //         name: "",
+  //         code: "",
+  //         referenceValues: [
+  //           {
+  //             minAge: "",
+  //             maxAge: "",
+  //             gender: "",
+  //             minReferenceValue: "",
+  //             maxReferenceValue: "",
+  //             unit: "",
+  //           },
+  //         ],
+  //         singleReferenceValues: {
+  //           code: "",
+  //           allPossibleValues: "",
+  //           referenceValue: "",
+  //           unit: "",
+  //         },
+  //         referenceValueType: "",
+  //         subTests: [
+  //           {
+  //             id: "",
+  //             name: "",
+  //             code: "",
+  //             referenceValues: [
+  //               {
+  //                 minAge: "",
+  //                 maxAge: "",
+  //                 gender: "",
+  //                 minReferenceValue: "",
+  //                 maxReferenceValue: "",
+  //                 testResultUnit: { name: "" },
+  //               },
+  //             ],
+  //           },
+  //         ],
+  //       },
+  //     ],
+  //   });
+  // };
   const addTest = () => {
     setFormData({
       ...formData,
@@ -180,7 +283,7 @@ const Report = () => {
               gender: "",
               minReferenceValue: "",
               maxReferenceValue: "",
-              unit: "",
+              testResultUnit: { name: "" }, // Initialize testResultUnit with an empty object that has a name property
             },
           ],
           singleReferenceValues: {
@@ -202,7 +305,7 @@ const Report = () => {
                   gender: "",
                   minReferenceValue: "",
                   maxReferenceValue: "",
-                  testResultUnit: { name: "" },
+                  testResultUnit: { name: "" }, // Initialize testResultUnit with an empty object that has a name property
                 },
               ],
             },
@@ -232,7 +335,7 @@ const Report = () => {
           gender: "",
           minReferenceValue: "",
           maxReferenceValue: "",
-          unit: "",
+          testResultUnit: { name: "" }, // Initialize testResultUnit with an empty object that has a name property
         },
       ],
     });
@@ -247,6 +350,7 @@ const Report = () => {
     );
     setFormData({ ...formData, tests: updatedTests });
   };
+  console.log(formData, "abccc");
 
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg">
@@ -312,7 +416,7 @@ const Report = () => {
             <label className="block text-sm font-medium text-gray-700">
               Test Sample Type
             </label>
-            <input
+            {/* <input
               type="text"
               name="testSampleType"
               value={formData.testSampleType}
@@ -320,14 +424,29 @@ const Report = () => {
                 setFormData({ ...formData, testSampleType: e.target.value })
               }
               className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2"
-            />
+            /> */}
+            <select
+              name=""
+              id=""
+              onChange={(e) => {
+                setFormData({ ...formData, testSampleType: e.target.value });
+              }}
+              className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2"
+            >
+              <option value="" disabled selected>
+                Select Sample Type
+              </option>
+              {arr.map((item) => (
+                <option value={item}>{item}</option>
+              ))}
+            </select>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Test Panel Code
             </label>
-            <input
+            {/* <input
               type="text"
               name="testPanelCode"
               value={formData.testPanelCode}
@@ -335,7 +454,22 @@ const Report = () => {
                 setFormData({ ...formData, testPanelCode: e.target.value })
               }
               className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2"
-            />
+            /> */}
+            <select
+              name=""
+              id=""
+              onChange={(e) =>
+                setFormData({ ...formData, testPanelCode: e.target.value })
+              }
+              className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2"
+            >
+              <option value="" disabled selected>
+                Select Pannel Code
+              </option>
+              {testPanelData?.map((item) => (
+                <option value={item.testPanelCode}>{item.testPanelCode}</option>
+              ))}
+            </select>
           </div>
         </div>
 
@@ -380,63 +514,83 @@ const Report = () => {
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Reference Value Type
-                </label>
-                <input
-                  type="text"
-                  name="referenceValueType"
-                  value={test.referenceValueType}
-                  onChange={(e) => handleInputChange(e, index)}
-                  className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2"
-                />
-              </div>
+              {formData.tests[index] ===
+                formData.tests[formData.tests.length - 1] && (
+                <>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Reference Value Type
+                    </label>
+                    <input
+                      type="text"
+                      name="referenceValueType"
+                      value={test.referenceValueType}
+                      onChange={(e) => handleInputChange(e, index)}
+                      className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2"
+                    />
+                  </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Single Reference Values - Code
-                </label>
-                <input
-                  type="text"
-                  name="code"
-                  value={test.singleReferenceValues.code}
-                  onChange={(e) =>
-                    handleInputChange(e, index, 0, "singleReferenceValues")
-                  }
-                  className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2"
-                />
-              </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Single Reference Values - Code
+                    </label>
+                    <input
+                      type="text"
+                      name="code"
+                      value={test.singleReferenceValues.code}
+                      onChange={(e) =>
+                        handleInputChange(e, index, 0, "singleReferenceValues")
+                      }
+                      className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2"
+                    />
+                  </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Single Reference Values - Reference Value
-                </label>
-                <input
-                  type="text"
-                  name="referenceValue"
-                  value={test.singleReferenceValues.referenceValue}
-                  onChange={(e) =>
-                    handleInputChange(e, index, 0, "singleReferenceValues")
-                  }
-                  className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2"
-                />
-              </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Single Reference Values - Reference Value
+                    </label>
+                    <input
+                      type="text"
+                      name="referenceValue"
+                      value={test.singleReferenceValues.referenceValue}
+                      onChange={(e) =>
+                        handleInputChange(e, index, 0, "singleReferenceValues")
+                      }
+                      className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2"
+                    />
+                  </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Single Reference Values - Unit
-                </label>
-                <input
-                  type="text"
-                  name="unit"
-                  value={test.singleReferenceValues.unit}
-                  onChange={(e) =>
-                    handleInputChange(e, index, 0, "singleReferenceValues")
-                  }
-                  className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2"
-                />
-              </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Single Reference Values - Unit
+                    </label>
+                    {/* <input
+                      type="text"
+                      name="unit"
+                      value={test.singleReferenceValues.unit}
+                      onChange={(e) =>
+                        handleInputChange(e, index, 0, "singleReferenceValues")
+                      }
+                      className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2"
+                    /> */}
+                    <select
+                      name=""
+                      id=""
+                      onChange={(e) =>
+                        handleInputChange(e, index, 0, "singleReferenceValues")
+                      }
+                      className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2"
+                    >
+                      <option value="" disabled selected>
+                        Select Unit
+                      </option>
+                      {testUnitData.map((item) => (
+                        <option value={item.name}>{item.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                </>
+              )}
 
               {/* <div>
                 <label className="block text-sm font-medium text-gray-700">
@@ -454,112 +608,164 @@ const Report = () => {
               </div> */}
             </div>
 
-            {test.referenceValues.map((refVal, subIndex) => (
-              <div
-                key={subIndex}
-                className="bg-gray-200 p-4 rounded-lg mb-4 mt-4"
-              >
-                <h3 className="text-lg font-semibold mb-2">
-                  Reference Value {subIndex + 1}
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Min Age
-                    </label>
-                    <input
-                      type="text"
-                      name="minAge"
-                      value={refVal.minAge}
-                      onChange={(e) =>
-                        handleInputChange(e, index, subIndex, "referenceValues")
-                      }
-                      className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2"
-                    />
-                  </div>
+            {formData.tests[index] ===
+              formData.tests[formData.tests.length - 1] &&
+              test.referenceValues.map((refVal, subIndex) => (
+                <div
+                  key={subIndex}
+                  className="bg-gray-200 p-4 rounded-lg mb-4 mt-4"
+                >
+                  <h3 className="text-lg font-semibold mb-2">
+                    Reference Value {subIndex + 1}
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        Min Age
+                      </label>
+                      <input
+                        type="text"
+                        name="minAge"
+                        value={refVal.minAge}
+                        onChange={(e) =>
+                          handleInputChange(
+                            e,
+                            index,
+                            subIndex,
+                            "referenceValues"
+                          )
+                        }
+                        className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2"
+                      />
+                    </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Max Age
-                    </label>
-                    <input
-                      type="text"
-                      name="maxAge"
-                      value={refVal.maxAge}
-                      onChange={(e) =>
-                        handleInputChange(e, index, subIndex, "referenceValues")
-                      }
-                      className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2"
-                    />
-                  </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        Max Age
+                      </label>
+                      <input
+                        type="text"
+                        name="maxAge"
+                        value={refVal.maxAge}
+                        onChange={(e) =>
+                          handleInputChange(
+                            e,
+                            index,
+                            subIndex,
+                            "referenceValues"
+                          )
+                        }
+                        className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2"
+                      />
+                    </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Gender
-                    </label>
-                    <input
-                      type="text"
-                      name="gender"
-                      value={refVal.gender}
-                      onChange={(e) =>
-                        handleInputChange(e, index, subIndex, "referenceValues")
-                      }
-                      className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2"
-                    />
-                  </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        Gender
+                      </label>
+                      <input
+                        type="text"
+                        name="gender"
+                        value={refVal.gender}
+                        onChange={(e) =>
+                          handleInputChange(
+                            e,
+                            index,
+                            subIndex,
+                            "referenceValues"
+                          )
+                        }
+                        className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2"
+                      />
+                    </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Min Reference Value
-                    </label>
-                    <input
-                      type="text"
-                      name="minReferenceValue"
-                      value={refVal.minReferenceValue}
-                      onChange={(e) =>
-                        handleInputChange(e, index, subIndex, "referenceValues")
-                      }
-                      className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2"
-                    />
-                  </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        Min Reference Value
+                      </label>
+                      <input
+                        type="text"
+                        name="minReferenceValue"
+                        value={refVal.minReferenceValue}
+                        onChange={(e) =>
+                          handleInputChange(
+                            e,
+                            index,
+                            subIndex,
+                            "referenceValues"
+                          )
+                        }
+                        className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2"
+                      />
+                    </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Max Reference Value
-                    </label>
-                    <input
-                      type="text"
-                      name="maxReferenceValue"
-                      value={refVal.maxReferenceValue}
-                      onChange={(e) =>
-                        handleInputChange(e, index, subIndex, "referenceValues")
-                      }
-                      className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2"
-                    />
-                  </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        Max Reference Value
+                      </label>
+                      <input
+                        type="text"
+                        name="maxReferenceValue"
+                        value={refVal.maxReferenceValue}
+                        onChange={(e) =>
+                          handleInputChange(
+                            e,
+                            index,
+                            subIndex,
+                            "referenceValues"
+                          )
+                        }
+                        className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2"
+                      />
+                    </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Unit
-                    </label>
-                    <input
-                      type="text"
-                      name="testResultUnit"
-                      value={refVal.testResultUnit.name}
-                      onChange={(e) =>
-                        handleInputChange(e, index, subIndex, "referenceValues")
-                      }
-                      className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2"
-                    />
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        Unit
+                      </label>
+                      {/* <input
+                        type="text"
+                        name="testResultUnit"
+                        value={refVal.testResultUnit.name}
+                        onChange={(e) =>
+                          handleInputChange(
+                            e,
+                            index,
+                            subIndex,
+                            "referenceValues"
+                          )
+                        }
+                        className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2"
+                      /> */}
+                      <select
+                        name=""
+                        id=""
+                        onChange={(e) =>
+                          handleInputChange(
+                            e,
+                            index,
+                            subIndex,
+                            "referenceValues"
+                          )
+                        }
+                        className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2"
+                      >
+                        <option value="" disabled selected>
+                          Select Unit
+                        </option>
+                        {testUnitData.map((item) => (
+                          <option value={item.name}>{item.name}</option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
 
             <button
               type="button"
               onClick={() => addSubTest(index)}
-              className="bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600"
+              className="bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 mt-4"
             >
               Add Sub Test
             </button>
@@ -615,140 +821,163 @@ const Report = () => {
                     />
                   </div>
 
-                  {subTest.referenceValues.map((subRefVal, refIndex) => (
-                    <div
-                      key={refIndex}
-                      className="col-span-1 md:col-span-2 lg:col-span-4 w-full"
-                    >
-                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                        <div className="w-full">
-                          <label className="block text-sm font-medium text-gray-700">
-                            Min Age
-                          </label>
-                          <input
-                            type="text"
-                            name="minAge"
-                            value={subRefVal.minAge}
-                            onChange={(e) =>
-                              handleInputChange(
-                                e,
-                                index,
-                                subIndex,
-                                "referenceValues",
-                                "sub"
-                              )
-                            }
-                            className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2"
-                          />
-                        </div>
+                  {formData.tests[index] ===
+                    formData.tests[formData.tests.length - 1] &&
+                    subTest.referenceValues.map((subRefVal, refIndex) => (
+                      <div
+                        key={refIndex}
+                        className="col-span-1 md:col-span-2 lg:col-span-4 w-full"
+                      >
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                          <div className="w-full">
+                            <label className="block text-sm font-medium text-gray-700">
+                              Min Age
+                            </label>
+                            <input
+                              type="text"
+                              name="minAge"
+                              value={subRefVal.minAge}
+                              onChange={(e) =>
+                                handleInputChange(
+                                  e,
+                                  index,
+                                  subIndex,
+                                  "referenceValues",
+                                  "sub"
+                                )
+                              }
+                              className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2"
+                            />
+                          </div>
 
-                        <div className="w-full">
-                          <label className="block text-sm font-medium text-gray-700">
-                            Max Age
-                          </label>
-                          <input
-                            type="text"
-                            name="maxAge"
-                            value={subRefVal.maxAge}
-                            onChange={(e) =>
-                              handleInputChange(
-                                e,
-                                index,
-                                subIndex,
-                                "referenceValues",
-                                "sub"
-                              )
-                            }
-                            className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2"
-                          />
-                        </div>
+                          <div className="w-full">
+                            <label className="block text-sm font-medium text-gray-700">
+                              Max Age
+                            </label>
+                            <input
+                              type="text"
+                              name="maxAge"
+                              value={subRefVal.maxAge}
+                              onChange={(e) =>
+                                handleInputChange(
+                                  e,
+                                  index,
+                                  subIndex,
+                                  "referenceValues",
+                                  "sub"
+                                )
+                              }
+                              className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2"
+                            />
+                          </div>
 
-                        <div className="w-full">
-                          <label className="block text-sm font-medium text-gray-700">
-                            Gender
-                          </label>
-                          <input
-                            type="text"
-                            name="gender"
-                            value={subRefVal.gender}
-                            onChange={(e) =>
-                              handleInputChange(
-                                e,
-                                index,
-                                subIndex,
-                                "referenceValues",
-                                "sub"
-                              )
-                            }
-                            className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2"
-                          />
-                        </div>
+                          <div className="w-full">
+                            <label className="block text-sm font-medium text-gray-700">
+                              Gender
+                            </label>
+                            <input
+                              type="text"
+                              name="gender"
+                              value={subRefVal.gender}
+                              onChange={(e) =>
+                                handleInputChange(
+                                  e,
+                                  index,
+                                  subIndex,
+                                  "referenceValues",
+                                  "sub"
+                                )
+                              }
+                              className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2"
+                            />
+                          </div>
 
-                        <div className="w-full">
-                          <label className="block text-sm font-medium text-gray-700">
-                            Min Reference Value
-                          </label>
-                          <input
-                            type="text"
-                            name="minReferenceValue"
-                            value={subRefVal.minReferenceValue}
-                            onChange={(e) =>
-                              handleInputChange(
-                                e,
-                                index,
-                                subIndex,
-                                "referenceValues",
-                                "sub"
-                              )
-                            }
-                            className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2"
-                          />
-                        </div>
+                          <div className="w-full">
+                            <label className="block text-sm font-medium text-gray-700">
+                              Min Reference Value
+                            </label>
+                            <input
+                              type="text"
+                              name="minReferenceValue"
+                              value={subRefVal.minReferenceValue}
+                              onChange={(e) =>
+                                handleInputChange(
+                                  e,
+                                  index,
+                                  subIndex,
+                                  "referenceValues",
+                                  "sub"
+                                )
+                              }
+                              className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2"
+                            />
+                          </div>
 
-                        <div className="w-full">
-                          <label className="block text-sm font-medium text-gray-700">
-                            Max Reference Value
-                          </label>
-                          <input
-                            type="text"
-                            name="maxReferenceValue"
-                            value={subRefVal.maxReferenceValue}
-                            onChange={(e) =>
-                              handleInputChange(
-                                e,
-                                index,
-                                subIndex,
-                                "referenceValues",
-                                "sub"
-                              )
-                            }
-                            className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2"
-                          />
-                        </div>
+                          <div className="w-full">
+                            <label className="block text-sm font-medium text-gray-700">
+                              Max Reference Value
+                            </label>
+                            <input
+                              type="text"
+                              name="maxReferenceValue"
+                              value={subRefVal.maxReferenceValue}
+                              onChange={(e) =>
+                                handleInputChange(
+                                  e,
+                                  index,
+                                  subIndex,
+                                  "referenceValues",
+                                  "sub"
+                                )
+                              }
+                              className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2"
+                            />
+                          </div>
 
-                        <div className="w-full">
-                          <label className="block text-sm font-medium text-gray-700">
-                            Unit
-                          </label>
-                          <input
-                            type="text"
-                            name="testResultUnit"
-                            value={subRefVal.testResultUnit.name}
-                            onChange={(e) =>
-                              handleInputChange(
-                                e,
-                                index,
-                                subIndex,
-                                "referenceValues",
-                                "sub"
-                              )
-                            }
-                            className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2"
-                          />
+                          <div className="w-full">
+                            <label className="block text-sm font-medium text-gray-700">
+                              Unit
+                            </label>
+                            {/* <input
+                              type="text"
+                              name="testResultUnit"
+                              value={subRefVal.testResultUnit.name}
+                              onChange={(e) =>
+                                handleInputChange(
+                                  e,
+                                  index,
+                                  subIndex,
+                                  "referenceValues",
+                                  "sub"
+                                )
+                              }
+                              className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2"
+                            /> */}
+                            <select
+                              name=""
+                              id=""
+                              onChange={(e) =>
+                                handleInputChange(
+                                  e,
+                                  index,
+                                  subIndex,
+                                  "referenceValues",
+                                  "sub"
+                                )
+                              }
+                              className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2"
+                            >
+                              <option value="" disabled selected>
+                                Select Unit
+                              </option>
+                              {testUnitData.map((item) => (
+                                <option value={item.name}>{item.name}</option>
+                              ))}
+                            </select>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
                 </div>
               </div>
             ))}
@@ -768,7 +997,7 @@ const Report = () => {
             <label className="block text-sm font-medium text-gray-700">
               Test Result Type
             </label>
-            <input
+            {/* <input
               type="text"
               name="testResultType"
               value={formData.testResultType}
@@ -776,7 +1005,22 @@ const Report = () => {
                 setFormData({ ...formData, testResultType: e.target.value })
               }
               className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2"
-            />
+            /> */}
+            <select
+              name=""
+              id=""
+              onChange={(e) => {
+                setFormData({ ...formData, testResultType: e.target.value });
+              }}
+              className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2"
+            >
+              <option value="" disabled selected>
+                Select Result Type
+              </option>
+              {testResultTypeArr.map((item) => (
+                <option value={item}>{item}</option>
+              ))}
+            </select>
           </div>
 
           <div>

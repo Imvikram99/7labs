@@ -34,6 +34,8 @@ import LabCenter from "./LabCenter";
 import LabProfile from "./LabProfile";
 import NewBill from "./NewBill";
 import Report from "./Report";
+import Booking from "./Booking";
+import AllBooking from "./AllBooking";
 import RegisterCustomer from "./RegisterCustomer";
 
 export default function SidebarWithHeader({ children }) {
@@ -57,6 +59,8 @@ export default function SidebarWithHeader({ children }) {
     "Register New Customer": <RegisterCustomer />,
     "Create New Bill": <NewBill />,
     "Create Report": <Report />,
+    "Create Booking": <Booking />,
+    "All Booking": <AllBooking />,
   };
 
   function handleComponentChange(componentName) {
@@ -176,6 +180,20 @@ function SidebarContent({ handleComponentChange }) {
         label="Create Report"
         // icon={FiFilePlus}
         onClick={() => handleComponentChange("Create Report")}
+      />
+      <hr />
+      <NavItem
+        label="Create Booking"
+        // icon={FiFilePlus}
+
+        onClick={() => handleComponentChange("Create Booking")}
+      />
+      <hr />
+      <NavItem
+        label="All Booking"
+        // icon={FiFilePlus}
+
+        onClick={() => handleComponentChange("All Booking")}
       />
       <hr />
     </Box>
