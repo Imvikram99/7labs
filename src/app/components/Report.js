@@ -437,7 +437,9 @@ const Report = () => {
                 Select Sample Type
               </option>
               {arr.map((item) => (
-                <option value={item}>{item}</option>
+                <option key={item} value={item}>
+                  {item}
+                </option>
               ))}
             </select>
           </div>
@@ -467,7 +469,9 @@ const Report = () => {
                 Select Pannel Code
               </option>
               {testPanelData?.map((item) => (
-                <option value={item.testPanelCode}>{item.testPanelCode}</option>
+                <option value={item.testPanelCode} key={item}>
+                  {item.testPanelCode}
+                </option>
               ))}
             </select>
           </div>
@@ -585,7 +589,9 @@ const Report = () => {
                         Select Unit
                       </option>
                       {testUnitData.map((item) => (
-                        <option value={item.name}>{item.name}</option>
+                        <option value={item.name} key={item}>
+                          {item.name}
+                        </option>
                       ))}
                     </select>
                   </div>
@@ -754,7 +760,9 @@ const Report = () => {
                           Select Unit
                         </option>
                         {testUnitData.map((item) => (
-                          <option value={item.name}>{item.name}</option>
+                          <option value={item.name} key={item}>
+                            {item.name}
+                          </option>
                         ))}
                       </select>
                     </div>
@@ -971,7 +979,9 @@ const Report = () => {
                                 Select Unit
                               </option>
                               {testUnitData.map((item) => (
-                                <option value={item.name}>{item.name}</option>
+                                <option value={item.name} key={item}>
+                                  {item.name}
+                                </option>
                               ))}
                             </select>
                           </div>
@@ -1018,7 +1028,9 @@ const Report = () => {
                 Select Result Type
               </option>
               {testResultTypeArr.map((item) => (
-                <option value={item}>{item}</option>
+                <option value={item} key={item}>
+                  {item}
+                </option>
               ))}
             </select>
           </div>
