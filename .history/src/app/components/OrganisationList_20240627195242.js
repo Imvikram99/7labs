@@ -167,6 +167,7 @@ const AddTestPanel = () => {
       {testResultType === 'MATRIX' && (
   <div>
  <div>
+  <label htmlFor="matrixTestReportTemplate.report_type" className="block text-sm font-medium text-gray-700">Report Type</label>
   <input type="hidden" {...register('matrixTestReportTemplate.report_type')} value="MatrixTestReportTemplate" /></div>
 <div>
   <label htmlFor="matrixTestReportTemplate.primarySampleType" className="block text-sm font-medium text-gray-700">Primary Sample Type</label>

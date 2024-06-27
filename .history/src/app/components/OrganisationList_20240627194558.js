@@ -166,8 +166,9 @@ const AddTestPanel = () => {
       </div>
       {testResultType === 'MATRIX' && (
   <div>
- <div>
-  <input type="hidden" {...register('matrixTestReportTemplate.report_type')} value="MatrixTestReportTemplate" /></div>
+  <label htmlFor="matrixTestReportTemplate.report_type" className="block text-sm font-medium text-gray-700">Report Type</label>
+  <input {...register('matrixTestReportTemplate.report_type')} className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
+</div>
 <div>
   <label htmlFor="matrixTestReportTemplate.primarySampleType" className="block text-sm font-medium text-gray-700">Primary Sample Type</label>
   <input {...register('matrixTestReportTemplate.primarySampleType')} className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
@@ -204,7 +205,7 @@ const AddTestPanel = () => {
   <label htmlFor="matrixTestReportTemplate.testReportDate" className="block text-sm font-medium text-gray-700">Test Report Date</label>
   <input {...register('matrixTestReportTemplate.testReportDate')} className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
 </div>
-</div>
+
 )}
       <button type="submit" className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Add Test Panel</button>
     </form>
