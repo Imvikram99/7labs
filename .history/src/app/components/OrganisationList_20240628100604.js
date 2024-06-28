@@ -9,6 +9,10 @@ const AddTestPanel = () => {
   const [testCategories, setTestCategories] = useState([]);
   const [testUnits, setTestUnits] = useState([]);
 
+  const testReferenceValueTypes = testFields.map((field, index) =>
+    watch(`tests.${index}.referenceValueType`)
+  );
+
   useEffect(() => {
     axios.get('http://localhost:8080/api/v1/lab/testpanel/category', {
       headers: {
@@ -117,9 +121,43 @@ const AddTestPanel = () => {
                     <option value="NONE">NONE</option>
                   </select>
                 </div>
+                {testReferenceValueTypes[index] === 'RANGE' && (
+                  <div>
+                    <label htmlFor={`tests.${index}.referenceValues`} className="block text-sm font-medium text-gray-700">Reference Values</label>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label htmlFor={`tests.${index}.referenceValues.minAge`} className="block text-sm font-medium text-gray-700">Min Age</label>
+                        <input {...register(`tests.${index}.referenceValues.minAge`)} className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
+                      </div>
+                      <div>
+                        <label htmlFor={`tests.${index}.referenceValues.maxAge`} className="block text-sm font-medium text-gray-700">Max Age</label>
+                        <input {...register(`tests.${index}.referenceValues.maxAge`)} className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
+                      </div>
+                      <div>
+                        <label htmlFor={`tests.${index}.referenceValues.gender`} className="block text-sm font-medium text-gray-700">Gender</label>
+                        <input {...register(`tests.${index}.referenceValues.gender`)} className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
+                      </div>
+                      <div>
+                        <label htmlFor={`tests.${index}.referenceValues.minReferenceValue`} className="block text-sm font-medium text-gray-700">Min Reference Value</label>
+                        <input {...register(`tests.${index}.referenceValues.minReferenceValue`)} className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
+                      </div>
+                      <div>
+                        <label htmlFor={`tests.${index}.referenceValues.maxReferenceValue`} className="block text-sm font-medium text-gray-700">Max Reference Value</label>
+                        <input {...register(`tests.${index}.referenceValues.maxReferenceValue`)} className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
+                      </div>
+                      <div>
+                        <label htmlFor={`tests.${index}.referenceValues.testResultUnit`} className="block text-sm font-medium text-gray-700">Test Result Unit</label>
+                        <input {...register(`tests.${index}.referenceValues.testResultUnit`)} className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
-              {watch(`tests.${index}.referenceValueType`) === 'RANGE' && (
-                <ReferenceValues control={control} index={index} register={register} />
+              {testResultType === 'DOCUMENT' && (
+                <div>
+                  <label htmlFor={`tests.${index}.document`} className="block text-sm font-medium text-gray-700">Document</label>
+                  <input {...register(`tests.${index}.document`)} className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
+                </div>
               )}
               <button type="button" onClick={() => removeTest(index)} className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">Remove Test</button>
             </div>
@@ -152,107 +190,48 @@ const AddTestPanel = () => {
         <input {...register('interpretation')} className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
       </div>
       {testResultType === 'MATRIX' && (
-        <MatrixTemplate register={register} control={control} />
+        <div>
+          <input type="hidden" {...register('matrixTestReportTemplate.report_type')} value="MatrixTestReportTemplate" />
+          <div>
+            <label htmlFor="matrixTestReportTemplate.primarySampleType" className="block text-sm font-medium text-gray-700">Primary Sample Type</label>
+            <input {...register('matrixTestReportTemplate.primarySampleType')} className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
+          </div>
+          <div>
+            <label htmlFor="matrixTestReportTemplate.description" className="block text-sm font-medium text-gray-700">Description</label>
+            <input {...register('matrixTestReportTemplate.description')} className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
+          </div>
+          <div>
+            <label htmlFor="matrixTestReportTemplate.columns" className="block text-sm font-medium text-gray-700">Columns</label>
+            {testFields.map((item, index) => (
+              <div key={item.id} className="grid grid-cols-2 gap-4">
+                <input {...register(`matrixTestReportTemplate.columns.${index}.growth_measurement`)} className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
+                <input {...register(`matrixTestReportTemplate.columns.${index}.comments`)} className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
+                <button type="button" onClick={() => removeTest(index)} className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">Remove Column</button>
+              </div>
+            ))}
+            <button type="button" onClick={() => appendTest({})} className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Add Column</button>
+          </div>
+          <div>
+            <label htmlFor="matrixTestReportTemplate.columnStyles" className="block text-sm font-medium text-gray-700">Column Styles</label>
+            {testFields.map((item, index) => (
+              <div key={item.id} className="grid grid-cols-4 gap-4">
+                <input {...register(`matrixTestReportTemplate.columnStyles.${index}.width`)} className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
+                <input {...register(`matrixTestReportTemplate.columnStyles.${index}.backgroundColor`)} className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
+                <input {...register(`matrixTestReportTemplate.columnStyles.${index}.textColor`)} className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
+                <input {...register(`matrixTestReportTemplate.columnStyles.${index}.alignment`)} className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
+                <button type="button" onClick={() => removeTest(index)} className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">Remove Column Style</button>
+              </div>
+            ))}
+            <button type="button" onClick={() => appendTest({})} className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Add Column Style</button>
+          </div>
+          <div>
+            <label htmlFor="matrixTestReportTemplate.testReportDate" className="block text-sm font-medium text-gray-700">Test Report Date</label>
+            <input {...register('matrixTestReportTemplate.testReportDate')} className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
+          </div>
+        </div>
       )}
       <button type="submit" className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Add Test Panel</button>
     </form>
-  );
-};
-
-const ReferenceValues = ({ control, index, register }) => {
-  const { fields: referenceValueFields, append: appendReferenceValue, remove: removeReferenceValue } = useFieldArray({
-    control,
-    name: `tests.${index}.referenceValues`
-  });
-
-  return (
-    <div className="space-y-4">
-      {referenceValueFields.map((refItem, refIndex) => (
-        <div key={refItem.id} className="space-y-2">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Min Age</label>
-              <input {...register(`tests.${index}.referenceValues.${refIndex}.minAge`)} className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Max Age</label>
-              <input {...register(`tests.${index}.referenceValues.${refIndex}.maxAge`)} className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Gender</label>
-              <input {...register(`tests.${index}.referenceValues.${refIndex}.gender`)} className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Min Reference Value</label>
-              <input {...register(`tests.${index}.referenceValues.${refIndex}.minReferenceValue`)} className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Max Reference Value</label>
-              <input {...register(`tests.${index}.referenceValues.${refIndex}.maxReferenceValue`)} className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Test Result Unit</label>
-              <input {...register(`tests.${index}.referenceValues.${refIndex}.testResultUnit.name`)} className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
-            </div>
-          </div>
-          <button type="button" onClick={() => removeReferenceValue(refIndex)} className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">Remove Reference Value</button>
-        </div>
-      ))}
-      <button type="button" onClick={() => appendReferenceValue({})} className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Add Reference Value</button>
-    </div>
-  );
-};
-
-const MatrixTemplate = ({ register, control }) => {
-  const { fields: columnFields, append: appendColumn, remove: removeColumn } = useFieldArray({
-    control,
-    name: 'matrixTestReportTemplate.columns'
-  });
-  const { fields: columnStyleFields, append: appendColumnStyle, remove: removeColumnStyle } = useFieldArray({
-    control,
-    name: 'matrixTestReportTemplate.columnStyles'
-  });
-
-  return (
-    <div>
-      <input type="hidden" {...register('matrixTestReportTemplate.report_type')} value="MatrixTestReportTemplate" />
-      <div>
-        <label htmlFor="matrixTestReportTemplate.primarySampleType" className="block text-sm font-medium text-gray-700">Primary Sample Type</label>
-        <input {...register('matrixTestReportTemplate.primarySampleType')} className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
-      </div>
-      <div>
-        <label htmlFor="matrixTestReportTemplate.description" className="block text-sm font-medium text-gray-700">Description</label>
-        <input {...register('matrixTestReportTemplate.description')} className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
-      </div>
-      <div>
-        <label htmlFor="matrixTestReportTemplate.columns" className="block text-sm font-medium text-gray-700">Columns</label>
-        {columnFields.map((column, columnIndex) => (
-          <div key={column.id} className="grid grid-cols-2 gap-4">
-            <input {...register(`matrixTestReportTemplate.columns.${columnIndex}.growth_measurement`)} className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
-            <input {...register(`matrixTestReportTemplate.columns.${columnIndex}.comments`)} className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
-            <button type="button" onClick={() => removeColumn(columnIndex)} className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">Remove Column</button>
-          </div>
-        ))}
-        <button type="button" onClick={() => appendColumn({})} className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Add Column</button>
-      </div>
-      <div>
-        <label htmlFor="matrixTestReportTemplate.columnStyles" className="block text-sm font-medium text-gray-700">Column Styles</label>
-        {columnStyleFields.map((columnStyle, columnStyleIndex) => (
-          <div key={columnStyle.id} className="grid grid-cols-4 gap-4">
-            <input {...register(`matrixTestReportTemplate.columnStyles.${columnStyleIndex}.width`)} className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
-            <input {...register(`matrixTestReportTemplate.columnStyles.${columnStyleIndex}.backgroundColor`)} className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
-            <input {...register(`matrixTestReportTemplate.columnStyles.${columnStyleIndex}.textColor`)} className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
-            <input {...register(`matrixTestReportTemplate.columnStyles.${columnStyleIndex}.alignment`)} className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
-            <button type="button" onClick={() => removeColumnStyle(columnStyleIndex)} className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">Remove Column Style</button>
-          </div>
-        ))}
-        <button type="button" onClick={() => appendColumnStyle({})} className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Add Column Style</button>
-      </div>
-      <div>
-        <label htmlFor="matrixTestReportTemplate.testReportDate" className="block text-sm font-medium text-gray-700">Test Report Date</label>
-        <input {...register('matrixTestReportTemplate.testReportDate')} className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
-      </div>
-    </div>
   );
 };
 
