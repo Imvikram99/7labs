@@ -30,41 +30,8 @@ const AddTestPanel = () => {
   }, []);
 
   const onSubmit = data => {
-    const matrixColumns = data.matrixTestReportTemplate.columns.reduce((acc, column) => {
-        const inputKey = column.inputKey;
-        const inputComment = column.inputComment;
-        const inputName = column.inputName;
-      
-        // Check if the inputName key already exists in the accumulator
-        if (!acc[inputName]) {
-          acc[inputName] = {}; // Initialize if not existing
-        }
-      
-        // Assign inputKey as a key inside the object at inputName
-        acc[inputName][inputKey] = inputComment;
-      
-        return acc;
-      }, {});
-
-      const columnStyles = data.matrixTestReportTemplate.columnStyles.reduce((acc, style) => {
-        const styleName = style.name; // Assuming there's a 'name' property to use as a key
-        acc[styleName] = {
-          width: style.width,
-          backgroundColor: style.backgroundColor,
-          textColor: style.textColor,
-          alignment: style.alignment
-        };
-        return acc;
-      }, {});
-      
-    
     const formData = {
       ...data,
-      matrixTestReportTemplate: {
-        ...data.matrixTestReportTemplate,
-        columns: matrixColumns,
-        columnStyles:columnStyles,
-      },
       testCategory: testCategories.find(category => category.id === data.testCategory)
     };
     axios.post('http://localhost:8080/api/v1/lab/testpanel', formData, {
@@ -246,6 +213,7 @@ const MatrixTemplate = ({ register, control }) => {
     name: 'matrixTestReportTemplate.columnStyles'
   });
 
+  
   return (
     <div>
       <input type="hidden" {...register('matrixTestReportTemplate.report_type')} value="MatrixTestReportTemplate" />
@@ -261,12 +229,8 @@ const MatrixTemplate = ({ register, control }) => {
         <label htmlFor="matrixTestReportTemplate.columns" className="block text-sm font-medium text-gray-700">Columns</label>
         {columnFields.map((column, columnIndex) => (
           <div key={column.id} className="grid grid-cols-2 gap-4">
-            <label htmlFor="matrixTestReportTemplate.columns.${columnIndex}.inputKey" className="block text-sm font-medium text-gray-700">columnKey</label>
-            <input {...register(`matrixTestReportTemplate.columns.${columnIndex}.inputKey`)} className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
-            <label htmlFor="matrixTestReportTemplate.columns.${columnIndex}.inputComment" className="block text-sm font-medium text-gray-700">columnValue</label>
-            <input {...register(`matrixTestReportTemplate.columns.${columnIndex}.inputComment`)} className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
-            <label htmlFor="matrixTestReportTemplate.columns.${columnIndex}.inputName" className="block text-sm font-medium text-gray-700">columnName</label>
-            <input {...register(`matrixTestReportTemplate.columns.${columnIndex}.inputName`)} className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
+            <input {...register(`matrixTestReportTemplate.columns.${columnIndex}.growth_measurement`)} placeholder="Growth Measurement" className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
+            <input {...register(`matrixTestReportTemplate.columns.${columnIndex}.comments`)} placeholder="Comments" className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
             <button type="button" onClick={() => removeColumn(columnIndex)} className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">Remove Column</button>
           </div>
         ))}
@@ -276,10 +240,10 @@ const MatrixTemplate = ({ register, control }) => {
         <label htmlFor="matrixTestReportTemplate.columnStyles" className="block text-sm font-medium text-gray-700">Column Styles</label>
         {columnStyleFields.map((columnStyle, columnStyleIndex) => (
           <div key={columnStyle.id} className="grid grid-cols-4 gap-4">
-            <input {...register(`matrixTestReportTemplate.columnStyles.${columnStyleIndex}.width`)} className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
-            <input {...register(`matrixTestReportTemplate.columnStyles.${columnStyleIndex}.backgroundColor`)} className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
-            <input {...register(`matrixTestReportTemplate.columnStyles.${columnStyleIndex}.textColor`)} className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
-            <input {...register(`matrixTestReportTemplate.columnStyles.${columnStyleIndex}.alignment`)} className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
+            <input {...register(`matrixTestReportTemplate.columnStyles.${columnStyleIndex}.width`)} placeholder="Width" className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
+            <input {...register(`matrixTestReportTemplate.columnStyles.${columnStyleIndex}.backgroundColor`)} placeholder="Background Color" className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
+            <input {...register(`matrixTestReportTemplate.columnStyles.${columnStyleIndex}.textColor`)} placeholder="Text Color" className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
+            <input {...register(`matrixTestReportTemplate.columnStyles.${columnStyleIndex}.alignment`)} placeholder="Alignment" className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
             <button type="button" onClick={() => removeColumnStyle(columnStyleIndex)} className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">Remove Column Style</button>
           </div>
         ))}
@@ -287,7 +251,7 @@ const MatrixTemplate = ({ register, control }) => {
       </div>
       <div>
         <label htmlFor="matrixTestReportTemplate.testReportDate" className="block text-sm font-medium text-gray-700">Test Report Date</label>
-        <input {...register('matrixTestReportTemplate.testReportDate')} className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
+        <input {...register('matrixTestReportTemplate.testReportDate')} type="date" className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
       </div>
     </div>
   );

@@ -30,40 +30,24 @@ const AddTestPanel = () => {
   }, []);
 
   const onSubmit = data => {
-    const matrixColumns = data.matrixTestReportTemplate.columns.reduce((acc, column) => {
+    const matrixColumns = data.matrixTestReportTemplate.columns.map(column => {
         const inputKey = column.inputKey;
         const inputComment = column.inputComment;
         const inputName = column.inputName;
-      
-        // Check if the inputName key already exists in the accumulator
-        if (!acc[inputName]) {
-          acc[inputName] = {}; // Initialize if not existing
-        }
-      
-        // Assign inputKey as a key inside the object at inputName
-        acc[inputName][inputKey] = inputComment;
-      
-        return acc;
-      }, {});
-
-      const columnStyles = data.matrixTestReportTemplate.columnStyles.reduce((acc, style) => {
-        const styleName = style.name; // Assuming there's a 'name' property to use as a key
-        acc[styleName] = {
-          width: style.width,
-          backgroundColor: style.backgroundColor,
-          textColor: style.textColor,
-          alignment: style.alignment
+    
+        return {
+            ...column, // Optionally keep the original structure
+            [inputName]: { // Use inputName as a key
+                [inputKey]: inputComment // Inside this key, map inputKey to inputComment
+            }
         };
-        return acc;
-      }, {});
-      
+      });
     
     const formData = {
       ...data,
       matrixTestReportTemplate: {
         ...data.matrixTestReportTemplate,
         columns: matrixColumns,
-        columnStyles:columnStyles,
       },
       testCategory: testCategories.find(category => category.id === data.testCategory)
     };

@@ -45,17 +45,6 @@ const AddTestPanel = () => {
       
         return acc;
       }, {});
-
-      const columnStyles = data.matrixTestReportTemplate.columnStyles.reduce((acc, style) => {
-        const styleName = style.name; // Assuming there's a 'name' property to use as a key
-        acc[styleName] = {
-          width: style.width,
-          backgroundColor: style.backgroundColor,
-          textColor: style.textColor,
-          alignment: style.alignment
-        };
-        return acc;
-      }, {});
       
     
     const formData = {
@@ -63,7 +52,6 @@ const AddTestPanel = () => {
       matrixTestReportTemplate: {
         ...data.matrixTestReportTemplate,
         columns: matrixColumns,
-        columnStyles:columnStyles,
       },
       testCategory: testCategories.find(category => category.id === data.testCategory)
     };

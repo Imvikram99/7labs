@@ -63,7 +63,6 @@ const AddTestPanel = () => {
       matrixTestReportTemplate: {
         ...data.matrixTestReportTemplate,
         columns: matrixColumns,
-        columnStyles:columnStyles,
       },
       testCategory: testCategories.find(category => category.id === data.testCategory)
     };
