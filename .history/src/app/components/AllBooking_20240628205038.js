@@ -1,159 +1,168 @@
-'use client';
+import React, { useState, useEffect } from "react";
+import { FaDownload } from "react-icons/fa6";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
 
-import React, { useState,useEffect } from 'react';
-import InvoiceData from './InvoiceData';
-import InvoicePDF from './InvoicePDF';
-import { useFormData } from './context';
-
-export default function NewBill({ }) {
-
-    useEffect(() => {
-        console.log("ddddddd");
-
-      }, []);
-
-  const [customerName, setCustomerName] = useState('');
-  const [invoiceDate, setInvoiceDate] = useState('');
-  const { formData, updateFormData } = useFormData();
-  
-  const [products, setProducts] = useState([
-    { name: '', quantity: 0, price: 0, taxRate: 0 },
-  ]);
-
-  const handleCustomerNameChange = (event) => {
-    console.log('Rendering NewBill with formData:', formData);
-    setCustomerName(event.target.value);
-  };
-
-  const handleInvoiceDateChange = (event) => {
-    setInvoiceDate(event.target.value);
-  };
-
-  const handleProductChange = (index, field, value) => {
-    const newProducts = [...products];
-    newProducts[index][field] = value;
-    setProducts(newProducts);
-  };
-
-  const handleAddProduct = () => {
-    setProducts([...products, { name: '', quantity: 0, price: 0, taxRate: 0 }]);
-  };
-
-  const handleRemoveProduct = (index) => {
-    const newProducts = [...products];
-    newProducts.splice(index, 1);
-    setProducts(newProducts);
-  };
-
-  const customer = { name: customerName };
-  const invoice = { date: invoiceDate, products };
+const Modal = ({ showModal, handleClose, children }) => {
+  if (!showModal) return null;
 
   return (
-<main className="flex min-h-screen flex-col items-center justify-center bg-green-100 w-full">
- <form className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 w-full max-w-lg">
-        <div className="mb-4">
-          <label className="block text-green-700 text-sm font-bold mb-2" htmlFor="customerName">
-            Customer Name:
-          </label>
-          <input
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            id="customerName"
-            type="text"
-            value={customerName}
-            onChange={handleCustomerNameChange}
-          />
+    <div className="fixed z-10 inset-0 overflow-y-auto">
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="fixed inset-0 transition-opacity">
+          <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
         </div>
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="invoiceDate">
-            Invoice Date:
-          </label>
-          <input
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            id="invoiceDate"
-            type="date"
-            value={invoiceDate}
-            onChange={handleInvoiceDateChange}
-          />
-        </div>
-        {products.map((product, index) => (
-          <div key={index} className="mb-4 flex items-center">
-            <div className="grid grid-cols-4 gap-4 flex-grow">
-              <div>
-                <label className="block text-green-700 text-sm font-bold mb-2" htmlFor={`productName-${index}`}>
-                  Product:
-                </label>
-                <input
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  id={`productName-${index}`}
-                  type="text"
-                  value={product.name}
-                  onChange={(event) => handleProductChange(index, 'name', event.target.value)}
-                />
-              </div>
-              <div>
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor={`quantity-${index}`}>
-                  Quantity:
-                </label>
-                <input
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  id={`quantity-${index}`}
-                  type="number"
-                  value={product.quantity}
-                  onChange={(event) => handleProductChange(index, 'quantity', event.target.value)}
-                />
-              </div>
-              <div>
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor={`price-${index}`}>
-                  Price:
-                </label>
-                <input
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  id={`price-${index}`}
-                  type="number"
-                  value={product.price}
-                  onChange={(event) => handleProductChange(index, 'price', event.target.value)}
-                />
-              </div>
-              <div>
-                <label className="block text-red-700 text-sm font-bold mb-2" htmlFor={`taxRate-${index}`}>
-                  Tax Rate:
-                </label>
-                <input
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  id={`taxRate-${index}`}
-                  type="number"
-                  value={product.taxRate}
-                  onChange={(event) => handleProductChange(index, 'taxRate', event.target.value)}
-                />
-              </div>
+        <div className="bg-white w-full h-full overflow-hidden shadow-xl transform transition-all">
+          <div className="bg-white p-4">
+            <div className="flex justify-end">
+              <button
+                onClick={handleClose}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                &times;
+              </button>
             </div>
+            <div>{children}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const TestComponent = ({ data }) => {
+  return (
+    <div>
+      <h2>Tests:</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Test Name</th>
+            <th>Barcode</th>
+            <th>Cost</th>
+            <th>Code</th>
+            <th>Test Panel Report</th>
+            {/* Add more table headers as needed */}
+          </tr>
+        </thead>
+        <tbody>
+          {data.bookingSlip.tests.map((test) => (
+            <tr key={test.id}>
+              <td>{test.name}</td>
+              <td>{test.barCode}</td>
+              <td>{test.cost}</td>
+              <td>{test.code}</td>
+              <td>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Test Master Name</th>
+                      {/* Add more table headers as needed */}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {test.testPanelReport.testMasterReportList.map((report) => (
+                      <tr key={report.testReport.testReportId}>
+                        <td>{test.testPanelReport.name}</td>
+                        <td>{report.testMasterName}</td>
+                        {/* Add more table data as needed */}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </td>
+              {/* Add more table data as needed */}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
+
+
+const AllBooking = () => {
+  const [bookings, setBookings] = useState([]);
+  const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedBooking, setSelectedBooking] = useState(null);
+
+  const fetchBookings = async (selectedDate) => {
+    try {
+      const response = await fetch(
+        `http://localhost:8080/api/v1/lab/bookings?date=${selectedDate}`,
+        {
+          method: "GET",
+          headers: {
+            "X-API-KEY": "test123",
+            "X-PARTNER-ID": "PYTHONMAN2",
+          },
+        }
+      );
+      const result = await response.json();
+      setBookings(result);
+    } catch (error) {
+      console.error("Error fetching bookings:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchBookings(date);
+  }, [date]);
+
+  const handleOpenModal = (booking) => {
+    setSelectedBooking(booking);
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setSelectedBooking(null);
+  };
+
+  return (
+    <div className="max-w-4xl mx-auto p-4 bg-white shadow-md rounded-lg">
+      <h1 className="text-2xl font-bold mb-4">ALL Bookings of {date}</h1>
+      <div className="flex items-center border rounded-lg overflow-hidden mb-4">
+        <input
+          type="date"
+          value={date}
+          className="w-full px-3 py-2 border-none outline-none"
+          onChange={(e) => setDate(e.target.value)}
+        />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {bookings.map((booking) => (
+          <div key={booking.id} className="bg-white shadow-md rounded-lg p-4">
+            <h2 className="text-xl font-semibold mb-2">
+              {booking.patientDetails.firstName}{" "}
+              {booking.patientDetails.lastName}
+            </h2>
+            <p className="text-gray-700">
+              Patient ID: {booking.bookingSlip.patientId}
+            </p>
+            <p className="text-gray-700">Date: {booking.bookingSlip.date}</p>
+            <p className="text-gray-700">Time: {booking.bookingSlip.time}</p>
             <button
-              className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ml-4"
-              type="button"
-              onClick={() => handleRemoveProduct(index)}
+              className="px-3 py-3 bg-gray-200 hover:bg-gray-300 text-gray-600"
+              onClick={() => handleOpenModal(booking)}
             >
-              -
+              <FaDownload className="text-black-500 test-2xl" />
+              {/* View and Download PDF */}
             </button>
           </div>
         ))}
-        <button
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-          type="button"
-          onClick={handleAddProduct}
-        >
-          +
-        </button>
-      </form>
-      <div className="bg-blue-100 p-4">
-  <InvoiceData customer={customer} invoice={invoice} />
-</div>
-<div className="bg-red-500 p-4 mt-4">
-  <InvoicePDF customer={customer} invoice={invoice} />
-</div>
-    </main>
-  );
-}
+      </div>
 
+      <Modal showModal={showModal} handleClose={handleCloseModal}>
+        {selectedBooking && <TestComponent data={selectedBooking} />}
+      </Modal>
+    </div>
+  );
+};
+
+export default AllBooking;
 
 // const AllBooking = () => {
 //   const [bookings, setBookings] = useState([]);

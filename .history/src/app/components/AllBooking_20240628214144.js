@@ -228,3 +228,4 @@ const AllBooking = () => {
 
 export default AllBooking;
 
+This code includes the styling I mentioned earlier. It makes the page look more visually appealing and user-friendly. The modal is styled to be centered on the screen and has a close button. The booking cards have a shadow and a rounded border. The date input has a border and a shadow. The button to open the modal has a gradient background and a shadow.

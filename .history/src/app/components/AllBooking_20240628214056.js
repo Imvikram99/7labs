@@ -175,48 +175,37 @@ const AllBooking = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-      <div className="px-4 py-6 sm:px-0">
-        <h1 className="text-3xl font-bold leading-tight text-gray-900 mb-4">
-          ALL Bookings of {date}
-        </h1>
-        <div className="mb-4">
-          <input
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          />
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {bookings.map((booking) => (
-            <div key={booking.id} className="bg-white overflow-hidden shadow rounded-lg">
-              <div className="px-4 py-5 sm:px-6">
-                <h2 className="text-lg leading-6 font-medium text-gray-900">
-                  {booking.patientDetails.firstName} {booking.patientDetails.lastName}
-                </h2>
-                <p className="mt-1 max-w-2xl text-sm text-gray-500">
-                  Patient ID: {booking.bookingSlip.patientId}
-                </p>
-                <p className="mt-1 max-w-2xl text-sm text-gray-500">
-                  Date: {booking.bookingSlip.date}
-                </p>
-                <p className="mt-1 max-w-2xl text-sm text-gray-500">
-                  Time: {booking.bookingSlip.time}
-                </p>
-              </div>
-              <div className="px-4 py-4 sm:px-6">
-                <button
-                  className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                  onClick={() => handleOpenModal(booking)}
-                >
-                  <FaDownload className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
-                  View and Download PDF
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
+    <div className="max-w-4xl mx-auto p-4 bg-white shadow-md rounded-lg">
+      <h1 className="text-2xl font-bold mb-4">ALL Bookings of {date}</h1>
+      <div className="flex items-center border rounded-lg overflow-hidden mb-4">
+        <input
+          type="date"
+          value={date}
+          className="w-full px-3 py-2 border-none outline-none"
+          onChange={(e) => setDate(e.target.value)}
+        />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {bookings.map((booking) => (
+          <div key={booking.id} className="bg-white shadow-md rounded-lg p-4">
+            <h2 className="text-xl font-semibold mb-2">
+              {booking.patientDetails.firstName}{" "}
+              {booking.patientDetails.lastName}
+            </h2>
+            <p className="text-gray-700">
+              Patient ID: {booking.bookingSlip.patientId}
+            </p>
+            <p className="text-gray-700">Date: {booking.bookingSlip.date}</p>
+            <p className="text-gray-700">Time: {booking.bookingSlip.time}</p>
+            <button
+              className="px-3 py-3 bg-gray-200 hover:bg-gray-300 text-gray-600"
+              onClick={() => handleOpenModal(booking)}
+            >
+              <FaDownload className="text-black-500 test-2xl" />
+              {/* View and Download PDF */}
+            </button>
+          </div>
+        ))}
       </div>
 
       <Modal showModal={showModal} handleClose={handleCloseModal}>
@@ -227,4 +216,3 @@ const AllBooking = () => {
 };
 
 export default AllBooking;
-
