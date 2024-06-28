@@ -14,17 +14,6 @@ const AddTestPanel = () => {
   watch(`tests.${index}.referenceValueType`)
 );
 
-const addReferenceValues = (testIndex) => {
-    appendReferenceValue({
-      minAge: '',
-      maxAge: '',
-      gender: '',
-      minReferenceValue: '',
-      maxReferenceValue: '',
-      testResultUnit: ''
-    }, testIndex);
-  };
-
   useEffect(() => {
     axios.get('http://localhost:8080/api/v1/lab/testpanel/category', {
       headers: {
@@ -137,14 +126,12 @@ const addReferenceValues = (testIndex) => {
             {
                 testReferenceValueTypes[index] == 'RANGE' &&(
                     <div>
-                        {/* <button type="button" onClick={() => {
+                        <button type="button" onClick={() => {
                 // Append a new set of reference values
                 append(`tests.${index}.referenceValues`, {});
-              }}>Add Reference Value Set</button> */}
-              {/* {item.referenceValues?.map((refValue, refIndex) => (
-              <div key={refIndex}> */}
-              
-             
+              }}>Add Reference Value Set</button>
+              {item.referenceValues?.map((refValue, refIndex) => ())}
+              <div key={refIndex}>
   <label htmlFor={`tests.${index}.referenceValues`} className="block text-sm font-medium text-gray-700">Reference Values</label>
   <div className="grid grid-cols-2 gap-4">
     <div>
@@ -173,16 +160,13 @@ const addReferenceValues = (testIndex) => {
     </div>
   </div>
 </div>
-)
-
-}
-{/* <button type="button" onClick={() => {
+<button type="button" onClick={() => {
                     // Remove a specific set of reference values
                     remove(`tests.${index}.referenceValues`, refIndex);
                   }}>Remove This Set</button>
                     </div>
                 )
-            } */}
+            }
           </div>
 {testResultType === 'DOCUMENT' && (
   <div>
@@ -271,4 +255,3 @@ const addReferenceValues = (testIndex) => {
 };
 
 export default AddTestPanel;
-

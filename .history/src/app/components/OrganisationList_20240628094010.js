@@ -141,10 +141,8 @@ const addReferenceValues = (testIndex) => {
                 // Append a new set of reference values
                 append(`tests.${index}.referenceValues`, {});
               }}>Add Reference Value Set</button> */}
-              {/* {item.referenceValues?.map((refValue, refIndex) => (
-              <div key={refIndex}> */}
-              
-             
+              {item.referenceValues?.map((refValue, refIndex) => (
+              <div key={refIndex}>
   <label htmlFor={`tests.${index}.referenceValues`} className="block text-sm font-medium text-gray-700">Reference Values</label>
   <div className="grid grid-cols-2 gap-4">
     <div>
@@ -173,16 +171,14 @@ const addReferenceValues = (testIndex) => {
     </div>
   </div>
 </div>
-)
-
-}
-{/* <button type="button" onClick={() => {
+))}
+<button type="button" onClick={() => {
                     // Remove a specific set of reference values
                     remove(`tests.${index}.referenceValues`, refIndex);
                   }}>Remove This Set</button>
                     </div>
                 )
-            } */}
+            }
           </div>
 {testResultType === 'DOCUMENT' && (
   <div>

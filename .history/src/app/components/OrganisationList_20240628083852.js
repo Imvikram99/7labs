@@ -13,17 +13,11 @@ const AddTestPanel = () => {
   const testReferenceValueTypes = fields.map((field, index) =>
   watch(`tests.${index}.referenceValueType`)
 );
-
-const addReferenceValues = (testIndex) => {
-    appendReferenceValue({
-      minAge: '',
-      maxAge: '',
-      gender: '',
-      minReferenceValue: '',
-      maxReferenceValue: '',
-      testResultUnit: ''
-    }, testIndex);
-  };
+const TestItem = ({ item, index, register, control, removeTest }) => {
+    const { fields: referenceValueFields, append: appendReferenceValue, remove: removeReferenceValue } = useFieldArray({
+      control,
+      name: `tests.${index}.referenceValues`
+    });
 
   useEffect(() => {
     axios.get('http://localhost:8080/api/v1/lab/testpanel/category', {
@@ -110,6 +104,7 @@ const addReferenceValues = (testIndex) => {
       {testResultType === 'BLOOD_MULTIPLE_PARAMETER' ? (
         <>
       {fields.map((item, index) => (
+        <TestItem key={item.id} item={item} index={index} register={register} control={control} removeTest={remove} />
         <div key={item.id} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -137,14 +132,9 @@ const addReferenceValues = (testIndex) => {
             {
                 testReferenceValueTypes[index] == 'RANGE' &&(
                     <div>
-                        {/* <button type="button" onClick={() => {
-                // Append a new set of reference values
-                append(`tests.${index}.referenceValues`, {});
-              }}>Add Reference Value Set</button> */}
-              {/* {item.referenceValues?.map((refValue, refIndex) => (
-              <div key={refIndex}> */}
-              
-             
+              <button type="button" onClick={() => appendReferenceValue({})}>Add Reference Value Set</button>
+              {item.referenceValueFields?.map((refValue, refIndex) => (
+              <div  key={refValue.id}>
   <label htmlFor={`tests.${index}.referenceValues`} className="block text-sm font-medium text-gray-700">Reference Values</label>
   <div className="grid grid-cols-2 gap-4">
     <div>
@@ -172,17 +162,13 @@ const addReferenceValues = (testIndex) => {
       <input {...register(`tests.${index}.referenceValues.testResultUnit`)} className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
     </div>
   </div>
+  <button type="button" onClick={() => removeReferenceValue(refIndex)}>Remove This Set</button>
 </div>
-)
+))}
 
-}
-{/* <button type="button" onClick={() => {
-                    // Remove a specific set of reference values
-                    remove(`tests.${index}.referenceValues`, refIndex);
-                  }}>Remove This Set</button>
                     </div>
                 )
-            } */}
+            }
           </div>
 {testResultType === 'DOCUMENT' && (
   <div>
@@ -271,4 +257,3 @@ const addReferenceValues = (testIndex) => {
 };
 
 export default AddTestPanel;
-

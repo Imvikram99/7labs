@@ -10,20 +10,6 @@ const AddTestPanel = () => {
   const { fields: columnStyleFields, append: appendColumnStyle, remove: removeColumnStyle } = useFieldArray({ control, name: `tests.${testFields.length - 1}.matrixTestReportTemplate.columnStyles` });
   const [testCategories, setTestCategories] = useState([]);
   const [testUnits, setTestUnits] = useState([]);
-  const testReferenceValueTypes = fields.map((field, index) =>
-  watch(`tests.${index}.referenceValueType`)
-);
-
-const addReferenceValues = (testIndex) => {
-    appendReferenceValue({
-      minAge: '',
-      maxAge: '',
-      gender: '',
-      minReferenceValue: '',
-      maxReferenceValue: '',
-      testResultUnit: ''
-    }, testIndex);
-  };
 
   useEffect(() => {
     axios.get('http://localhost:8080/api/v1/lab/testpanel/category', {
@@ -135,16 +121,9 @@ const addReferenceValues = (testIndex) => {
               </select>
             </div>
             {
-                testReferenceValueTypes[index] == 'RANGE' &&(
+                'RANGE'==`tests.${index}.referenceValueType`&&(
                     <div>
-                        {/* <button type="button" onClick={() => {
-                // Append a new set of reference values
-                append(`tests.${index}.referenceValues`, {});
-              }}>Add Reference Value Set</button> */}
-              {/* {item.referenceValues?.map((refValue, refIndex) => (
-              <div key={refIndex}> */}
-              
-             
+                        <div>
   <label htmlFor={`tests.${index}.referenceValues`} className="block text-sm font-medium text-gray-700">Reference Values</label>
   <div className="grid grid-cols-2 gap-4">
     <div>
@@ -173,17 +152,43 @@ const addReferenceValues = (testIndex) => {
     </div>
   </div>
 </div>
-)
 
-}
-{/* <button type="button" onClick={() => {
-                    // Remove a specific set of reference values
-                    remove(`tests.${index}.referenceValues`, refIndex);
-                  }}>Remove This Set</button>
                     </div>
                 )
-            } */}
+            }
           </div>
+          { && (
+            <div>
+  <label htmlFor={`tests.${index}.referenceValues`} className="block text-sm font-medium text-gray-700">Reference Values</label>
+  <div className="grid grid-cols-2 gap-4">
+    <div>
+      <label htmlFor={`tests.${index}.referenceValues.minAge`} className="block text-sm font-medium text-gray-700">Min Age</label>
+      <input {...register(`tests.${index}.referenceValues.minAge`)} className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
+    </div>
+    <div>
+      <label htmlFor={`tests.${index}.referenceValues.maxAge`} className="block text-sm font-medium text-gray-700">Max Age</label>
+      <input {...register(`tests.${index}.referenceValues.maxAge`)} className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
+    </div>
+    <div>
+      <label htmlFor={`tests.${index}.referenceValues.gender`} className="block text-sm font-medium text-gray-700">Gender</label>
+      <input {...register(`tests.${index}.referenceValues.gender`)} className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
+    </div>
+    <div>
+      <label htmlFor={`tests.${index}.referenceValues.minReferenceValue`} className="block text-sm font-medium text-gray-700">Min Reference Value</label>
+      <input {...register(`tests.${index}.referenceValues.minReferenceValue`)} className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
+    </div>
+    <div>
+      <label htmlFor={`tests.${index}.referenceValues.maxReferenceValue`} className="block text-sm font-medium text-gray-700">Max Reference Value</label>
+      <input {...register(`tests.${index}.referenceValues.maxReferenceValue`)} className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
+    </div>
+    <div>
+      <label htmlFor={`tests.${index}.referenceValues.testResultUnit`} className="block text-sm font-medium text-gray-700">Test Result Unit</label>
+      <input {...register(`tests.${index}.referenceValues.testResultUnit`)} className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
+    </div>
+  </div>
+</div>
+
+)}
 {testResultType === 'DOCUMENT' && (
   <div>
     <label htmlFor={`tests.${index}.document`} className="block text-sm font-medium text-gray-700">Document</label>
@@ -271,4 +276,3 @@ const addReferenceValues = (testIndex) => {
 };
 
 export default AddTestPanel;
-

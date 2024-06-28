@@ -174,8 +174,8 @@ const addReferenceValues = (testIndex) => {
   </div>
 </div>
 )
+)
 
-}
 {/* <button type="button" onClick={() => {
                     // Remove a specific set of reference values
                     remove(`tests.${index}.referenceValues`, refIndex);
