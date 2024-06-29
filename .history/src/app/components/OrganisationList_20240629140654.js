@@ -49,7 +49,7 @@ const AddTestPanel = () => {
           alignment: style.alignment
         };
         return acc;
-      }, {}) : {};
+      }, {});
       
     
     const formData = {

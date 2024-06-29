@@ -187,9 +187,15 @@ class SpecificApis {
       }
   };
 
-  async addTestPanel(formData) {
+  async sendTestPanel(formData) {
     try {
-      const response = await apiService.postData('api/v1/lab/testpanel', formData);
+      const response = await apiService.postData('api/v1/lab/testpanel', formData, {
+        headers: {
+          'X-API-KEY': 'test123',
+          'X-PARTNER-ID': 'PYTHONMAN2',
+          'Content-Type': 'application/json'
+        }
+      });
       return response.data;
     } catch (error) {
       console.error('Error sending test panel:', error);

@@ -12,19 +12,16 @@ const AddTestPanel = () => {
 
   useEffect(() => {
       specificApis.fetchTestCategories()
-      .then(response => {
-        setTestCategories(response);
-    })
+      .then(response => setTestCategories(response.data))
       .catch(error => console.error(error));
 
-      specificApis.fetchTestUnits()
-      .then(response => {
-        setTestUnits(response);})
+        
+      .then(response => setTestUnits(response.data))
       .catch(error => console.error(error));
   }, []);
 
   const onSubmit = data => {
-        const matrixColumns = data.matrixTestReportTemplate ? data.matrixTestReportTemplate.columns.reduce((acc, column) => {
+    const matrixColumns = data.matrixTestReportTemplate.columns.reduce((acc, column) => {
         const inputKey = column.inputKey;
         const inputComment = column.inputComment;
         const inputName = column.inputName;
@@ -38,9 +35,9 @@ const AddTestPanel = () => {
         acc[inputName][inputKey] = inputComment;
       
         return acc;
-      }, {}) : {};
+      }, {});
 
-      const columnStyles = data.matrixTestReportTemplate ? data.matrixTestReportTemplate.columnStyles.reduce((acc, style) => {
+      const columnStyles = data.matrixTestReportTemplate.columnStyles.reduce((acc, style) => {
         const styleName = style.name; // Assuming there's a 'name' property to use as a key
         acc[styleName] = {
           width: style.width,
@@ -49,7 +46,7 @@ const AddTestPanel = () => {
           alignment: style.alignment
         };
         return acc;
-      }, {}) : {};
+      }, {});
       
     
     const formData = {
@@ -61,7 +58,13 @@ const AddTestPanel = () => {
       },
       testCategory: testCategories.find(category => category.id === data.testCategory)
     };
-       specificApis.addTestPanel(formData)
+    axios.post('http://localhost:8080/api/v1/lab/testpanel', formData, {
+      headers: {
+        'X-API-KEY': 'test123',
+        'X-PARTNER-ID': 'PYTHONMAN2',
+        'Content-Type': 'application/json'
+      }
+    })
       .then(response => console.log(response))
       .catch(error => console.error(error));
   };

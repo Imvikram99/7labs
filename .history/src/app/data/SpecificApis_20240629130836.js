@@ -179,24 +179,13 @@ class SpecificApis {
   
    async fetchTestUnits() {
     try {
-        const response = await apiService.fetchData(`api/v1/lab/testpanel/testunit`);
+        const response = apiService.fetchData(`api/v1/lab/testpanel/testunit`);
         return response.data;
       } catch (error) {
         console.error('Error updating test result:', error);
         throw error;
       }
   };
-
-  async addTestPanel(formData) {
-    try {
-      const response = await apiService.postData('api/v1/lab/testpanel', formData);
-      return response.data;
-    } catch (error) {
-      console.error('Error sending test panel:', error);
-      throw error;
-    }
-  }
-  
   
 }
 

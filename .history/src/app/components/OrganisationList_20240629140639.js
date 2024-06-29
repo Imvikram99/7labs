@@ -38,7 +38,7 @@ const AddTestPanel = () => {
         acc[inputName][inputKey] = inputComment;
       
         return acc;
-      }, {}) : {};
+      }, {});
 
       const columnStyles = data.matrixTestReportTemplate ? data.matrixTestReportTemplate.columnStyles.reduce((acc, style) => {
         const styleName = style.name; // Assuming there's a 'name' property to use as a key
@@ -49,7 +49,7 @@ const AddTestPanel = () => {
           alignment: style.alignment
         };
         return acc;
-      }, {}) : {};
+      }, {});
       
     
     const formData = {

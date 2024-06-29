@@ -187,7 +187,7 @@ class SpecificApis {
       }
   };
 
-  async addTestPanel(formData) {
+  async sendTestPanel(formData) {
     try {
       const response = await apiService.postData('api/v1/lab/testpanel', formData);
       return response.data;
