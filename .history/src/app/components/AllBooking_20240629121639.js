@@ -147,7 +147,7 @@ const AllBooking = () => {
   useEffect(() => {
     specificApis.getBookings(date, "")
       .then(response => {
-        setBookings(response);
+        setBookings(response.data);
       })
       .catch(error => {
         console.error('Failed to fetch bookings:', error);

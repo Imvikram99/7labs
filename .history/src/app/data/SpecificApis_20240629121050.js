@@ -167,25 +167,13 @@ class SpecificApis {
     }
   }
 
-//   async fetchTestCategories = () => {
-//     try {
-//         const response = await apiService.fetchData(`api/v1/lab/testpanel/category`);
-//         return response.data;
-//       } catch (error) {
-//         console.error('Error updating test result:', error);
-//         throw error;
-//       }
-//   };
+  async fetchTestCategories = () => {
+    return apiService.get(`/testpanel/category`, COMMON_HEADERS);
+  };
   
-//   async fetchTestUnits = () => {
-//     try {
-//         const response = await apiService.fetchData(`api/v1/lab/testpanel/testunit`);
-//         return response.data;
-//       } catch (error) {
-//         console.error('Error updating test result:', error);
-//         throw error;
-//       }
-//   };
+  async fetchTestUnits = () => {
+    return apiService.get(`${BASE_URL}/testpanel/testunit`, COMMON_HEADERS);
+  };
   
 }
 

@@ -5,12 +5,12 @@ import axios from 'axios';
 class ApiService {
   constructor() {
     const apiKey = "test123"; // Set your API key
-    const tenantId = "PYTHONMAN2"; // Set your tenant ID
+    const tenantId = "PYTHONMAN"; // Set your tenant ID
 
     // Create an Axios instance
     this.client = axios.create({
-       baseURL: 'http://ec2-13-233-207-62.ap-south-1.compute.amazonaws.com:8080', // Set the base URL for all requests
-    //   baseURL: 'http://localhost:8080',
+    //   baseURL: 'http://ec2-13-233-207-62.ap-south-1.compute.amazonaws.com:8080', // Set the base URL for all requests
+      baseURL: 'localhost:8080',
       headers: {
         'Content-Type': 'application/json',
         'X-API-KEY': apiKey,

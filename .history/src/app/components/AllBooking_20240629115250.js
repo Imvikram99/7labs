@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { FaDownload } from "react-icons/fa6";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
-import { specificApis } from '../data/SpecificApis';
 
 const Modal = ({ showModal, handleClose, children }) => {
   if (!showModal) return null;
@@ -145,13 +144,7 @@ const AllBooking = () => {
   
 
   useEffect(() => {
-    specificApis.getBookings(date, "")
-      .then(response => {
-        setBookings(response);
-      })
-      .catch(error => {
-        console.error('Failed to fetch bookings:', error);
-      });
+    fetchBookings(date);
   }, [date]);
 
   const handleOpenModal = (booking) => {

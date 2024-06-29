@@ -145,13 +145,8 @@ const AllBooking = () => {
   
 
   useEffect(() => {
-    specificApis.getBookings(date, "")
-      .then(response => {
-        setBookings(response);
-      })
-      .catch(error => {
-        console.error('Failed to fetch bookings:', error);
-      });
+    fetchBookings(date);
+    specificApis.getBookings
   }, [date]);
 
   const handleOpenModal = (booking) => {
