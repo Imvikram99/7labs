@@ -1,28 +1,28 @@
-import React, { useState, useEffect } from "react";
+import React, {useState, useEffect} from "react";
 import {
-  Box,
-  Flex,
-  IconButton,
-  Icon,
-  useColorModeValue,
-  Drawer,
-  DrawerContent,
-  Text,
-  useDisclosure,
+    Box,
+    Flex,
+    IconButton,
+    Icon,
+    useColorModeValue,
+    Drawer,
+    DrawerContent,
+    Text,
+    useDisclosure,
 } from "@chakra-ui/react";
 import {
-  FiHome,
-  FiTrendingUp,
-  FiCompass,
-  FiStar,
-  FiSettings,
-  FiMenu,
-  FiBell,
-  FiUserPlus,
-  FiFilePlus,
+    FiHome,
+    FiTrendingUp,
+    FiCompass,
+    FiStar,
+    FiSettings,
+    FiMenu,
+    FiBell,
+    FiUserPlus,
+    FiFilePlus,
 } from "react-icons/fi";
-import { RxHamburgerMenu } from "react-icons/rx";
-import { useFormData } from "./context";
+import {RxHamburgerMenu} from "react-icons/rx";
+import {useFormData} from "./context";
 
 import PatientList from "./PatientList";
 import VerifyReports from "./VerifyReports";
@@ -37,213 +37,265 @@ import Report from "./Report";
 import Booking from "./Booking";
 import AllBooking from "./AllBooking";
 import RegisterCustomer from "./RegisterCustomer";
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import {
+    faArrowLeft,
+    faHome,
+    faCircle,
+    faList,
+    faRestroom,
+    faMoneyCheckDollar,
+    faUserTie,
+    faClipboardList
+} from '@fortawesome/free-solid-svg-icons';
 
-export default function SidebarWithHeader({ children }) {
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const [activeComponent, setActiveComponent] = useState(null);
-  const { formData, updateFormData } = useFormData();
+export default function SidebarWithHeader({children}) {
+    const {isOpen, onOpen, onClose} = useDisclosure();
+    const [activeComponent, setActiveComponent] = useState(null);
+    const {formData, updateFormData} = useFormData();
 
-  useEffect(() => {
-    setActiveComponent(components["Create New Bill"]);
-  }, []);
+    useEffect(() => {
+        setActiveComponent(components["Create New Bill"]);
+    }, []);
 
-  const components = {
-    "Patient List": <PatientList />,
-    "Verify Reports": <VerifyReports />,
-    "Financial Analysis": <FinancialAnalysis />,
-    "Test List": <TestList />,
-    "Organisation List": <OrganisationList />,
-    Employees: <EmployeeList />,
-    Center: <LabCenter />,
-    "Lab Profile": <LabProfile />,
-    "Register New Customer": <RegisterCustomer />,
-    "Create New Bill": <NewBill />,
-    "Create Report": <Report />,
-    "Create Booking": <Booking />,
-    "All Booking": <AllBooking />,
-  };
+    const components = {
+        "Patient List": <PatientList/>,
+        "Verify Reports": <VerifyReports/>,
+        "Financial Analysis": <FinancialAnalysis/>,
+        "Test List": <TestList/>,
+        "Organisation List": <OrganisationList/>,
+        Employees: <EmployeeList/>,
+        Center: <LabCenter/>,
+        "Lab Profile": <LabProfile/>,
+        "Register New Customer": <RegisterCustomer/>,
+        "Create New Bill": <NewBill/>,
+        "Create Report": <Report/>,
+        "Create Booking": <Booking/>,
+        "All Booking": <AllBooking/>,
+    };
 
-  function handleComponentChange(componentName) {
-    setActiveComponent(components[componentName]);
-  }
+    function handleComponentChange(componentName) {
+        setActiveComponent(components[componentName]);
+    }
 
-  return (
-    <Flex minH="100vh" bg={useColorModeValue("gray.100", "gray.900")}>
-      <SidebarContent
-        onClose={() => onClose()}
-        display={{ base: "none", md: "block" }}
-        w={{ base: "full", md: 60 }}
-        handleComponentChange={handleComponentChange}
-      />
-      <Drawer
-        autoFocus={false}
-        isOpen={isOpen}
-        placement="left"
-        onClose={onClose}
-        returnFocusOnClose={false}
-        onOverlayClick={onClose}
-        size="full"
-      >
-        <DrawerContent>
-          <SidebarContent
-            onClose={onClose}
-            handleComponentChange={handleComponentChange}
-          />
-        </DrawerContent>
-      </Drawer>
-      <Flex flex="1" flexDirection="column">
-        <MobileNav onOpen={onOpen} className="hello" />
-        <hr />
-        <Box flex="1" p="4">
-          {activeComponent}
+    return (
+        <Flex className="main-container" minH="100vh" bg={useColorModeValue("gray.100", "gray.900")}>
+            <SidebarContent
+                onClose={() => onClose()}
+                display={{base: "none", md: "block"}}
+                w={{base: "full", md: 60}}
+                handleComponentChange={handleComponentChange}
+            />
+            <Drawer
+                autoFocus={false}
+                isOpen={isOpen}
+                placement="left"
+                onClose={onClose}
+                returnFocusOnClose={false}
+                onOverlayClick={onClose}
+                size="full"
+            >
+                <DrawerContent>
+                    <SidebarContent
+                        onClose={onClose}
+                        handleComponentChange={handleComponentChange}
+                    />
+                </DrawerContent>
+            </Drawer>
+
+
+            <header>
+                <div className="topbar d-flex align-items-center">
+                    <nav className="navbar navbar-expand gap-3">
+                        <div className="mobile-toggle-menu"><i className="bx bx-menu"></i>
+                        </div>
+                        <div className="user-box dropdown px-3">
+                            <a className="d-flex align-items-center nav-link dropdown-toggle gap-3 dropdown-toggle-nocaret"
+                               href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                {/*<img src="assets/images/avatars/avatar-2.png" className="user-img" alt="user avatar">*/}
+                                <div className="user-info">
+                                    <p className="user-name mb-0">Vikram Panwar</p>
+                                    <p className="designattion mb-0">Web Designer</p>
+                                </div>
+                            </a>
+                        </div>
+                    </nav>
+                </div>
+            </header>
+
+
+            <Flex className="right-sidebar-container">
+                {/*<MobileNav onOpen={onOpen} className="hello"/>*/}
+                {/*<hr/>*/}
+                <Box flex="1" p="4" className="body-content-main">
+                    {activeComponent}
+                </Box>
+            </Flex>
+        </Flex>
+    );
+}
+
+function SidebarContent({handleComponentChange}) {
+    const [expandedIndex, setExpandedIndex] = useState(null);
+
+    const toggleThisMenu = (index) => {
+        setExpandedIndex(expandedIndex === index ? null : index);
+    };
+
+    const navItems = [
+        {
+            label: "Patient List",
+            icon: faList,
+            subItems: null
+        },
+        {
+            label: "Booking",
+            icon: faRestroom,
+            subItems: [
+                {
+                    label: "Create Booking",
+                    icon: faHome,
+                    subItems: null
+                },
+                {
+                    label: "All Booking",
+                    icon: faHome,
+                    subItems: null
+                }
+            ]
+        },
+        {
+            label: "Financial Analysis",
+            icon: faMoneyCheckDollar,
+            subItems: null
+        },
+        {
+            label: "Test List",
+            icon: faList,
+            subItems: null
+        },
+        {
+            label: "Organisation List",
+            icon: faList,
+            subItems: null
+        },
+        {
+            label: "Employees",
+            icon: faUserTie,
+            subItems: null
+        },
+        {
+            label: "Center",
+            icon: faHome,
+            subItems: null
+        },
+        {
+            label: "Lab Profile",
+            icon: faUserTie,
+            subItems: null
+        },
+        {
+            label: "Register New Customer",
+            icon: faUserTie,
+            subItems: null
+        },
+        {
+            label: "Create New Bill",
+            icon: faMoneyCheckDollar,
+            subItems: null
+        },
+        {
+            label: "Report",
+            icon: faClipboardList,
+            subItems: [
+                {
+                    label: "Create Report",
+                    icon: faHome,
+                    subItems: null
+                },
+                {
+                    label: "Verify Reports",
+                    icon: faHome,
+                    subItems: null
+                },
+            ]
+        }
+    ];
+
+    return (
+        <Box
+            transition="3s ease"
+            className="left-sidebar-container"
+        >
+            <div className="sidebar-header">
+                <div>
+                    <h4 className="logo-text">7 Labs</h4>
+                </div>
+                <div className="toggle-icon ms-auto"><FontAwesomeIcon icon={faArrowLeft}/></div>
+            </div>
+            <Box className="left-sidebar-menu-main">
+                <ul className="metismenu mm-show" id="menu">
+                    {navItems.map((item, index) => (
+                        <React.Fragment key={index}>
+                            <li onClick={() => item.subItems ? toggleThisMenu(index) : handleComponentChange(item.label)}
+                                className={expandedIndex === index ? 'mm-active' : ''}>
+                                <a href={void 0}
+                                   className={`${item.subItems !== null && item.subItems.length > 0 ? 'has-arrow' : ''}`}>
+                                    <div className="parent-icon"><i><FontAwesomeIcon icon={item.icon}/></i>
+                                    </div>
+                                    <div className="menu-title">{item.label}</div>
+                                </a>
+                            </li>
+                            {
+                                item.subItems !== null && item.subItems.length > 0 && (
+                                    <ul className={expandedIndex === index ? 'mm-collapse mm-show' : 'mm-collapse'}>
+                                        {item.subItems.map((subItem, subIndex) => (
+                                            <li key={subIndex} onClick={() => handleComponentChange(subItem.label)}>
+                                                <a href={void 0}>
+                                                    <div className="parent-icon"><i><FontAwesomeIcon icon={faCircle}/></i>
+                                                    </div>
+                                                    <div className="menu-title">{subItem.label}</div>
+                                                </a>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )
+                            }
+                        </React.Fragment>
+                    ))}
+                </ul>
+            </Box>
         </Box>
-      </Flex>
-    </Flex>
-  );
+    );
 }
 
-function SidebarContent({ handleComponentChange }) {
-  return (
-    <Box
-      transition="3s ease"
-      bg={useColorModeValue("#F7D4BC", "gray.900")}
-      borderRight="1px"
-      p="10px"
-      borderRightColor={useColorModeValue("gray.200", "gray.700")}
-      h="full"
-    >
-      <Flex h="40" alignItems="center" mx="8" justifyContent="space-between">
-        <Text fontSize="40px" fontFamily="monospace" fontWeight="bold">
-          7Labs
-        </Text>
-      </Flex>
-      <NavItem
-        label="Patient List"
-        // fontSize="16px"
-        pt="10px"
-        fontWeight="bolder"
-        onClick={() => handleComponentChange("Patient List")}
-      />
-      <hr />
-      <NavItem
-        label="Verify Reports"
-        onClick={() => handleComponentChange("Verify Reports")}
-      />
-      <hr />
-
-      <NavItem
-        label="Financial Analysis"
-        onClick={() => handleComponentChange("Financial Analysis")}
-      />
-      <hr />
-
-      <NavItem
-        label="Test List"
-        onClick={() => handleComponentChange("Test List")}
-      />
-      <hr />
-
-      <NavItem
-        label="Organisation List"
-        onClick={() => handleComponentChange("Organisation List")}
-      />
-      <hr />
-
-      <NavItem
-        label="Employees"
-        onClick={() => handleComponentChange("Employees")}
-      />
-      <hr />
-
-      <NavItem label="Center" onClick={() => handleComponentChange("Center")} />
-      <hr />
-
-      <NavItem
-        label="Lab Profile"
-        onClick={() => handleComponentChange("Lab Profile")}
-      />
-      <hr />
-
-      <NavItem
-        label="Register New Customer"
-        onClick={() => handleComponentChange("Register New Customer")}
-      />
-      <hr />
-
-      <NavItem
-        label="Create New Bill"
-        icon={FiFilePlus}
-        onClick={() => handleComponentChange("Create New Bill")}
-      />
-      <hr />
-      <NavItem
-        label="Create Report"
-        // icon={FiFilePlus}
-        onClick={() => handleComponentChange("Create Report")}
-      />
-      <hr />
-      <NavItem
-        label="Create Booking"
-        // icon={FiFilePlus}
-
-        onClick={() => handleComponentChange("Create Booking")}
-      />
-      <hr />
-      <NavItem
-        label="All Booking"
-        // icon={FiFilePlus}
-
-        onClick={() => handleComponentChange("All Booking")}
-      />
-      <hr />
-    </Box>
-  );
-}
-
-function NavItem({ label, onClick }) {
-  return (
-    <Flex
-      align="center"
-      p="4"
-      mx="4"
-      borderRadius="lg"
-      role="group"
-      cursor="pointer"
-      _hover={{ bg: "cyan.400", color: "white" }}
-      onClick={onClick}
-    >
-      <Text>{label}</Text>
-    </Flex>
-  );
-}
-
-function MobileNav({ onOpen }) {
-  return (
-    <Flex
-      // px={{ base: 4, md: 4 }}
-      height="40"
-      alignItems="center"
-      bg={useColorModeValue("#F7D4BC", "gray.900")}
-      justifyContent="space-between"
-      px="10px"
-    >
-      <Text
-        ml={4}
-        display={{ base: "flex", md: "none" }}
-        fontSize="30px"
-        p="10px"
-        fontFamily="monospace"
-        fontWeight="bold"
-      >
-        7Labs
-      </Text>
-      <IconButton
-        size="lg"
-        variant="ghost"
-        aria-label="open menu"
-        icon={<RxHamburgerMenu />}
-        onClick={onOpen}
-      />
-    </Flex>
-  );
+function MobileNav({onOpen}) {
+    return (
+        <Flex
+            // px={{ base: 4, md: 4 }}
+            height="40"
+            alignItems="center"
+            bg={useColorModeValue("#F7D4BC", "gray.900")}
+            justifyContent="space-between"
+            px="10px"
+        >
+            <Text
+                ml={4}
+                display={{base: "flex", md: "none"}}
+                fontSize="30px"
+                p="10px"
+                fontFamily="monospace"
+                fontWeight="bold"
+            >
+                7Labs
+            </Text>
+            <IconButton
+                size="lg"
+                variant="ghost"
+                aria-label="open menu"
+                icon={<RxHamburgerMenu/>}
+                onClick={onOpen}
+            />
+        </Flex>
+    );
 }
