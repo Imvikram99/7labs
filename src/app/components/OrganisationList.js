@@ -40,8 +40,8 @@ const AddTestPanel = () => {
             return acc;
         }, {}) : {};
 
-        const columnStyles = data.matrixTestReportTemplate ? data.matrixTestReportTemplate.columnStyles.reduce((acc, style) => {
-            const styleName = style.name;
+        const columnStyles = data.matrixTestReportTemplate ? data.matrixTestReportTemplate.columns.reduce((acc, style) => {
+            const styleName = style.inputName;
             acc[styleName] = {
                 width: style.width,
                 backgroundColor: style.backgroundColor,
@@ -456,6 +456,10 @@ const MatrixTemplate = ({register, control}) => {
                                             <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">columnKey</th>
                                             <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">columnValue</th>
                                             <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">columnName</th>
+                                            <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">width</th>
+                                            <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">backgroundColor</th>
+                                            <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">textColor</th>
+                                            <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">alignment</th>
                                             <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6"/>
                                         </tr>
                                         </thead>
@@ -478,71 +482,23 @@ const MatrixTemplate = ({register, control}) => {
                                                     />
                                                 </td>
                                                 <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
+                                                    <input {...register(`matrixTestReportTemplate.columns.${columnIndex}.width`)} type='number'  required={true}
+                                                           className="mt-1 border border-gray-300 rounded px-2 py-1 w-full text-gray-700"/>
+                                                </td>
+                                                <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
+                                                    <input {...register(`matrixTestReportTemplate.columns.${columnIndex}.backgroundColor`)}  required={true}
+                                                           className="mt-1 border border-gray-300 rounded px-2 py-1 w-full text-gray-700"/>
+                                                </td>
+                                                <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
+                                                    <input {...register(`matrixTestReportTemplate.columns.${columnIndex}.textColor`)}  required={true}
+                                                           className="mt-1 border border-gray-300 rounded px-2 py-1 w-full text-gray-700"/>
+                                                </td>
+                                                <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
+                                                    <input {...register(`matrixTestReportTemplate.columns.${columnIndex}.alignment`)}  required={true}
+                                                           className="mt-1 border border-gray-300 rounded px-2 py-1 w-full text-gray-700"/>
+                                                </td>
+                                                <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
                                                     <button type="button" onClick={() => removeColumn(columnIndex)}
-                                                            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
-                                                        <Icon as={DeleteIcon} />
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="sm:flex sm:items-center">
-                        <div className="sm:flex-auto">
-                            <h1 className="text-base font-semibold leading-6 text-gray-900">Columns Styles</h1>
-                        </div>
-                        <div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
-                            <button type="button" onClick={() => {
-                                appendColumnStyle({})
-                            }} className="block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Add Column Styles</button>
-                        </div>
-                    </div>
-                    <div className="my-3 flow-root px-4 sm:px-6 lg:px-8">
-                        <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-                            <div className="inline-block min-w-full py-2 align-middle px-1">
-                                <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
-                                    <table className="min-w-full divide-y divide-gray-300">
-                                        <thead className="bg-gray-50">
-                                        <tr>
-                                            <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">name</th>
-                                            <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">width</th>
-                                            <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">backgroundColor</th>
-                                            <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">textColor</th>
-                                            <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">alignment</th>
-                                            <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
-
-                                            </th>
-                                        </tr>
-                                        </thead>
-                                        <tbody className="divide-y divide-gray-200 bg-white">
-                                        {columnStyleFields.map((columnStyle, columnStyleIndex) => (
-                                            <tr key={columnStyle.id} className="">
-                                                <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
-                                                    <input {...register(`matrixTestReportTemplate.columnStyles.${columnStyleIndex}.name`)}  required={true}
-                                                           className="mt-1 border border-gray-300 rounded px-2 py-1 w-full text-gray-700"/>
-                                                </td>
-                                                <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
-                                                    <input {...register(`matrixTestReportTemplate.columnStyles.${columnStyleIndex}.width`)} type='number'  required={true}
-                                                           className="mt-1 border border-gray-300 rounded px-2 py-1 w-full text-gray-700"/>
-                                                </td>
-                                                <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
-                                                    <input {...register(`matrixTestReportTemplate.columnStyles.${columnStyleIndex}.backgroundColor`)}  required={true}
-                                                           className="mt-1 border border-gray-300 rounded px-2 py-1 w-full text-gray-700"/>
-                                                </td>
-                                                <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
-                                                    <input {...register(`matrixTestReportTemplate.columnStyles.${columnStyleIndex}.textColor`)}  required={true}
-                                                           className="mt-1 border border-gray-300 rounded px-2 py-1 w-full text-gray-700"/>
-                                                </td>
-                                                <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
-                                                    <input {...register(`matrixTestReportTemplate.columnStyles.${columnStyleIndex}.alignment`)}  required={true}
-                                                           className="mt-1 border border-gray-300 rounded px-2 py-1 w-full text-gray-700"/>
-                                                </td>
-                                                <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
-                                                    <button type="button" onClick={() => removeColumnStyle(columnStyleIndex)}
                                                             className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
                                                         <Icon as={DeleteIcon} />
                                                     </button>
