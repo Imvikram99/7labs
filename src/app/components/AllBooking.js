@@ -1,10 +1,11 @@
-import React, {useState, useEffect} from "react";
+import React, {useState, useEffect, Fragment} from "react";
 import {FaDownload} from "react-icons/fa6";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import {specificApis} from '../data/SpecificApis';
 import {faArrowLeft, faRestroom} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import Image from "next/image";
 
 const Modal = ({showModal, handleClose, children}) => {
     if (!showModal) return null;
@@ -15,14 +16,14 @@ const Modal = ({showModal, handleClose, children}) => {
                 <div className="fixed inset-0 transition-opacity" aria-hidden="true">
                     <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
                 </div>
-                <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">
-          &#8203;
-        </span>
-                <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:align-middle w-7/10" style={{minWidth:'60%'}}>
-                <div className="card" style={{marginBottom: '0'}}>
-                    <div className="card-body">
+                <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+                <div
+                    className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:align-middle w-7/10"
+                    style={{minWidth: '60%'}}>
+                    <div className="card" style={{marginBottom: '0'}}>
+                        <div className="card-body">
                             {children}
-                         <div className="bg-gray-50 mt-3 sm:flex sm:flex-row-reverse">
+                            <div className="bg-gray-50 mt-3 sm:flex sm:flex-row-reverse">
                                 <button
                                     type="button"
                                     className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
@@ -81,16 +82,25 @@ const TestComponent = ({data}) => {
                         );
                     } else if (report.testReport.report_type === "BloodReport") {
                         return (
-                            <div key={report.testReport.testReportId}>
-                                <h4 className="font-bold">Blood Report</h4>
-                                <p>Investigation: <span className="report-value">{report.testReport.investigation}</span></p>
-                                <p>Value: <span className="report-value">{report.testReport.value}</span></p>
-                                <p>Unit: <span className="report-value">{report.testReport.unit}</span></p>
-                                <p>Min Reference Value: <span className="report-value">{report.testReport.minReferenceValue}</span></p>
-                                <p>Max Reference Value: <span className="report-value">{report.testReport.maxReferenceValue}</span></p>
-                                <p>Primary Sample Type: <span className="report-value">{report.testReport.primarySampleType}</span></p>
-                                {/* Add more BloodReport details as needed */}
-                            </div>
+                            <tr key={report.testReport.testReportId}>
+                                <td>
+                                    <span className="report-value">{report.testReport.investigation}</span>
+                                </td>
+                                <td>
+                                    <span className="report-value">{report.testReport.value}</span>
+                                </td>
+                                <td>
+                                    <span>{report.testReport.minReferenceValue}</span>
+                                    -
+                                    <span>{report.testReport.maxReferenceValue}</span>
+                                </td>
+                                <td>
+                                    <span>{report.testReport.unit}</span>
+                                </td>
+                                <td>
+                                    <span className="capitalize">{report.testReport.primarySampleType}</span>
+                                </td>
+                            </tr>
                         );
                     }
                 }
@@ -105,33 +115,50 @@ const TestComponent = ({data}) => {
 
     return (
         <div>
-            <h2 className="font-bold fa-xl mb-8 mt-3">Test Report</h2>
-            <table className="text-start w-100">
-                <thead>
-                <tr>
-                    <th className="text-start">Test Name</th>
-                    <th className="text-start">Barcode</th>
-                    <th className="text-start">Cost</th>
-                    <th className="text-start">Code</th>
-                    <th className="text-start">Test Panel Report</th>
-                    {/* Add more table headers as needed */}
-                </tr>
-                </thead>
-                <tbody>
-                {data.bookingSlip.tests.map((test) => (
-                    <tr key={test.id}>
-                        <td><span className="text-blue-700">{test.name}</span></td>
-                        <td>{test.barCode}</td>
-                        <td>{test.cost}</td>
-                        <td>{test.code}</td>
-                        <td>
-                            <div>{renderTestPanelReport(test.testPanelReport)}</div>
-                        </td>
-                        {/* Add more table data as needed */}
+            <div className="report-main-body">
+                <div className="address-part">
+                    <div className="a-left">
+                        <h5 className="hos-name">Hospital Name</h5>
+                        <p>19/C, East Noyatola, Moghbazar</p>
+                    </div>
+                    <div className="a-right">
+                        <Image src="/logoreport1.png" width="100" height="100" alt="logo"/>
+                    </div>
+                </div>
+                <h3 className="report-title">Laboratory Report</h3>
+                <div className="personal-info-part">
+                    <div className="a-left">
+                        <h5><span>Name:</span> <strong>{data.patientDetails.firstName} {data.patientDetails.lastName}</strong></h5>
+                        <h5><span>DoB:</span> {data.patientDetails.dob}</h5>
+                        <h5><span>Doctor:</span> Alfaz Uddin</h5>
+                        <h5><span>Address:</span> {data.patientDetails.addressLine1}, {data.patientDetails.addressLine2}, {data.patientDetails.addressLine3}</h5>
+                    </div>
+                    <div className="a-right">
+                        <h5><span>Patient ID:</span><strong>{data.patientDetails.patientId}</strong></h5>
+                        <h5><span>Age:</span><strong>{data.patientDetails.ageInYears}</strong>Y <strong>{data.patientDetails.ageInMonths}</strong>M <strong>{data.patientDetails.ageInDays}</strong>D</h5>
+                        <h5><span>SEX:</span>{data.patientDetails.gender}</h5>
+                        <h5><span>Test ID:</span>{data.patientDetails.pinCode}</h5>
+                    </div>
+                </div>
+                <hr/>
+                <h2 className="test-title">Complete Blood Count</h2>
+                <table className="text-start w-100">
+                    <thead>
+                    <tr>
+                        <th className="text-start">Test Name</th>
+                        <th className="text-start">Result</th>
+                        <th className="text-start">Range</th>
+                        <th className="text-start">Units</th>
+                        <th className="text-start">Sample Type</th>
                     </tr>
-                ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                    {data.bookingSlip.tests.map((test) => (
+                        <Fragment key={test.id}>{renderTestPanelReport(test.testPanelReport)}</Fragment>
+                    ))}
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 };

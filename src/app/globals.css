@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -44,6 +46,7 @@
 body {
     /*background-image: linear-gradient(45deg, #1565C0, #1E88E5);*/
     background-color: #f5f5f5;
+    font-family: 'Open Sans', sans-serif;
 }
 
 .main-container {
@@ -202,7 +205,7 @@ a {
 
 .left-sidebar-container .metismenu ul {
     border: 1px solid #EDEDED;
-  background: #f4f9f9;
+    background: #f4f9f9;
 }
 
 .left-sidebar-container ul {
@@ -335,7 +338,7 @@ a {
     align-items: center;
     justify-content: center;
     border-top-left-radius: 0;
-  border-top-right-radius: 0;
+    border-top-right-radius: 0;
 }
 
 hr {
@@ -445,14 +448,80 @@ form.card {
     /*color: #e9ecef;*/
 }
 
-.base-blue{
+.base-blue {
     color: #5281EF;
 }
 
-.report-value{
+.report-value {
     color: #1D4CAE;
-  font-size: 13px;
-  font-style: italic;
-  font-weight: 400;
+    font-size: 13px;
+    font-style: italic;
+    font-weight: 400;
+}
+
+.report-main-body {
+    color: #000000;
+    font-size: 14px;
+    font-weight: normal;
+}
+
+.report-main-body .test-title {
+    color: #1D4CAE;
+    font-size: 15px;
+    font-weight: 700;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+.report-main-body .address-part {
+    display: flex;
+    justify-content: space-between;
+}
+
+.report-main-body .personal-info-part {
+    display: flex;
+    justify-content: space-between;
+}
+
+.report-main-body .personal-info-part h5 span {
+    display: inline-block;
+    min-width: 100px;
+}
+
+.report-main-body .address-part .hos-name {
+    color: #1D4CAE;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.report-main-body .address-part .a-left p {
+
+}
+
+.report-main-body .report-title {
+    background-color: #1D4CAE;
+    padding: 2px 20px;
+    color: #ffffff;
+    text-align: center;
+    font-size: 14px;
+    margin-top: 19px;
+    margin-bottom: 10px;
+}
+
+.report-main-body table th{
+    text-align: center;
+    font-weight: 600;
+}
+
+.report-main-body table td{
+    text-align: center;
+    font-weight: normal;
+    --bs-table-accent-bg: #ffffff !important
+}
+
+.report-main-body table td:first-child{
+    text-align: left;
 }
 
