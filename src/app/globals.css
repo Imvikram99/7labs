@@ -429,3 +429,11 @@ form.card {
     padding: 5px;
 }
 
+.mobile-toggle-menu {
+    position: absolute;
+    top: 50%;
+    transform: translate(0%, -50%);
+    cursor: pointer;
+    color: #e9ecef;
+}
+

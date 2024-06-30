@@ -46,7 +46,7 @@ import {
     faRestroom,
     faMoneyCheckDollar,
     faUserTie,
-    faClipboardList
+    faClipboardList, faBars
 } from '@fortawesome/free-solid-svg-icons';
 
 export default function SidebarWithHeader({children}) {
@@ -78,6 +78,13 @@ export default function SidebarWithHeader({children}) {
         setActiveComponent(components[componentName]);
     }
 
+    const openSidebar = () => {
+        document.getElementById("right-sidebar-container").style.marginLeft = "250px";
+        document.getElementById("left-sidebar-container").style.display = "block";
+        document.getElementById("topbar").style.left = "250px";
+        document.getElementById("mobile-toggle-menu").style.display = "none";
+    }
+
     return (
         <Flex className="main-container" minH="100vh" bg={useColorModeValue("gray.100", "gray.900")}>
             <SidebarContent
@@ -105,9 +112,10 @@ export default function SidebarWithHeader({children}) {
 
 
             <header>
-                <div className="topbar d-flex align-items-center">
+                <div id="topbar" className="topbar d-flex align-items-center">
                     <nav className="navbar navbar-expand gap-3">
-                        <div className="mobile-toggle-menu"><i className="bx bx-menu"></i>
+                        <div style={{display: 'none'}} id="mobile-toggle-menu" className="mobile-toggle-menu" onClick={openSidebar}>
+                            <FontAwesomeIcon icon={faBars}/>
                         </div>
                         <div className="user-box dropdown px-3">
                             <a className="d-flex align-items-center nav-link dropdown-toggle gap-3 dropdown-toggle-nocaret"
@@ -124,7 +132,7 @@ export default function SidebarWithHeader({children}) {
             </header>
 
 
-            <Flex className="right-sidebar-container">
+            <Flex className="right-sidebar-container" id="right-sidebar-container">
                 {/*<MobileNav onOpen={onOpen} className="hello"/>*/}
                 {/*<hr/>*/}
                 <Box flex="1" p="4" className="body-content-main">
@@ -138,9 +146,36 @@ export default function SidebarWithHeader({children}) {
 function SidebarContent({handleComponentChange}) {
     const [expandedIndex, setExpandedIndex] = useState(null);
 
+    useEffect(() => {
+    const mediaQuery = window.matchMedia('(max-width: 600px)');
+    const handleWindowResize = () => {
+        if (mediaQuery.matches) {
+            closeSidebar();
+        }
+    }
+
+    // Call the function initially
+    handleWindowResize();
+
+    // Add the listener
+    mediaQuery.addListener(handleWindowResize);
+
+    // Cleanup function
+    return () => {
+        mediaQuery.removeListener(handleWindowResize);
+    }
+}, []);
+
     const toggleThisMenu = (index) => {
         setExpandedIndex(expandedIndex === index ? null : index);
     };
+
+    const closeSidebar = () => {
+        document.getElementById("right-sidebar-container").style.marginLeft = "0%";
+        document.getElementById("left-sidebar-container").style.display = "none";
+        document.getElementById("topbar").style.left = "0";
+        document.getElementById("mobile-toggle-menu").style.display = "inline-block";
+    }
 
     const navItems = [
         {
@@ -226,12 +261,13 @@ function SidebarContent({handleComponentChange}) {
         <Box
             transition="3s ease"
             className="left-sidebar-container"
+            id="left-sidebar-container"
         >
             <div className="sidebar-header">
                 <div>
                     <h4 className="logo-text">7 Labs</h4>
                 </div>
-                <div className="toggle-icon ms-auto"><FontAwesomeIcon icon={faArrowLeft}/></div>
+                <div className="toggle-icon ms-auto" onClick={closeSidebar}><FontAwesomeIcon icon={faArrowLeft}/></div>
             </div>
             <Box className="left-sidebar-menu-main">
                 <ul className="metismenu mm-show" id="menu">
