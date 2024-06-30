@@ -18,23 +18,20 @@ const Modal = ({showModal, handleClose, children}) => {
                 <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">
           &#8203;
         </span>
-                <div
-                    className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                    <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                        <div className="sm:flex sm:items-start">
-                            <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                                {children}
+                <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:align-middle w-7/10" style={{minWidth:'60%'}}>
+                <div className="card" style={{marginBottom: '0'}}>
+                    <div className="card-body">
+                            {children}
+                         <div className="bg-gray-50 mt-3 sm:flex sm:flex-row-reverse">
+                                <button
+                                    type="button"
+                                    className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                                    onClick={handleClose}
+                                >
+                                    Close
+                                </button>
                             </div>
                         </div>
-                    </div>
-                    <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                        <button
-                            type="button"
-                            className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-                            onClick={handleClose}
-                        >
-                            Close
-                        </button>
                     </div>
                 </div>
             </div>
@@ -51,9 +48,9 @@ const TestComponent = ({data}) => {
                         return (
                             <div key={report.testReport.testReportId}>
                                 <h4>UltraSound Report</h4>
-                                <p>Header: {report.testReport.header}</p>
-                                <p>Body: {report.testReport.body}</p>
-                                <p>Impression: {report.testReport.impression}</p>
+                                <p>Header: <span className="report-value">{report.testReport.header}</span></p>
+                                <p>Body: <span className="report-value">{report.testReport.body}</span></p>
+                                <p>Impression: <span className="report-value">{report.testReport.impression}</span></p>
                                 {/* Add more UltraSoundReport details as needed */}
                             </div>
                         );
@@ -85,13 +82,13 @@ const TestComponent = ({data}) => {
                     } else if (report.testReport.report_type === "BloodReport") {
                         return (
                             <div key={report.testReport.testReportId}>
-                                <h4>Blood Report</h4>
-                                <p>Investigation: {report.testReport.investigation}</p>
-                                <p>Value: {report.testReport.value}</p>
-                                <p>Unit: {report.testReport.unit}</p>
-                                <p>Min Reference Value: {report.testReport.minReferenceValue}</p>
-                                <p>Max Reference Value: {report.testReport.maxReferenceValue}</p>
-                                <p>Primary Sample Type: {report.testReport.primarySampleType}</p>
+                                <h4 className="font-bold">Blood Report</h4>
+                                <p>Investigation: <span className="report-value">{report.testReport.investigation}</span></p>
+                                <p>Value: <span className="report-value">{report.testReport.value}</span></p>
+                                <p>Unit: <span className="report-value">{report.testReport.unit}</span></p>
+                                <p>Min Reference Value: <span className="report-value">{report.testReport.minReferenceValue}</span></p>
+                                <p>Max Reference Value: <span className="report-value">{report.testReport.maxReferenceValue}</span></p>
+                                <p>Primary Sample Type: <span className="report-value">{report.testReport.primarySampleType}</span></p>
                                 {/* Add more BloodReport details as needed */}
                             </div>
                         );
@@ -108,22 +105,22 @@ const TestComponent = ({data}) => {
 
     return (
         <div>
-            <h2>Tests:</h2>
-            <table>
+            <h2 className="font-bold fa-xl mb-8 mt-3">Test Report</h2>
+            <table className="text-start w-100">
                 <thead>
                 <tr>
-                    <th>Test Name</th>
-                    <th>Barcode</th>
-                    <th>Cost</th>
-                    <th>Code</th>
-                    <th>Test Panel Report</th>
+                    <th className="text-start">Test Name</th>
+                    <th className="text-start">Barcode</th>
+                    <th className="text-start">Cost</th>
+                    <th className="text-start">Code</th>
+                    <th className="text-start">Test Panel Report</th>
                     {/* Add more table headers as needed */}
                 </tr>
                 </thead>
                 <tbody>
                 {data.bookingSlip.tests.map((test) => (
                     <tr key={test.id}>
-                        <td>{test.name}</td>
+                        <td><span className="text-blue-700">{test.name}</span></td>
                         <td>{test.barCode}</td>
                         <td>{test.cost}</td>
                         <td>{test.code}</td>
@@ -168,19 +165,19 @@ const AllBooking = () => {
 
     return (
         <div className="max-w-7xl mx-auto">
-            <h6 className="uppercase font-extrabold text-xl text-white"><FontAwesomeIcon icon={faRestroom}/> | ALL
+            <h6 className="uppercase font-extrabold text-xl"><FontAwesomeIcon icon={faRestroom}/> | ALL
                 Bookings</h6>
             <hr/>
             <div className="">
-                <h6 className="text-amber-50 font-semibold leading-tight mb-4">
-                    ALL Bookings of <span className="italic text-blue-50">{date}</span>
+                <h6 className=" font-semibold mb-4">
+                    ALL Bookings of <span className="italic">{date}</span>
                 </h6>
                 <div className="mb-4">
                     <input
                         type="date"
                         value={date}
                         onChange={(e) => setDate(e.target.value)}
-                        className="w-full px-3 py-2 border-white text-white outline-none"
+                        className="w-full px-3 py-2 outline-none"
                     />
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -204,7 +201,7 @@ const AllBooking = () => {
                             </div>
                             <div className="download-btn-block">
                                 <button
-                                    className="w-100 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                    className="w-100 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-normal text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                                     onClick={() => handleOpenModal(booking)}
                                 >
                                     <FaDownload className="-ml-1 mr-2 h-5 w-5" aria-hidden="true"/>

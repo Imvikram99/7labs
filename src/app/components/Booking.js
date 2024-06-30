@@ -232,7 +232,7 @@ const Booking = () => {
 
     return (
         <div className="max-w-7xl mx-auto">
-            <h6 className="uppercase font-extrabold text-xl text-white"><FontAwesomeIcon icon={faRestroom}/> | Create
+            <h6 className="uppercase font-extrabold text-xl"><FontAwesomeIcon icon={faRestroom}/> | Create
                 Bookings</h6>
             <hr/>
             <form
@@ -263,7 +263,7 @@ const Booking = () => {
                 <div className="mb-4">
                     <div className="flex justify-between mt-4">
                         {" "}
-                        <h3 className="text-xl font-bolder mb-2 ">Patient Details</h3>
+                        <h3 className="text-xl font-bolder mb-2 base-blue">Patient Details</h3>
                         {Object.keys(searchResults).length > 0 && (
                             <button
                                 className=" py-2 px-3 bg-blue-500 hover:bg-blue-600 text-white rounded-md"
@@ -620,7 +620,7 @@ const Booking = () => {
 
                 {/* Tests */}
                 <div className="mb-4">
-                    <h3 className="text-xl font-bolder mb-2">Tests</h3>
+                    <h3 className="text-xl font-bolder mb-2 base-blue">Tests</h3>
                     {formData.bookingSlip.tests.map((test, index) => (
                         <div
                             key={index}
@@ -738,7 +738,7 @@ const Booking = () => {
 
                 {/* Additional Booking Slip Details */}
                 <div className="mb-4">
-                    <h3 className="text-xl font-bolder mb-2">Booking Slip Details</h3>
+                    <h3 className="text-xl font-bolder mb-2 base-blue">Booking Slip Details</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label
