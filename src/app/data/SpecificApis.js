@@ -187,6 +187,24 @@ class SpecificApis {
       }
   };
 
+  async fetchAllPossibleReference() {
+    try {
+      const response = await apiService.fetchData(`api/v1/lab/testpanel/allPossibleReferenceValues`);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  async addPossibleReference(formData) {
+    try {
+      const response = await apiService.postData('api/v1/lab/testpanel/allPossibleReferenceValues', formData);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async addTestPanel(formData) {
     try {
       const response = await apiService.postData('api/v1/lab/testpanel', formData);
