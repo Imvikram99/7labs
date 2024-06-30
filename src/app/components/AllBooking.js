@@ -41,6 +41,9 @@ const Modal = ({showModal, handleClose, children}) => {
 };
 
 const TestComponent = ({data}) => {
+    const [xyz, setXyz] = useState({});
+    const [reportType, setReportType] = useState(null); // New state for report_type
+
     const renderTestPanelReport = (testPanelReport) => {
         if (testPanelReport.testMasterReportList) {
             return testPanelReport.testMasterReportList.map((report) => {
@@ -113,8 +116,24 @@ const TestComponent = ({data}) => {
         return null;
     };
 
+    const filterTestById = (testId) => {
+        console.log(testId)
+        const x = data.bookingSlip.tests.filter(test => test.id === testId);
+        setXyz(x[0]);
+    }
+
     return (
         <div>
+            <label className="block text-sm mb-2">Select a Test</label>
+            <select className="mb-3" name="test-dropdown" id="test-dropdown" onChange={(e) => filterTestById(e.target.value)}>
+                <option value="">--- Select a Test ---</option>
+                {
+                    data.bookingSlip.tests.map((test) =>
+                        <option key={test.id} value={test.id}>{test.name}</option>
+                    )
+                }
+            </select>
+
             <div className="report-main-body">
                 <div className="address-part">
                     <div className="a-left">
@@ -153,9 +172,9 @@ const TestComponent = ({data}) => {
                     </tr>
                     </thead>
                     <tbody>
-                    {data.bookingSlip.tests.map((test) => (
-                        <Fragment key={test.id}>{renderTestPanelReport(test.testPanelReport)}</Fragment>
-                    ))}
+                    {
+                        xyz && xyz.testPanelReport && renderTestPanelReport(xyz.testPanelReport)
+                    }
                     </tbody>
                 </table>
             </div>
