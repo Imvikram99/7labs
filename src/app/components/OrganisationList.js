@@ -5,6 +5,8 @@ import {specificApis} from '../data/SpecificApis';
 import {Box, Icon, Input} from "@chakra-ui/react";
 import SingleReferenceValues from "@/app/components/OrganizationListContents/SingleReferenceValues";
 import { DeleteIcon } from '@chakra-ui/icons';
+import AddSubTests from "@/app/components/AddSubTests"
+import AddReferenceValues from "@/app/components/AddReferenceValues"
 
 const AddTestPanel = () => {
     const {register, control, watch, handleSubmit} = useForm();
@@ -200,9 +202,9 @@ const AddTestPanel = () => {
                                         <SingleReferenceValues control={control} index={index} register={register} name={`tests.${index}`}/>
                                     )}
                                     {watch(`tests.${index}.referenceValueType`) === 'RANGE' && (
-                                        <ReferenceValues control={control} index={index} register={register} name={`tests.${index}`}/>
+                                        <AddReferenceValues control={control} index={index} register={register} name={`tests.${index}`}/>
                                     )}
-                                    <SubTestValues control={control} index={index} register={register} watch={watch}/>
+                                    <AddSubTests control={control} index={index} register={register} watch={watch} name={`tests.${index}`}/>
                                     <div className="flex justify-end w-full">
                                         <button
                                             type="button" onClick={() => removeTest(index)}
@@ -263,141 +265,6 @@ const AddTestPanel = () => {
 
     );
 };
-
-const ReferenceValues = ({control, index, register,name}) => {
-    const {fields: referenceValueFields, append: appendReferenceValue, remove: removeReferenceValue} = useFieldArray({
-        control,
-        name: `${name}.referenceValues`
-    });
-    if(referenceValueFields.length == 0){
-        appendReferenceValue()
-    }
-
-    return (
-        <div className="space-y-4 ml-7">
-            {referenceValueFields.map((refItem, refIndex) => (
-                <div key={refItem.id} className="space-y-2 border p-4 relative">
-                    <div className="grid grid-cols-3 gap-4">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">Min Age</label>
-                            <input {...register(`${name}.referenceValues.${refIndex}.minAge`)}  required={true}
-                                   className="mt-1 border border-gray-300 rounded px-2 py-1 w-full text-gray-700"/>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">Max Age</label>
-                            <input {...register(`${name}.referenceValues.${refIndex}.maxAge`)}  required={true}
-                                   className="mt-1 border border-gray-300 rounded px-2 py-1 w-full text-gray-700"/>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">Gender</label>
-                            <select
-                                {...register(`${name}.referenceValues.${refIndex}.gender`)}  required={true}
-                                className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md border">\
-                                <option value={"OTHER"}>Other</option>
-                                <option value={"ANY"}>Any</option>
-                                <option value={"MALE"}>Male</option>
-                                <option value={"FEMALE"}>Female</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">Min Reference Value</label>
-                            <input {...register(`${name}.referenceValues.${refIndex}.minReferenceValue`)}  required={true}
-                                   className="mt-1 border border-gray-300 rounded px-2 py-1 w-full text-gray-700"/>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">Max Reference Value</label>
-                            <input {...register(`${name}.referenceValues.${refIndex}.maxReferenceValue`)}  required={true}
-                                   className="mt-1 border border-gray-300 rounded px-2 py-1 w-full text-gray-700"/>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">Test Result Unit</label>
-                            <input {...register(`${name}.referenceValues.${refIndex}.testResultUnit.name`)}  required={true}
-                                   className="mt-1 border border-gray-300 rounded px-2 py-1 w-full text-gray-700"/>
-                        </div>
-                    </div>
-                    <button type="button" onClick={() => removeReferenceValue(refIndex)}
-                            className="inline-flex rounded-full -top-4 -right-4 absolute items-center px-2 py-2 border border-transparent text-sm font-medium shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
-                        <Icon as={DeleteIcon} />
-                    </button>
-                </div>
-            ))}
-            <button type="button" onClick={() => appendReferenceValue({})}
-                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Add
-                Reference Value
-            </button>
-        </div>
-    );
-};
-
-const SubTestValues = ({control, index, register,watch}) => {
-    const {fields: subTestFields, append: appendSubTestValue, remove: removeSubTesteValue} = useFieldArray({
-        control,
-        name: `tests.${index}.subTests`
-    });
-    return (
-        <>
-            {subTestFields.map((item, itemIndex) => (
-                <div key={item.id} className="space-y-4 border border-slate-500 rounded-2xl p-4 relative">
-                    <span className="font-bold">Sub Test {itemIndex + 1}</span>
-                    <div className="grid grid-cols-4 gap-4">
-                        <div className='hidden'>
-                            <label htmlFor={ `tests.${index}.subTests.id`}
-                                   className="block text-sm font-medium text-gray-700">Test ID</label>
-                            <input {...register( `tests.${index}.id`)}  required={true}
-                                   className="mt-1 border border-gray-300 rounded px-2 py-1 w-full text-gray-700"/>
-                        </div>
-                        <div className='hidden'>
-                            <label htmlFor={ `tests.${index}.subTests.${itemIndex}.code`}
-                                   className="block text-sm font-medium text-gray-700">
-                                Test Code
-                            </label>
-                            <input {...register( `tests.${index}.code`)}  required={true}
-                                   className="mt-1 border border-gray-300 rounded px-2 py-1 w-full text-gray-700"/>
-                        </div>
-                        <div>
-                            <label htmlFor={ `tests.${index}.subTests.${itemIndex}.name`}
-                                   className="block text-sm font-medium text-gray-700">
-                                Test Name
-                            </label>
-                            <input {...register( `tests.${index}.subTests.${itemIndex}.name`)}  required={true}
-                                   className="mt-1 border border-gray-300 rounded px-2 py-1 w-full text-gray-700"/>
-                        </div>
-                        <div>
-                            <label htmlFor={ `tests.${index}.subTests.${itemIndex}.referenceValueType`}
-                                   className="block text-sm font-medium text-gray-700">
-                                Reference Value Type
-                            </label>
-                            <select {...register( `tests.${index}.subTests.${itemIndex}.referenceValueType`)}  required={true}
-                                    className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md border">
-                                <option value="">Select Value</option>
-                                <option value="SINGLE_STRING">SINGLE_STRING</option>
-                                <option value="RANGE">RANGE</option>
-                                <option value="NONE">NONE</option>
-                            </select>
-                        </div>
-                    </div>
-                    {watch( `tests.${index}.subTests.${itemIndex}.referenceValueType`) === 'SINGLE_STRING' && (
-                        <SingleReferenceValues control={control} index={index} register={register} name={`tests.${index}.subTests.${itemIndex}`}/>
-                    )}
-                    {watch( `tests.${index}.subTests.${itemIndex}.referenceValueType`) === 'RANGE' && (
-                        <ReferenceValues control={control} index={index} register={register} name={`tests.${index}.subTests.${itemIndex}`}/>
-                    )}
-                    <div className="flex justify-start w-full">
-                        <button type="button" onClick={() => removeSubTesteValue(itemIndex)}
-                                className="inline-flex rounded-full -top-2 -right-4 absolute items-center px-2 py-2 border border-transparent text-sm font-medium shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
-                            <Icon as={DeleteIcon} />
-                        </button>
-                    </div>
-                </div>
-            ))}
-            <button type="button" onClick={() => appendSubTestValue({})}
-                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Add Sub
-                Test
-            </button>
-        </>
-    );
-};
-
 
 const MatrixTemplate = ({register, control}) => {
     const {setValue} = useForm();
