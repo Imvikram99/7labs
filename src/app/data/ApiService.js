@@ -39,8 +39,8 @@ class ApiService {
     return this.client.get(url);
   }
 
-  postData(url, data) {
-    return this.client.post(url, data);
+  postData(url, data, headers) {
+    return this.client.post(url, data, headers);
   }
 }
 
