@@ -27,7 +27,7 @@ export default function PatientList() {
 
     return (
         <div className="max-w-7xl mx-auto">
-            <h6 className="uppercase font-extrabold text-xl text-white"><FontAwesomeIcon icon={faList}/> | Patient List
+            <h6 className="uppercase font-extrabold text-xl"><FontAwesomeIcon icon={faList}/> | Patient List
             </h6>
             <hr/>
             <div className="card">

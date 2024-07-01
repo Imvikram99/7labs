@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -42,8 +44,9 @@
 
 
 body {
-    background-image: linear-gradient(45deg, #1565C0, #1E88E5);
-    background-color: #1B7BD7;
+    /*background-image: linear-gradient(45deg, #1565C0, #1E88E5);*/
+    background-color: #f5f5f5;
+    font-family: 'Open Sans', sans-serif;
 }
 
 .main-container {
@@ -66,6 +69,7 @@ body {
     z-index: 11;
     box-shadow: 0 .3rem .8rem rgba(0, 0, 0, .12) !important;
     transition: all .2s ease-out;
+    background-color: #ffffff;
 }
 
 .right-sidebar-container {
@@ -86,9 +90,9 @@ body {
     bottom: 0;
     padding: 0 15px;
     z-index: 5;
-    background: rgb(255 255 255 / 12%);
     border-bottom: 1px solid rgb(255 255 255 / 12%);
     border-right: 1px solid rgb(255 255 255 / 12%);
+    background-color: #ffffff;
 }
 
 .logo-text {
@@ -97,13 +101,13 @@ body {
     margin-left: 10px;
     margin-bottom: 0;
     letter-spacing: 1px;
-    color: #ffffff;
+    /*color: #ffffff;*/
 }
 
 .toggle-icon {
     font-size: 19px;
     cursor: pointer;
-    color: #ffffff;
+    /*color: #ffffff;*/
 }
 
 .left-sidebar-menu-main {
@@ -139,7 +143,7 @@ body {
     list-style: none;
 }
 
-.left-sidebar-container .metismenu li + li {
+.left-sidebar-container .metismenu li {
     margin-top: 5px;
 }
 
@@ -154,9 +158,9 @@ body {
     display: flex;
     align-items: center;
     justify-content: left;
-    padding: 6px 16px;
+    padding: 6px;
     font-size: 14px;
-    color: rgb(255 255 255 / 75%);
+    /*color: rgb(255 255 255 / 75%);*/
     outline-width: 0;
     text-overflow: ellipsis;
     overflow: hidden;
@@ -173,11 +177,12 @@ a {
 .left-sidebar-container .metismenu a .parent-icon {
     font-size: 16px;
     line-height: 1;
+    min-width: 30px;
 }
 
-.left-sidebar-container .metismenu a .menu-title {
-    margin-left: 10px;
-}
+/*.left-sidebar-container .metismenu a .menu-title {*/
+/*    margin-left: 10px;*/
+/*}*/
 
 .metismenu .has-arrow::after {
     position: absolute;
@@ -199,8 +204,8 @@ a {
 }
 
 .left-sidebar-container .metismenu ul {
-    border: 1px solid rgb(255 255 255 / 12%);
-    background: rgb(255 255 255 / 10%);
+    border: 1px solid #EDEDED;
+    background: #f4f9f9;
 }
 
 .left-sidebar-container ul {
@@ -220,20 +225,20 @@ a {
 
 .left-sidebar-container .metismenu ul a {
     padding: 6px 15px 6px 20px;
-    font-size: 15px;
+    font-size: 13px;
     border: 0;
     cursor: pointer;
 }
 
 .left-sidebar-container .metismenu ul a i {
     margin-right: 10px;
-    font-size: 13px;
+    font-size: 11px;
 }
 
 .left-sidebar-container .metismenu .mm-active > a, .left-sidebar-container .metismenu a:active, .left-sidebar-container .metismenu a:focus, .left-sidebar-container .metismenu a:hover {
-    color: #ffffff;
+    color: #4678ee !important;
     text-decoration: none;
-    background: rgb(255 255 255 / 15%);
+    background: #f0f7ff;
 }
 
 .topbar {
@@ -242,10 +247,11 @@ a {
     left: 250px;
     right: 0;
     height: 60px;
-    background: #1668B3;
+    /*background: #1668B3;*/
     border-bottom: 1px solid rgb(255 255 255 / 15%);
     z-index: 10;
     box-shadow: 0 .125rem .25rem rgba(0, 0, 0, .075) !important;
+    background-color: #ffffff;
 }
 
 .topbar .navbar {
@@ -268,8 +274,8 @@ a {
     display: flex;
     align-items: center;
     height: 60px;
-    border-left: 1px solid rgb(255 255 255 / 15%);
-    border-right: 1px solid rgb(255 255 255 / 15%);
+    border-left: 1px solid rgb(0 0 0 / 15%);
+    border-right: 1px solid rgb(0 0 0 / 15%);
     float: right;
 }
 
@@ -286,12 +292,12 @@ a {
 .user-info .user-name {
     font-size: 15px;
     font-weight: 500;
-    color: #fff;
+    /*color: #fff;*/
 }
 
 .user-info .designattion {
     font-size: 13px;
-    color: rgb(255 255 255 / 64%);
+    /*color: rgb(255 255 255 / 64%);*/
 }
 
 .body-content-main {
@@ -299,7 +305,7 @@ a {
 }
 
 .card {
-    background-color: rgb(0 0 0 / 20%);
+    background-color: #ffffff;
     box-shadow: 0 .3rem .8rem rgba(0, 0, 0, .12);
     margin-bottom: 1.5rem;
     border: 0 solid transparent;
@@ -308,13 +314,13 @@ a {
 .card-body {
     flex: 1 1 auto;
     padding: 1rem;
-    color: #ffffff;
+    /*color: #ffffff;*/
 }
 
 .card p {
     margin: 0;
     padding: 0;
-    color: rgba(255, 255, 255, 0.85);
+    /*color: rgba(255, 255, 255, 0.85);*/
 }
 
 .card-body-out p {
@@ -331,17 +337,13 @@ a {
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #fff;
-    color: #333 !important;
-}
-
-.download-btn-block button:hover {
-    color: #f2f2f2 !important;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
 }
 
 hr {
     margin: 1rem 0;
-    color: #e9ecef;
+    color: #bdbdbd;
     border: 0;
     border-top-color: #e9ecef;
     border-top: 1px solid;
@@ -363,6 +365,15 @@ input, select {
     border: 1px solid #909090;
 }
 
+input:focus-visible, select:focus-visible {
+    outline: none;
+}
+
+input:focus {
+    border: 1px solid #4678ee;
+    /*box-shadow: 0 0 0 0.25rem rgba(70, 120, 238, 0.25);*/
+}
+
 .search-patient-main {
     border: 1px solid #909090;
 }
@@ -376,7 +387,7 @@ input.search-patient {
 }
 
 table {
-    color: #ffffff;
+    /*color: #ffffff;*/
     text-align: center;
     font-size: 14px;
 }
@@ -392,8 +403,8 @@ tbody, td, tfoot, th, thead, tr {
 }
 
 table > tbody > tr:nth-of-type(2n+1) > * {
-    --bs-table-accent-bg: rgb(255 255 255 / 12%);
-    color: rgb(255 255 255 / 85%);
+    --bs-table-accent-bg: #CCCCCC;
+    /*color: rgb(255 255 255 / 85%);*/
 }
 
 table > :not(caption) > * > * {
@@ -426,5 +437,117 @@ form.card {
 .f-aw-edit {
     color: green;
     padding: 5px;
+}
+
+.mobile-toggle-menu {
+    position: absolute;
+    top: 50%;
+    transform: translate(0%, -50%);
+    cursor: pointer;
+    /*color: #e9ecef;*/
+}
+
+.base-blue {
+    color: #5281EF;
+}
+
+.report-value {
+    color: #1D4CAE;
+    font-size: 13px;
+    font-style: italic;
+    font-weight: 400;
+}
+
+.report-main-body {
+    color: #000000;
+    font-size: 14px;
+    font-weight: normal;
+}
+
+.custom-modal .card{
+    box-shadow: none;
+}
+
+.custom-modal .card-body{
+    padding: 20px 30px;
+}
+
+.custom-modal .custom-modal-close{
+    display: block;
+  width: 100%;
+  float: right;
+  text-align: right;
+  margin-right: 30px;
+}
+
+.report-main-body .test-title {
+    color: #1D4CAE;
+    font-size: 15px;
+    font-weight: 700;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+.report-main-body .address-part {
+    display: flex;
+    justify-content: space-between;
+}
+
+.report-main-body .personal-info-part {
+    display: flex;
+    justify-content: space-between;
+}
+
+.report-main-body .personal-info-part h5 span {
+    display: inline-block;
+    min-width: 100px;
+}
+
+.report-main-body .address-part .hos-name {
+    color: #1D4CAE;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.report-main-body .address-part .a-left p {
+
+}
+
+.report-main-body .report-title {
+    background-color: #1D4CAE;
+    padding: 2px 20px;
+    color: #ffffff;
+    text-align: center;
+    font-size: 14px;
+    margin-top: 19px;
+    margin-bottom: 10px;
+}
+
+.report-main-body table th{
+    text-align: center;
+    font-weight: 600;
+}
+
+.report-main-body table td{
+    text-align: center;
+    font-weight: normal;
+    --bs-table-accent-bg: #ffffff !important
+}
+
+.report-main-body table td:first-child{
+    text-align: left;
+}
+
+.report-main-body .signature-part{
+    margin-top: 50px;
+    float: right;
+  display: block;
+  overflow: hidden;
+}
+
+.no-test-selected-msg{
+    margin: 50px !important;
 }
 
