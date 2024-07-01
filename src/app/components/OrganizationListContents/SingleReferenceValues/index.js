@@ -101,9 +101,7 @@ const SingleReferenceValues = ({register, name, nested,control,testUnits}) => {
                     <div>
                         <label className="block text-sm font-medium text-gray-700">Unit</label>
                                <select {...register(`${name}.singleReferenceValues.unit`)}>
-                                 {(testUnits || []).map((e)=>{
-                                    return <option value={e.name}>{e.name}</option>
-                                 })}
+                                 {(testUnits || []).map((e,index) => <option value={e.name} key={index}>{e.name}</option>)}
                                </select>
                     </div>
                 </div>
