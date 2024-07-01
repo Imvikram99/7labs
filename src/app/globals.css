@@ -143,7 +143,7 @@ body {
     list-style: none;
 }
 
-.left-sidebar-container .metismenu li + li {
+.left-sidebar-container .metismenu li {
     margin-top: 5px;
 }
 
@@ -158,7 +158,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: left;
-    padding: 6px 16px;
+    padding: 6px;
     font-size: 14px;
     /*color: rgb(255 255 255 / 75%);*/
     outline-width: 0;
@@ -177,12 +177,12 @@ a {
 .left-sidebar-container .metismenu a .parent-icon {
     font-size: 16px;
     line-height: 1;
-    min-width: 17px;
+    min-width: 30px;
 }
 
-.left-sidebar-container .metismenu a .menu-title {
-    margin-left: 10px;
-}
+/*.left-sidebar-container .metismenu a .menu-title {*/
+/*    margin-left: 10px;*/
+/*}*/
 
 .metismenu .has-arrow::after {
     position: absolute;
@@ -465,6 +465,22 @@ form.card {
     font-weight: normal;
 }
 
+.custom-modal .card{
+    box-shadow: none;
+}
+
+.custom-modal .card-body{
+    padding: 20px 30px;
+}
+
+.custom-modal .custom-modal-close{
+    display: block;
+  width: 100%;
+  float: right;
+  text-align: right;
+  margin-right: 30px;
+}
+
 .report-main-body .test-title {
     color: #1D4CAE;
     font-size: 15px;
@@ -523,5 +539,16 @@ form.card {
 
 .report-main-body table td:first-child{
     text-align: left;
+}
+
+.report-main-body .signature-part{
+    margin-top: 50px;
+    float: right;
+  display: block;
+  overflow: hidden;
+}
+
+.no-test-selected-msg{
+    margin: 50px !important;
 }
 
