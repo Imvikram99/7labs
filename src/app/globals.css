@@ -358,7 +358,6 @@ input, select {
     font-weight: 300;
     line-height: 1.5;
     background-clip: padding-box;
-    appearance: none;
     border-radius: .375rem;
     transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
     /*color: #ffffff;*/
