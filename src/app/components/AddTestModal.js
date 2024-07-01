@@ -1,12 +1,22 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import SingleReferenceValues from './OrganizationListContents/SingleReferenceValues';
 import AddReferenceValues from '@/app/components/AddReferenceValues'
 import AddSubTests from '@/app/components/AddSubTests'
 import { calc } from '@chakra-ui/react';
+import { specificApis } from '../data/SpecificApis';
 
 function AddTestModal({ isOpen, onClose, onSave }) {
   const { register, control, watch, handleSubmit,reset } = useForm();
+  const [testUnits, setTestUnits] = useState([]);
+
+  useEffect(()=>{
+    specificApis.fetchTestUnits()
+    .then(response => {
+        setTestUnits(response);
+    })
+    .catch(error => console.error(error));
+  },[])
 
   const onSubmit = (data) => {
     onSave(data);
@@ -50,13 +60,13 @@ function AddTestModal({ isOpen, onClose, onSave }) {
           </div>
          <div className='mb-3'>
          {watch(`referenceValueType`) === 'SINGLE_STRING' && (
-            <SingleReferenceValues control={control}  register={register} name={``} />
+            <SingleReferenceValues control={control}  register={register} name={``} testUnits={testUnits}/>
           )}
           {watch(`referenceValueType`) === 'RANGE' && (
             <AddReferenceValues control={control} register={register} name={``} />
           )}
          </div>
-          <AddSubTests control={control} register={register} watch={watch} name={``} />
+          <AddSubTests control={control} register={register} watch={watch} name={``} testUnits={testUnits}/>
           <div className="flex justify-between items-center mt-4">
             <button type="submit" className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Save Test</button>
             <button type="button" onClick={onClose} className="bg-pink-500 hover:bg-pink-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Cancel</button>

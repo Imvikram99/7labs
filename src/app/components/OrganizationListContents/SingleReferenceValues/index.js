@@ -4,7 +4,7 @@ import Select from "react-select";
 import {Controller, useForm} from "react-hook-form";
 import AddNewPossibleValueModal from "../AddNewPossibleValueModal";
 
-const SingleReferenceValues = ({register, name, nested,control}) => {
+const SingleReferenceValues = ({register, name, nested,control,testUnits}) => {
     const [possibleValues, setPossibleValues] = useState([]);
     const {setValue} = useForm();
 
@@ -50,6 +50,13 @@ const SingleReferenceValues = ({register, name, nested,control}) => {
                                         <Select
                                             className="w-full"
                                             options={possibleValues}
+                                      
+                                            defaultValue={(value || []).map((e)=>{
+                                                if(typeof e == 'string'){
+                                                    return {value:e,label:e}
+                                                }
+                                                return e
+                                            })}
                                             isMulti
                                             onChange={(selectedOptions) => {
                                                 const values = selectedOptions.map((option) => option.value);
@@ -93,8 +100,11 @@ const SingleReferenceValues = ({register, name, nested,control}) => {
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700">Unit</label>
-                        <input {...register(`${name}.singleReferenceValues.unit`)} type='number' required="true"
-                               className="mt-1 border border-gray-300 rounded px-2 py-1 w-full text-gray-700"/>
+                               <select {...register(`${name}.singleReferenceValues.unit`)}>
+                                 {(testUnits || []).map((e)=>{
+                                    return <option value={e.name}>{e.name}</option>
+                                 })}
+                               </select>
                     </div>
                 </div>
             </div>

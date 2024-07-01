@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {useForm, useFieldArray} from 'react-hook-form';
+import {useForm, useFieldArray, Controller} from 'react-hook-form';
 import axios from 'axios';
 import {specificApis} from '../data/SpecificApis';
 import {Box, Icon, Input} from "@chakra-ui/react";
@@ -7,14 +7,16 @@ import SingleReferenceValues from "@/app/components/OrganizationListContents/Sin
 import { DeleteIcon } from '@chakra-ui/icons';
 import AddSubTests from "@/app/components/AddSubTests"
 import AddReferenceValues from "@/app/components/AddReferenceValues"
+import Select from "react-select";
+import toast from 'react-hot-toast';
 
 const AddTestPanel = () => {
-    const {register, control, watch, handleSubmit} = useForm();
+    const {register, control, watch, handleSubmit,setValue} = useForm();
     const {fields: testFields, append: appendTest, remove: removeTest} = useFieldArray({control, name: 'tests'});
 
     const [testCategories, setTestCategories] = useState([]);
     const [testUnits, setTestUnits] = useState([]);
-
+    const [test, setTest] = useState([]);
     useEffect(() => {
         specificApis.fetchTestCategories()
             .then(response => {
@@ -27,7 +29,17 @@ const AddTestPanel = () => {
                 setTestUnits(response);
             })
             .catch(error => console.error(error));
+            fetchTests();
     }, []);
+
+    async function fetchTests() {
+        try {
+            const fetchedTests = await specificApis.fetchTestList();
+            setTest(fetchedTests);
+        } catch (error) {
+            console.error('Failed to fetch tests:', error);
+        }
+    }
 
     const onSubmit = data => {
         const matrixColumns = data.matrixTestReportTemplate ? data.matrixTestReportTemplate.columns.reduce((acc, column) => {
@@ -52,8 +64,10 @@ const AddTestPanel = () => {
             };
             return acc;
         }, {}) : {};
-
+        delete data?.testlist
+        const code = []
         data.tests = data.tests.map((e)=>{
+            code.push(e.code)
             if(e.referenceValueType === "RANGE"){
                 delete e.matrixTestReportTemplate
             }
@@ -67,6 +81,12 @@ const AddTestPanel = () => {
             })
             return e
         })
+        
+        if(code.length !== [...new Set(code)].length){
+            toast.error('Please Add Unique Test Code For Every TestPanel')
+            return
+        }
+
         if(data.testResultType === 'MATRIX'){
             data.matrixTestReportTemplate = {
                 ...data.matrixTestReportTemplate,
@@ -158,6 +178,35 @@ const AddTestPanel = () => {
                     </div>
                     {testResultType === 'BLOOD_MULTIPLE_PARAMETER' && (
                         <>
+                         <label className="block text-sm font-medium text-gray-700">
+                                    Select Test
+                                </label>
+                        <div className="flex items-center">
+                                    <Controller
+                                    name={'testlist'}
+                                        control={control}
+                                        render={({ field: { onChange, value } }) => (
+                                        <Select
+                                            className="w-full"
+                                            options={(test.map((e)=>{return {value:e.id,label:e.name}}) ?? [])}
+                                            isMulti
+                                            value={value}
+                                            onChange={(selectedOptions,selected) => {
+                                                if(selected.action == 'remove-value'){
+                                                    const index = testFields.findIndex((a)=>a.id == selected.removedValue?.value)
+                                                    removeTest(index)
+                                                }else{
+                                                    const newTest = test.find((a)=>a.id == selected.option?.value)
+                                                    if(newTest){
+                                                      appendTest(newTest)
+                                                    }
+                                                }
+                                                onChange(selectedOptions);
+                                            }}
+                                        />
+                                    )}
+                                    />
+                                </div>
                             {testFields.map((item, index) => (
                                 <div key={item.id} className="space-y-4 border border-slate-500 rounded-2xl p-4">
                                     <span className="font-bold">Test {index + 1}</span>
@@ -199,15 +248,19 @@ const AddTestPanel = () => {
                                         </div>
                                     </div>
                                     {watch(`tests.${index}.referenceValueType`) === 'SINGLE_STRING' && (
-                                        <SingleReferenceValues control={control} index={index} register={register} name={`tests.${index}`}/>
+                                        <SingleReferenceValues control={control} index={index} register={register} name={`tests.${index}`} testUnits={testUnits}/>
                                     )}
                                     {watch(`tests.${index}.referenceValueType`) === 'RANGE' && (
                                         <AddReferenceValues control={control} index={index} register={register} name={`tests.${index}`}/>
                                     )}
-                                    <AddSubTests control={control} index={index} register={register} watch={watch} name={`tests.${index}`}/>
+                                    <AddSubTests control={control} index={index} register={register} watch={watch} name={`tests.${index}`} testUnits={testUnits}/>
                                     <div className="flex justify-end w-full">
                                         <button
-                                            type="button" onClick={() => removeTest(index)}
+                                            type="button" onClick={() => {
+                                                const data = (watch('testlist') || []).filter((e)=>e.value !== watch(`tests.${index}.id`))
+                                                setValue('testlist', data);
+                                                removeTest(index)
+                                            }}
                                             className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                                         > <Icon as={DeleteIcon} />
                                         </button>
