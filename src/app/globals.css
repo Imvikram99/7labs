@@ -417,7 +417,7 @@ form.card {
     background-color: #ffffff;
 }
 
-.f-aw-save, .f-aw-cancel, .f-aw-edit {
+.f-aw-save, .f-aw-cancel, .f-aw-edit, .f-aw-upload {
     border-radius: 50%;
     cursor: pointer;
     background-color: #e9ecef;
@@ -427,6 +427,12 @@ form.card {
 .f-aw-save {
     color: green;
     padding: 4px 5px;
+}
+
+.f-aw-upload {
+    color: green;
+    padding: 5px 7px;
+    border: 1px solid;
 }
 
 .f-aw-cancel {
@@ -464,20 +470,20 @@ form.card {
     font-weight: normal;
 }
 
-.custom-modal .card{
+.custom-modal .card {
     box-shadow: none;
 }
 
-.custom-modal .card-body{
+.custom-modal .card-body {
     padding: 20px 30px;
 }
 
-.custom-modal .custom-modal-close{
+.custom-modal .custom-modal-close {
     display: block;
-  width: 100%;
-  float: right;
-  text-align: right;
-  margin-right: 30px;
+    width: 100%;
+    float: right;
+    text-align: right;
+    margin-right: 30px;
 }
 
 .report-main-body .test-title {
@@ -525,29 +531,54 @@ form.card {
     margin-bottom: 10px;
 }
 
-.report-main-body table th{
+.report-main-body table th {
     text-align: center;
     font-weight: 600;
 }
 
-.report-main-body table td{
+.report-main-body table td {
     text-align: center;
     font-weight: normal;
     --bs-table-accent-bg: #ffffff !important
 }
 
-.report-main-body table td:first-child{
+.report-main-body table td:first-child {
     text-align: left;
 }
 
-.report-main-body .signature-part{
+.report-main-body .signature-part {
     margin-top: 50px;
     float: right;
-  display: block;
-  overflow: hidden;
+    display: block;
+    overflow: hidden;
 }
 
-.no-test-selected-msg{
+.no-test-selected-msg {
     margin: 50px !important;
+}
+
+button{
+    font-size: 14px;
+}
+
+/* HTML: <div class="loader"></div> */
+.loading-custom {
+    width: fit-content;
+    font-weight: bold;
+    font-family: sans-serif;
+    font-size: 30px;
+    padding-bottom: 8px;
+    background: linear-gradient(currentColor 0 0) 0 100%/0% 3px no-repeat;
+    animation: l2 2s linear infinite;
+}
+
+.loader:before {
+    content: "Loading..."
+}
+
+@keyframes l2 {
+    to {
+        background-size: 100% 3px
+    }
 }
 

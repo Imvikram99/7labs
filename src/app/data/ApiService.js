@@ -39,6 +39,10 @@ class ApiService {
     return this.client.get(url);
   }
 
+  fetchBlobData(url) {
+    return this.client.get(url, { responseType: 'blob' });
+  }
+
   postData(url, data, headers) {
     return this.client.post(url, data, headers);
   }

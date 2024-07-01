@@ -148,7 +148,7 @@ class SpecificApis {
 
   async downloadFile(fileId){
     try{
-    const response = await apiService.fetchData(`api/v1/lab/reports/${encodeURIComponent(fileId)}`);
+    const response = await apiService.fetchBlobData(`api/v1/lab/reports/download/${encodeURIComponent(fileId)}`);
     return response.data;
     } catch (error){
         console.error('Error donwloading file');

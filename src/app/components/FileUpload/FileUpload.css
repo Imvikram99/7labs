@@ -1,0 +1,32 @@
+.upload-component {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.upload-component input[type="file"] {
+    margin-right: 20px;
+}
+
+.image-preview {
+    max-width: 300px;
+    min-height: 180px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.btn-file {
+    border: 2px dashed #4678ee;
+    border-radius: 5px;
+    margin: 10px 0 15px;
+    padding: 50px 30px;
+    width: 350px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.btn-file p {
+    color: #4678ee;
+    margin-top: 20px;
+}
