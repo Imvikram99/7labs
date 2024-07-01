@@ -122,6 +122,17 @@ class SpecificApis {
     }
   }
 
+  async downloadFile(fileId){
+    try{
+    const response = await apiService.fetchData(`api/v1/lab/reports/${encodeURIComponent(fileId)}`);
+    return response.data;
+    } catch (error){
+        console.error('Error donwloading file');
+        throw error;
+    }
+
+  }
+
   async addLabCenter(labcenterData) {
     try {
       const response = await apiService.postData('api/v1/lab/labcenter',labcenterData);
