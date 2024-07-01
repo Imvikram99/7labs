@@ -137,7 +137,7 @@ const AddTestPanel = () => {
                                 {...register('testCategory')}  required={true}
                                 className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md border">
                                 {testCategories.map((category,index) => (
-                                    <option key={category.id} value={index}>{category.name}</option>
+                                    <option key={category.name} value={index}>{category.name}</option>
                                 ))}
                             </select>
                         </div>
