@@ -110,6 +110,18 @@ class SpecificApis {
     }
   }
 
+  async addLetterHeadToCenter(file,labCenterId) {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      const response = await apiService.postData(`api/v1/lab/labcenter/letterhead/upload?labCenterId=${encodeURIComponent(labCenterId)}`,formData);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching center information:', error);
+      throw error;
+    }
+  }
+
   async addLabCenter(labcenterData) {
     try {
       const response = await apiService.postData('api/v1/lab/labcenter',labcenterData);
