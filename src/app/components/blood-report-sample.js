@@ -49,7 +49,22 @@ export default function LabProfile() {
                                             "testReportDate": "2024-07-02T05:08:55.093+00:00",
                                             "primarySampleType": "blood"
                                         },
-                                        "testMasterReports": null
+                                        "testMasterReports": [
+                                            {
+                                                "testMasterName": "sub packed cell volume",
+                                                "testReport": {
+                                                    "report_type": "BloodReport",
+                                                    "investigation": "sub packed cell volume",
+                                                    "value": 50.0,
+                                                    "unit": "%",
+                                                    "minReferenceValue": 30.0,
+                                                    "maxReferenceValue": 60.0,
+                                                    "testReportId": "8ccb6fc05",
+                                                    "testReportDate": "2024-07-02T05:08:55.093+00:00",
+                                                    "primarySampleType": "blood"
+                                                }
+                                            }
+                                        ]
                                     }
                                 ]
                             },
@@ -79,12 +94,12 @@ export default function LabProfile() {
                 },
                 {
                     "id": "520cb875",
-                    "name": "complete blood count real",
+                    "name": "complete blood count real2",
                     "barCode": null,
                     "cost": 3000.0,
                     "code": "bloot-fit",
                     "testPanelReport": {
-                        "name": "complete blood count real",
+                        "name": "complete blood count real2",
                         "testMasterReportList": [
                             {
                                 "testMasterName": "cbc-up",
@@ -186,20 +201,32 @@ export default function LabProfile() {
     };
 
     // Improved renderData function
-    const renderData = (testMasterReportList) => {
-        return testMasterReportList.map((testMaster, index) => (
-            <React.Fragment key={index}>
-                {testMaster.testMasterReports && testMaster.testMasterReports.map((report, idx) => (
-                    <tr key={idx}>
+    // Recursive function to render data, including nested reports
+    const renderData = (testMasters, parentName = '') => {
+        return testMasters.map((testMaster, index) => (
+            <React.Fragment key={'master-' + index}>
+                {testMaster.testReport && (
+                    <tr>
                         <td>{testMaster.testMasterName}</td>
-                        {report.testReport && Object.entries(report.testReport).filter(([key, _]) => key !== "report_type").map(([key, value]) => (
+                        {Object.entries(testMaster.testReport).filter(([key, _]) => key !== "report_type").map(([key, value]) => (
                             <td key={key}>{value}</td>
                         ))}
                     </tr>
-                ))}
+                )}
+                {testMaster.testMasterReports && (
+                    <>
+                        <tr style={{ backgroundColor: 'black', color: 'white' }}>
+                            <td colSpan="100%"><strong>{parentName ? `${parentName} - ${testMaster.testMasterName}` : testMaster.testMasterName}</strong></td>
+                        </tr>
+                        {renderData(testMaster.testMasterReports, testMaster.testMasterName)}
+                    </>
+                )}
             </React.Fragment>
         ));
     };
+    
+    
+  
 
     return (
         <div className="p-5 bg-gray-100 min-h-screen">
