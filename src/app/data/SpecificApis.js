@@ -223,6 +223,16 @@ class SpecificApis {
         throw error;
       }
   };
+
+  async addTestCategories(formData) {
+    try {
+        const response = await apiService.postData(`api/v1/lab/testpanel/category`,formData);
+        return response.data;
+      } catch (error) {
+        console.error('Error updating test Categories:', error);
+        throw error;
+      }
+  };
   
    async fetchTestUnits() {
     try {
@@ -230,6 +240,17 @@ class SpecificApis {
         return response.data;
       } catch (error) {
         console.error('Error updating test result:', error);
+        throw error;
+      }
+  };
+
+  async addTestUnits(formData) {
+    console.log(formData);
+    try {
+        const response = await apiService.postData(`api/v1/lab/testpanel/testunit`,formData);
+        return response.data;
+      } catch (error) {
+        console.error('Error updating test unit:', error);
         throw error;
       }
   };
