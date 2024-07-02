@@ -9,6 +9,7 @@ import AddSubTests from "@/app/components/AddSubTests"
 import AddReferenceValues from "@/app/components/AddReferenceValues"
 import Select from "react-select";
 import toast from 'react-hot-toast';
+import AddNewPossibleValueModal from './OrganizationListContents/AddNewPossibleValueModal';
 
 const AddTestPanel = () => {
     const {register, control, watch, handleSubmit,setValue} = useForm();
@@ -17,20 +18,33 @@ const AddTestPanel = () => {
     const [testCategories, setTestCategories] = useState([]);
     const [testUnits, setTestUnits] = useState([]);
     const [test, setTest] = useState([]);
+    const [open, setOpen] = useState({show:false,type:''});
     useEffect(() => {
-        specificApis.fetchTestCategories()
-            .then(response => {
-                setTestCategories(response);
-            })
-            .catch(error => console.error(error));
-
-        specificApis.fetchTestUnits()
-            .then(response => {
-                setTestUnits(response);
-            })
-            .catch(error => console.error(error));
+        getTestCategories()
+            getTestUnits()
             fetchTests();
     }, []);
+
+   function getTestUnits(){
+    specificApis.fetchTestUnits()
+    .then(response => {
+        setTestUnits(response);
+    })
+    .catch(error => console.error(error));
+   }
+
+   function getTestCategories(){
+    specificApis.fetchTestCategories()
+    .then(response => {
+        setTestCategories(response);
+    })
+    .catch(error => console.error(error));
+   }
+
+   function setModalOpen(type){
+     console.log(type);
+     setOpen({show:true,type})
+   }
 
     async function fetchTests() {
         try {
@@ -76,7 +90,6 @@ const AddTestPanel = () => {
             }
             e.subTests = e.subTests?.map((a)=>{
                 a.id = e.id
-                a.code = e.code
                 return a
             })
             return e
@@ -102,8 +115,14 @@ const AddTestPanel = () => {
             testCategory: testCategories.find(category => category.id === data.testCategory)
         };
         specificApis.addTestPanel(formData)
-            .then(response => console.log(response))
-            .catch(error => console.error(error));
+            .then(response => {
+                console.log(response)
+                toast.success('Sucessfully Added Organizer List')
+            })
+            .catch(error => {
+                toast.error('Faild To add Organizer List. Please Verify Data')
+                console.error(error)
+            });
     };
 
     const testResultType = watch('testResultType');
@@ -131,8 +150,9 @@ const AddTestPanel = () => {
                         </div>
                         <div>
                             <label htmlFor="testCategory" className="block text-sm font-medium text-gray-700">
-                                Test Category
+                                Test Category 12
                             </label>
+                            <div className='flex'>
                             <select
                                 {...register('testCategory')}  required={true}
                                 className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md border">
@@ -140,6 +160,14 @@ const AddTestPanel = () => {
                                     <option key={category.name} value={index}>{category.name}</option>
                                 ))}
                             </select>
+                            <button
+                                        type="button"
+                                        className="bg-green-500 text-white p-2 rounded ml-2"
+                                        onClick={() => setModalOpen("testCategory")}
+                                    >
+                                        Add
+                                    </button>
+                            </div>
                         </div>
 
                         <div>
@@ -210,8 +238,8 @@ const AddTestPanel = () => {
                             {testFields.map((item, index) => (
                                 <div key={item.id} className="space-y-4 border border-slate-500 rounded-2xl p-4">
                                     <span className="font-bold">Test {index + 1}</span>
-                                    <div className="grid grid-cols-4 gap-4">
-                                        <div>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className='hidden'>
                                             <label htmlFor={`tests.${index}.id`}
                                                    className="block text-sm font-medium text-gray-700">Test ID</label>
                                             <input {...register(`tests.${index}.id`)}  required={true}
@@ -233,7 +261,7 @@ const AddTestPanel = () => {
                                             <input {...register(`tests.${index}.name`)}  required={true}
                                                    className="mt-1 border border-gray-300 rounded px-2 py-1 w-full text-gray-700"/>
                                         </div>
-                                        <div>
+                                        {/* <div>
                                             <label htmlFor={`tests.${index}.referenceValueType`}
                                                    className="block text-sm font-medium text-gray-700">
                                                 Reference Value Type
@@ -245,15 +273,15 @@ const AddTestPanel = () => {
                                                 <option value="RANGE">RANGE</option>
                                                 <option value="NONE">NONE</option>
                                             </select>
-                                        </div>
+                                        </div> */}
                                     </div>
-                                    {watch(`tests.${index}.referenceValueType`) === 'SINGLE_STRING' && (
-                                        <SingleReferenceValues control={control} index={index} register={register} name={`tests.${index}`} testUnits={testUnits}/>
+                                    {/* {watch(`tests.${index}.referenceValueType`) === 'SINGLE_STRING' && (
+                                        <SingleReferenceValues control={control} index={index} register={register} name={`tests.${index}`} testUnits={testUnits} setModalOpen={setModalOpen}/>
                                     )}
                                     {watch(`tests.${index}.referenceValueType`) === 'RANGE' && (
                                         <AddReferenceValues control={control} index={index} register={register} name={`tests.${index}`}/>
-                                    )}
-                                    <AddSubTests control={control} index={index} register={register} watch={watch} name={`tests.${index}`} testUnits={testUnits}/>
+                                    )} */}
+                                    <AddSubTests control={control} index={index} register={register} watch={watch} name={`tests.${index}`} testUnits={testUnits} setModalOpen={setModalOpen}/>
                                     <div className="flex justify-end w-full">
                                         <button
                                             type="button" onClick={() => {
@@ -314,6 +342,14 @@ const AddTestPanel = () => {
                     </button>
                 </form>
             </div>
+            {open.show && (
+                <AddNewPossibleValueModal
+                    closeModal={()=>setOpen({show:false,type:''})}
+                    getReferenceValues={()=>open.type == 'unit' ? getTestUnits() : getTestCategories()}
+                    title={open.type == 'unit' ? 'Test Unit' : 'Test Category'}
+                    apiFunction={open.type == 'unit' ? 'addTestUnits' : 'addTestCategories'}
+                />
+            )}
         </main>
 
     );

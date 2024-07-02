@@ -4,7 +4,7 @@ import Select from "react-select";
 import {Controller, useForm} from "react-hook-form";
 import AddNewPossibleValueModal from "../AddNewPossibleValueModal";
 
-const SingleReferenceValues = ({register, name, nested,control,testUnits}) => {
+const SingleReferenceValues = ({register, name, nested,control,testUnits,setModalOpen}) => {
     const [possibleValues, setPossibleValues] = useState([]);
     const {setValue} = useForm();
 
@@ -80,7 +80,7 @@ const SingleReferenceValues = ({register, name, nested,control,testUnits}) => {
                             <label htmlFor="testSampleType" className="block text-sm font-medium text-gray-700">
                                 allPossibleValues
                             </label>
-                            <select {...register(`${name}.singleReferenceValues.allPossibleValues`)} required="true"
+                            <select {...register(`${name}.singleReferenceValues.allPossibleValues`)} required={true}
                                     className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md border">
                                 <option value="">Select</option>
                                 <option value="true">Yes</option>
@@ -90,26 +90,37 @@ const SingleReferenceValues = ({register, name, nested,control,testUnits}) => {
                     )}
                     <div>
                         <label className="block text-sm font-medium text-gray-700">Code</label>
-                        <input {...register(`${name}.singleReferenceValues.code`)} type='number' required="true"
+                        <input {...register(`${name}.singleReferenceValues.code`)} type='number' required={true}
                                className="mt-1 border border-gray-300 rounded px-2 py-1 w-full text-gray-700"/>
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700">Reference Value</label>
-                        <input {...register(`${name}.singleReferenceValues.referenceValue`)} required="true"
+                        <input {...register(`${name}.singleReferenceValues.referenceValue`)} required={true}
                                className="mt-1 border border-gray-300 rounded px-2 py-1 w-full text-gray-700"/>
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700">Unit</label>
-                               <select {...register(`${name}.singleReferenceValues.unit`)}>
+                         <div className='flex'>
+                         <select {...register(`${name}.singleReferenceValues.unit`)}>
                                  {(testUnits || []).map((e,index) => <option value={e.name} key={index}>{e.name}</option>)}
-                               </select>
+                        </select>    
+                               <button
+                                        type="button"
+                                        className="bg-green-500 text-white p-2 rounded ml-2"
+                                        onClick={() => setModalOpen("unit")}
+                                    >
+                                        Add
+                                </button>
+                        </div>     
                     </div>
                 </div>
             </div>
             {activeModal && (
                 <AddNewPossibleValueModal
                     closeModal={closeModal}
+                    title={'Possible Values'}
                     getReferenceValues={getReferenceValues}
+                    apiFunction={'addPossibleReference'}
                 />
             )}
         </div>

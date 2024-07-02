@@ -1,13 +1,13 @@
 import React, {useState} from 'react';
 import {specificApis} from "../../../data/SpecificApis";
 
-const AddNewPossibleValueModal = ({closeModal,getReferenceValues}) => {
+const AddNewPossibleValueModal = ({closeModal,getReferenceValues,title,apiFunction}) => {
     const [name,setValue] = useState("");
     const [error,setError] = useState("");
 
     const crateNewPossibleValue = () => {
         if (name) {
-            specificApis.addPossibleReference({name}).then(()=> {
+            specificApis[apiFunction]({name}).then(()=> {
                 getReferenceValues()
                 closeModal()
             });
@@ -19,7 +19,7 @@ const AddNewPossibleValueModal = ({closeModal,getReferenceValues}) => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white rounded p-4 max-w-lg w-full">
                 <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-lg font-bold">Add New Possible Value</h3>
+                    <h3 className="text-lg font-bold">Add New {title}</h3>
                     <button onClick={closeModal} className="text-gray-700">
                         Close
                     </button>
@@ -28,7 +28,7 @@ const AddNewPossibleValueModal = ({closeModal,getReferenceValues}) => {
                     <div className="space-y-4">
                         <div>
                             <label className="block text-gray-700">
-                                Possible Value
+                               {title}
                             </label>
                             <input
                                 name="sampleCollector"
