@@ -8,6 +8,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import Image from "next/image";
 import {formatDate} from "@/helper/globalFunctions";
 import {CustomModal} from "@/app/components/CustomModal";
+import BloodReportSample from "@/app/components/blood-report-sample";
 
 const TestComponent = ({data}) => {
     const [selectedTests, setSelectedTests] = useState([]);
@@ -121,25 +122,26 @@ const TestComponent = ({data}) => {
     }
 
 
-    const renderData = (testMasterReportList, nested = false) => {
-        return testMasterReportList.map((testMaster, index) => (
-            <React.Fragment key={index}>
-                {testMaster.testMasterReports && testMaster.testMasterReports.map((report, idx) => (
-                    <tr key={idx} className={nested ? "nested-row" : ""}>
+    const renderData = (testMasters, parentName = '') => {
+        return testMasters.map((testMaster, index) => (
+            <React.Fragment key={'master-' + index}>
+                {testMaster.testReport && (
+                    <tr>
                         <td className="capitalize">{testMaster.testMasterName}</td>
-                        {report.testReport && Object.entries(report.testReport).filter(([key, _]) => key !== "report_type").map(([key, value]) => (
+                        {Object.entries(testMaster.testReport).filter(([key, _]) => key !== "report_type").map(([key, value]) => (
                             <td key={key}>{key === 'investigation' ? <span
                                 className="capitalize">{value}</span> : key === 'testReportDate' ? formatDate(value) : value}</td>
                         ))}
                     </tr>
-                ))}
-
-                {/* If nested testMasterReports, add them to the table */}
-                {
-                    testMaster.testMasterReports !== null && testMaster.testMasterReports.length > 0 && (
-                        <Fragment>{renderData(testMaster.testMasterReports, true)}</Fragment>
-                    )
-                }
+                )}
+                {testMaster.testMasterReports && (
+                    <>
+                        <tr style={{ backgroundColor: '#484848', color: 'white', border: '1px solid aliceblue' }}>
+                            <td colSpan="100%" style={{textAlign: 'center', textTransform: 'capitalize'}}><strong>{parentName ? `${parentName} - ${testMaster.testMasterName}` : testMaster.testMasterName}</strong></td>
+                        </tr>
+                        {renderData(testMaster.testMasterReports, testMaster.testMasterName)}
+                    </>
+                )}
             </React.Fragment>
         ));
     };
