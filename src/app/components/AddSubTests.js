@@ -4,7 +4,7 @@ import AddReferenceValues from "./AddReferenceValues";
 import SingleReferenceValues from "./OrganizationListContents/SingleReferenceValues";
 import { DeleteIcon } from "@chakra-ui/icons";
 
-const SubTestValues = ({control, index, register,watch,name}) => {
+const SubTestValues = ({control, index, register,watch,name,testUnits}) => {
     const {fields: subTestFields, append: appendSubTestValue, remove: removeSubTesteValue} = useFieldArray({
         control,
         name: name ? `${name}.subTests` : 'subTests'
@@ -40,7 +40,7 @@ const SubTestValues = ({control, index, register,watch,name}) => {
                         </div>
                     </div>
                     {watch( `${name}.${itemIndex}.referenceValueType`) === 'SINGLE_STRING' && (
-                        <SingleReferenceValues control={control} index={index} register={register} name={`${name}.${itemIndex}`}/>
+                        <SingleReferenceValues control={control} index={index} register={register} name={`${name}.${itemIndex}`} testUnits={testUnits}/>
                     )}
                     {watch( `${name}.${itemIndex}.referenceValueType`) === 'RANGE' && (
                         <AddReferenceValues control={control} index={index} register={register} name={`${name}.${itemIndex}`}/>
