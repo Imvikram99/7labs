@@ -6,102 +6,67 @@ import {specificApis} from '../data/SpecificApis';
 import {faArrowLeft, faRestroom} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import Image from "next/image";
-
-const Modal = ({showModal, handleClose, children}) => {
-    if (!showModal) return null;
-
-    return (
-        <div className="fixed z-10 inset-0 overflow-y-auto custom-modal">
-            <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                <div className="fixed inset-0 transition-opacity" aria-hidden="true">
-                    <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
-                </div>
-                <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-                <div
-                    className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:align-middle w-7/10"
-                    style={{minWidth: '60%'}}>
-                    <div className="card" style={{marginBottom: '0'}}>
-                        <div className="card-body">
-                            {children}
-                        </div>
-                    </div>
-                    <div className="custom-modal-close mt-5 mb-4 sm:flex sm:flex-row-reverse">
-                        <button
-                            type="button"
-                            className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-                            onClick={handleClose}
-                        >
-                            Close
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-};
+import {formatDate} from "@/helper/globalFunctions";
+import {CustomModal} from "@/app/components/CustomModal";
 
 const TestComponent = ({data}) => {
-    const [selectedTestData, setSelectedTestData] = useState({});
+    const [selectedTests, setSelectedTests] = useState([]);
     const [reportType, setReportType] = useState(null);
-    const [reportData, setReportData] = useState(null);
 
-    const renderTestPanelReport = (mainData, reportData, reportType) => {
+    const renderTestPanelReport = (selectedTests, reportType) => {
         if (reportType === "BloodReport") {
             return (
-                <Fragment>
-                    <h2 className="test-title">{mainData.name}</h2>
-                    <table className="text-start w-100">
-                        <thead>
-                        <tr>
-                            <th className="text-start">Test Name</th>
-                            <th className="text-start">Result</th>
-                            <th className="text-start">Range</th>
-                            <th className="text-start">Units</th>
-                            <th className="text-start">Sample Type</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {
-                            reportData.map((report, index) => (
-                                <tr key={index}>
-                                    <td>
-                                        <span className="report-value">{report.testReport.investigation}</span>
-                                    </td>
-                                    <td>
-                                        <span className="report-value">{report.testReport.value}</span>
-                                    </td>
-                                    <td>
-                                        <span>{report.testReport.minReferenceValue}</span>
-                                        -
-                                        <span>{report.testReport.maxReferenceValue}</span>
-                                    </td>
-                                    <td>
-                                        <span>{report.testReport.unit}</span>
-                                    </td>
-                                    <td>
-                                        <span className="capitalize">{report.testReport.primarySampleType}</span>
-                                    </td>
-                                </tr>
-                            ))
-                        }
-                        </tbody>
-                    </table>
-                </Fragment>
-            );
-        }
-        else if (reportType === "UltraSoundReport") {
-            return (
-                <div>
-                    <h2 className="test-title">{mainData.name}</h2>
-                    <p>Header: <span className="report-value">{reportData.header}</span></p>
-                    <p>Body: <span className="report-value">{reportData.body}</span></p>
-                    <p>Impression: <span className="report-value">{reportData.impression}</span></p>
+                <div className="bg-white rounded-lg">
+                    {selectedTests.length > 0 ? (
+                        <Fragment>
+                            {selectedTests.map((test, index) => (
+                                <div key={index}>
+                                    <h2 className="text-lg font-bold mb-2 text-center uppercase">{test.name}</h2>
+                                    <table className="table-auto w-full mb-4">
+                                        <thead>
+                                        <tr>
+                                            <th className="px-4 py-2">Test Name</th>
+                                            <th className="px-4 py-2">Investigation</th>
+                                            <th className="px-4 py-2">Value</th>
+                                            <th className="px-4 py-2">Unit</th>
+                                            <th className="px-4 py-2">Min</th>
+                                            <th className="px-4 py-2">Max</th>
+                                            <th className="px-4 py-2">Test Report ID</th>
+                                            <th className="px-4 py-2">Report Date</th>
+                                            <th className="px-4 py-2">Sample Type</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {renderData(test.testPanelReport.testMasterReportList)}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            ))}
+                        </Fragment>
+                    ) : <p className="text-gray-600">Please select a test to view the report.</p>}
                 </div>
             );
-        }else if (reportType === "MatrixTestReportTemplate") {
+        } else if (reportType === "UltraSoundReport") {
+            let data = selectedTests[0];
             return (
                 <div>
-                    <h2 className="test-title">{mainData.name}</h2>
+                    <h2 className="test-title">{data.name}</h2>
+                    {
+                        data.testPanelReport && data.testPanelReport.testMasterReportList.map((testMaster, index) => (
+                            <div key={index} className="ultar-report-main">
+                                <p>Header: <span className="report-value">{testMaster.header}</span></p>
+                                <p>Body: <span className="report-value">{testMaster.body}</span></p>
+                                <p>Impression: <span className="report-value">{testMaster.impression}</span></p>
+                            </div>
+                        ))
+                    }
+                </div>
+            );
+        } else if (reportType === "MatrixTestReportTemplate") {
+            let data = selectedTests[0];
+            return (
+                <div>
+                    <h2 className="test-title">{data.name}</h2>
                     <table className="text-start w-100">
                         <thead>
                         <tr>
@@ -111,7 +76,7 @@ const TestComponent = ({data}) => {
                         </tr>
                         </thead>
                         <tbody>
-                        {Object.entries(reportData.columns).map(([week, data]) => (
+                        {Object.entries(data.testPanelReport.testMasterReportList[0].testReport.columns).map(([week, data]) => (
                             <tr key={week}>
                                 <td className="capitalize text-blue-700" style={{textAlign: 'center'}}>{week}</td>
                                 <td>{data.growth_measurement}</td>
@@ -128,33 +93,56 @@ const TestComponent = ({data}) => {
     };
 
     const filterTestById = (testId) => {
-        const picked = data.bookingSlip.tests.filter(test => test.id === testId)[0];
-        setSelectedTestData(picked);
+        if (testId === '') {
+            setSelectedTests([]);
+            setReportType('');
+        } else {
+            const picked = data.bookingSlip.tests.filter(test => test.id === testId);
+            setSelectedTests(picked);
 
-        // Get report type and report data from selected test
-        if (picked && picked.testPanelReport && picked.testPanelReport.testMasterReportList) {
-            picked.testPanelReport.testMasterReportList.forEach(report => {
-                // Check if testReport exists and has a report_type
-                if (report.testReport && report.testReport.report_type) {
-                    setReportType(report.testReport.report_type);
-                    setReportData(report.testReport)
-                }
-                // Check if testMasterReports exists
-                // this is for blood report
-                if (report.testMasterReports) {
-                    report.testMasterReports.forEach(masterReport => {
-                        masterReport.testMasterReports.forEach(masterReport2 => {
-                            // Check if testReport exists and has a report_type
-                            if (masterReport2.testReport && masterReport2.testReport.report_type) {
-                                setReportType(masterReport2.testReport.report_type);
-                                setReportData(masterReport.testMasterReports)
-                            }
-                        });
-                    });
-                }
-            });
+            // Get report type from selected Test
+            const processReports = (reports) => {
+                reports.forEach(report => {
+                    // Check if testReport exists and has a report_type
+                    if (report.testReport && report.testReport.report_type) {
+                        setReportType(report.testReport.report_type);
+                    }
+                    // Check if testMasterReports exists
+                    if (report.testMasterReports) {
+                        processReports(report.testMasterReports);
+                    }
+                });
+            };
+
+            if (picked && picked[0].testPanelReport && picked[0].testPanelReport.testMasterReportList) {
+                processReports(picked[0].testPanelReport.testMasterReportList);
+            }
         }
     }
+
+
+    const renderData = (testMasterReportList, nested = false) => {
+        return testMasterReportList.map((testMaster, index) => (
+            <React.Fragment key={index}>
+                {testMaster.testMasterReports && testMaster.testMasterReports.map((report, idx) => (
+                    <tr key={idx} className={nested ? "nested-row" : ""}>
+                        <td className="capitalize">{testMaster.testMasterName}</td>
+                        {report.testReport && Object.entries(report.testReport).filter(([key, _]) => key !== "report_type").map(([key, value]) => (
+                            <td key={key}>{key === 'investigation' ? <span
+                                className="capitalize">{value}</span> : key === 'testReportDate' ? formatDate(value) : value}</td>
+                        ))}
+                    </tr>
+                ))}
+
+                {/* If nested testMasterReports, add them to the table */}
+                {
+                    testMaster.testMasterReports !== null && testMaster.testMasterReports.length > 0 && (
+                        <Fragment>{renderData(testMaster.testMasterReports, true)}</Fragment>
+                    )
+                }
+            </React.Fragment>
+        ));
+    };
 
     return (
         <div>
@@ -204,7 +192,9 @@ const TestComponent = ({data}) => {
                 <hr/>
 
                 {
-                    selectedTestData && selectedTestData.testPanelReport && reportType !== '' ? renderTestPanelReport(selectedTestData, reportData, reportType) : <p className="no-test-selected-msg text-center text-red-500">Please select a test name to view report</p>
+                    setSelectedTests.length > 0 && reportType !== '' ? renderTestPanelReport(selectedTests, reportType) :
+                        <p className="no-test-selected-msg text-center text-red-500">Please select a test name to view
+                            report</p>
                 }
 
                 <div className="signature-part">
@@ -235,7 +225,7 @@ const AllBooking = () => {
     }, [date]);
 
     const handleOpenModal = (booking) => {
-        setSelectedBooking(booking);
+        setSelectedBooking(booking)
         setShowModal(true);
     };
 
@@ -266,7 +256,7 @@ const AllBooking = () => {
                         <div key={booking.id} className="card overflow-hidden shadow rounded-lg">
                             <div className="card-body">
                                 <h2 className="text-lg card-title font-bold">
-                                    Vikram Panwar {booking.patientDetails.firstName} {booking.patientDetails.lastName}
+                                    {booking.patientDetails.firstName} {booking.patientDetails.lastName}
                                 </h2>
                             </div>
                             <div className="card-body-out">
@@ -294,9 +284,9 @@ const AllBooking = () => {
                 </div>
             </div>
 
-            <Modal showModal={showModal} handleClose={handleCloseModal}>
+            <CustomModal showModal={showModal} handleClose={handleCloseModal}>
                 {selectedBooking && <TestComponent data={selectedBooking}/>}
-            </Modal>
+            </CustomModal>
         </div>
     );
 };
