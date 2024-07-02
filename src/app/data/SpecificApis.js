@@ -110,6 +110,53 @@ class SpecificApis {
     }
   }
 
+  async addLetterHeadToCenter(file,labCenterId) {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      const response = await apiService.postData(`api/v1/lab/labcenter/letterhead/upload?labCenterId=${encodeURIComponent(labCenterId)}`,formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      }
+    );
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching center information:', error);
+      throw error;
+    }
+  }
+
+  async addReportToPatient(patientId, date, report) {
+    try {
+        const url = `api/v1/lab/upload/${encodeURIComponent(patientId)}/report/upload?date=${encodeURIComponent(date)}`;
+        const formData = new FormData();
+        formData.append('file', report);
+        const response = await apiService.postData(url, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data' 
+            }
+        });
+
+        return response.data;
+    } catch (error) {
+        console.error('Error uploading report:', error);
+        throw error;
+    }
+}
+
+
+  async downloadFile(fileId){
+    try{
+    const response = await apiService.fetchBlobData(`api/v1/lab/reports/download/${encodeURIComponent(fileId)}`);
+    return response.data;
+    } catch (error){
+        console.error('Error donwloading file');
+        throw error;
+    }
+
+  }
+
   async addLabCenter(labcenterData) {
     try {
       const response = await apiService.postData('api/v1/lab/labcenter',labcenterData);

@@ -1,140 +1,210 @@
-import React, {useState, useEffect} from "react";
+import React, {useState, useEffect, Fragment} from "react";
 import {FaDownload} from "react-icons/fa6";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import {specificApis} from '../data/SpecificApis';
 import {faArrowLeft, faRestroom} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-
-const Modal = ({showModal, handleClose, children}) => {
-    if (!showModal) return null;
-
-    return (
-        <div className="fixed z-10 inset-0 overflow-y-auto">
-            <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                <div className="fixed inset-0 transition-opacity" aria-hidden="true">
-                    <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
-                </div>
-                <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">
-          &#8203;
-        </span>
-                <div
-                    className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                    <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                        <div className="sm:flex sm:items-start">
-                            <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                                {children}
-                            </div>
-                        </div>
-                    </div>
-                    <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                        <button
-                            type="button"
-                            className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-                            onClick={handleClose}
-                        >
-                            Close
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-};
+import Image from "next/image";
+import {formatDate} from "@/helper/globalFunctions";
+import {CustomModal} from "@/app/components/CustomModal";
+import BloodReportSample from "@/app/components/blood-report-sample";
 
 const TestComponent = ({data}) => {
-    const renderTestPanelReport = (testPanelReport) => {
-        if (testPanelReport.testMasterReportList) {
-            return testPanelReport.testMasterReportList.map((report) => {
-                if (report.testReport) {
-                    if (report.testReport.report_type === "UltraSoundReport") {
-                        return (
-                            <div key={report.testReport.testReportId}>
-                                <h4>UltraSound Report</h4>
-                                <p>Header: {report.testReport.header}</p>
-                                <p>Body: {report.testReport.body}</p>
-                                <p>Impression: {report.testReport.impression}</p>
-                                {/* Add more UltraSoundReport details as needed */}
-                            </div>
-                        );
-                    } else if (report.testReport.report_type === "MatrixTestReportTemplate") {
-                        return (
-                            <div key={report.testReport.testReportId}>
-                                <h4>Matrix Test Report Template</h4>
-                                <table>
-                                    <thead>
-                                    <tr>
-                                        <th>Week</th>
-                                        <th>Growth Measurement</th>
-                                        <th>Comments</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    {Object.entries(report.testReport.columns).map(([week, data]) => (
-                                        <tr key={week}>
-                                            <td>{week}</td>
-                                            <td>{data.growth_measurement}</td>
-                                            <td>{data.comments}</td>
+    const [selectedTests, setSelectedTests] = useState([]);
+    const [reportType, setReportType] = useState(null);
+
+    const renderTestPanelReport = (selectedTests, reportType) => {
+        if (reportType === "BloodReport") {
+            return (
+                <div className="bg-white rounded-lg">
+                    {selectedTests.length > 0 ? (
+                        <Fragment>
+                            {selectedTests.map((test, index) => (
+                                <div key={index}>
+                                    <h2 className="text-lg font-bold mb-2 text-center uppercase">{test.name}</h2>
+                                    <table className="table-auto w-full mb-4">
+                                        <thead>
+                                        <tr>
+                                            <th className="px-4 py-2">Test Name</th>
+                                            <th className="px-4 py-2">Investigation</th>
+                                            <th className="px-4 py-2">Value</th>
+                                            <th className="px-4 py-2">Unit</th>
+                                            <th className="px-4 py-2">Min</th>
+                                            <th className="px-4 py-2">Max</th>
+                                            <th className="px-4 py-2">Test Report ID</th>
+                                            <th className="px-4 py-2">Report Date</th>
+                                            <th className="px-4 py-2">Sample Type</th>
                                         </tr>
-                                    ))}
-                                    </tbody>
-                                </table>
-                                {/* Add more MatrixTestReportTemplate details as needed */}
+                                        </thead>
+                                        <tbody>
+                                        {renderData(test.testPanelReport.testMasterReportList)}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            ))}
+                        </Fragment>
+                    ) : <p className="text-gray-600">Please select a test to view the report.</p>}
+                </div>
+            );
+        } else if (reportType === "UltraSoundReport") {
+            let data = selectedTests[0];
+            return (
+                <div>
+                    <h2 className="test-title">{data.name}</h2>
+                    {
+                        data.testPanelReport && data.testPanelReport.testMasterReportList.map((testMaster, index) => (
+                            <div key={index} className="ultar-report-main">
+                                <p>Header: <span className="report-value">{testMaster.header}</span></p>
+                                <p>Body: <span className="report-value">{testMaster.body}</span></p>
+                                <p>Impression: <span className="report-value">{testMaster.impression}</span></p>
                             </div>
-                        );
-                    } else if (report.testReport.report_type === "BloodReport") {
-                        return (
-                            <div key={report.testReport.testReportId}>
-                                <h4>Blood Report</h4>
-                                <p>Investigation: {report.testReport.investigation}</p>
-                                <p>Value: {report.testReport.value}</p>
-                                <p>Unit: {report.testReport.unit}</p>
-                                <p>Min Reference Value: {report.testReport.minReferenceValue}</p>
-                                <p>Max Reference Value: {report.testReport.maxReferenceValue}</p>
-                                <p>Primary Sample Type: {report.testReport.primarySampleType}</p>
-                                {/* Add more BloodReport details as needed */}
-                            </div>
-                        );
+                        ))
                     }
-                }
-                if (report.testMasterReports) {
-                    return renderTestPanelReport({testMasterReportList: report.testMasterReports});
-                }
-                return null;
-            });
+                </div>
+            );
+        } else if (reportType === "MatrixTestReportTemplate") {
+            let data = selectedTests[0];
+            return (
+                <div>
+                    <h2 className="test-title">{data.name}</h2>
+                    <table className="text-start w-100">
+                        <thead>
+                        <tr>
+                            <th>Week</th>
+                            <th>Growth Measurement</th>
+                            <th>Comments</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {Object.entries(data.testPanelReport.testMasterReportList[0].testReport.columns).map(([week, data]) => (
+                            <tr key={week}>
+                                <td className="capitalize text-blue-700" style={{textAlign: 'center'}}>{week}</td>
+                                <td>{data.growth_measurement}</td>
+                                <td>{data.comments}</td>
+                            </tr>
+                        ))}
+                        </tbody>
+                    </table>
+                </div>
+            );
         }
+
         return null;
+    };
+
+    const filterTestById = (testId) => {
+        if (testId === '') {
+            setSelectedTests([]);
+            setReportType('');
+        } else {
+            const picked = data.bookingSlip.tests.filter(test => test.id === testId);
+            setSelectedTests(picked);
+
+            // Get report type from selected Test
+            const processReports = (reports) => {
+                reports.forEach(report => {
+                    // Check if testReport exists and has a report_type
+                    if (report.testReport && report.testReport.report_type) {
+                        setReportType(report.testReport.report_type);
+                    }
+                    // Check if testMasterReports exists
+                    if (report.testMasterReports) {
+                        processReports(report.testMasterReports);
+                    }
+                });
+            };
+
+            if (picked && picked[0].testPanelReport && picked[0].testPanelReport.testMasterReportList) {
+                processReports(picked[0].testPanelReport.testMasterReportList);
+            }
+        }
+    }
+
+
+    const renderData = (testMasters, parentName = '') => {
+        return testMasters.map((testMaster, index) => (
+            <React.Fragment key={'master-' + index}>
+                {testMaster.testReport && (
+                    <tr>
+                        <td className="capitalize">{testMaster.testMasterName}</td>
+                        {Object.entries(testMaster.testReport).filter(([key, _]) => key !== "report_type").map(([key, value]) => (
+                            <td key={key}>{key === 'investigation' ? <span
+                                className="capitalize">{value}</span> : key === 'testReportDate' ? formatDate(value) : value}</td>
+                        ))}
+                    </tr>
+                )}
+                {testMaster.testMasterReports && (
+                    <>
+                        <tr style={{ backgroundColor: '#484848', color: 'white', border: '1px solid aliceblue' }}>
+                            <td colSpan="100%" style={{textAlign: 'center', textTransform: 'capitalize'}}><strong>{parentName ? `${parentName} - ${testMaster.testMasterName}` : testMaster.testMasterName}</strong></td>
+                        </tr>
+                        {renderData(testMaster.testMasterReports, testMaster.testMasterName)}
+                    </>
+                )}
+            </React.Fragment>
+        ));
     };
 
     return (
         <div>
-            <h2>Tests:</h2>
-            <table>
-                <thead>
-                <tr>
-                    <th>Test Name</th>
-                    <th>Barcode</th>
-                    <th>Cost</th>
-                    <th>Code</th>
-                    <th>Test Panel Report</th>
-                    {/* Add more table headers as needed */}
-                </tr>
-                </thead>
-                <tbody>
-                {data.bookingSlip.tests.map((test) => (
-                    <tr key={test.id}>
-                        <td>{test.name}</td>
-                        <td>{test.barCode}</td>
-                        <td>{test.cost}</td>
-                        <td>{test.code}</td>
-                        <td>
-                            <div>{renderTestPanelReport(test.testPanelReport)}</div>
-                        </td>
-                        {/* Add more table data as needed */}
-                    </tr>
-                ))}
-                </tbody>
-            </table>
+            <label className="block text-sm mb-2">Select a Test</label>
+            <select className="mb-3" name="test-dropdown" id="test-dropdown"
+                    onChange={(e) => filterTestById(e.target.value)}>
+                <option value="">--- Select a Test ---</option>
+                {
+                    data.bookingSlip.tests.map((test) =>
+                        <option key={test.id} value={test.id}>{test.name}</option>
+                    )
+                }
+            </select>
+            <hr/>
+
+            <div className="report-main-body">
+                <div className="address-part">
+                    <div className="a-left">
+                        <h5 className="hos-name">Hospital Name</h5>
+                        <p>19/C, East Noyatola, Moghbazar</p>
+                    </div>
+                    <div className="a-right">
+                        <Image src="/logoreport1.png" width="100" height="100" alt="logo"/>
+                    </div>
+                </div>
+                <h3 className="report-title">Laboratory Report</h3>
+                <div className="personal-info-part">
+                    <div className="a-left">
+                        <h5><span>Name</span>
+                            <strong>{data.patientDetails.firstName} {data.patientDetails.lastName}</strong></h5>
+                        <h5><span>DoB</span> {data.patientDetails.dob}</h5>
+                        <h5><span>Doctor</span> Alfaz Uddin</h5>
+                        <h5><span>Phone</span> {data.patientDetails.phone}</h5>
+                        <h5>
+                            <span>Address</span> {data.patientDetails.addressLine1}, {data.patientDetails.addressLine2}, {data.patientDetails.addressLine3}
+                        </h5>
+                    </div>
+                    <div className="a-right">
+                        <h5><span>Patient ID</span><strong>{data.patientDetails.patientId}</strong></h5>
+                        <h5>
+                            <span>Age</span><strong>{data.patientDetails.ageInYears}</strong>Y <strong>{data.patientDetails.ageInMonths}</strong>M <strong>{data.patientDetails.ageInDays}</strong>D
+                        </h5>
+                        <h5><span>SEX</span>{data.patientDetails.gender}</h5>
+                        <h5><span>Test ID</span>{data.patientDetails.pinCode}</h5>
+                    </div>
+                </div>
+                <hr/>
+
+                {
+                    setSelectedTests.length > 0 && reportType !== '' ? renderTestPanelReport(selectedTests, reportType) :
+                        <p className="no-test-selected-msg text-center text-red-500">Please select a test name to view
+                            report</p>
+                }
+
+                <div className="signature-part">
+                    <p>Digitally signed by</p>
+                    <p><strong>Dr. Alfaz Uddin</strong></p>
+                    <p>GNU Public Key</p>
+                </div>
+            </div>
         </div>
     );
 };
@@ -157,7 +227,7 @@ const AllBooking = () => {
     }, [date]);
 
     const handleOpenModal = (booking) => {
-        setSelectedBooking(booking);
+        setSelectedBooking(booking)
         setShowModal(true);
     };
 
@@ -168,19 +238,19 @@ const AllBooking = () => {
 
     return (
         <div className="max-w-7xl mx-auto">
-            <h6 className="uppercase font-extrabold text-xl text-white"><FontAwesomeIcon icon={faRestroom}/> | ALL
+            <h6 className="uppercase font-extrabold text-xl"><FontAwesomeIcon icon={faRestroom}/> | ALL
                 Bookings</h6>
             <hr/>
             <div className="">
-                <h6 className="text-amber-50 font-semibold leading-tight mb-4">
-                    ALL Bookings of <span className="italic text-blue-50">{date}</span>
+                <h6 className=" font-semibold mb-4">
+                    ALL Bookings of <span className="italic">{date}</span>
                 </h6>
                 <div className="mb-4">
                     <input
                         type="date"
                         value={date}
                         onChange={(e) => setDate(e.target.value)}
-                        className="w-full px-3 py-2 border-white text-white outline-none"
+                        className="w-full px-3 py-2 outline-none"
                     />
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -188,7 +258,7 @@ const AllBooking = () => {
                         <div key={booking.id} className="card overflow-hidden shadow rounded-lg">
                             <div className="card-body">
                                 <h2 className="text-lg card-title font-bold">
-                                    Vikram Panwar {booking.patientDetails.firstName} {booking.patientDetails.lastName}
+                                    {booking.patientDetails.firstName} {booking.patientDetails.lastName}
                                 </h2>
                             </div>
                             <div className="card-body-out">
@@ -204,7 +274,7 @@ const AllBooking = () => {
                             </div>
                             <div className="download-btn-block">
                                 <button
-                                    className="w-100 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                    className="w-100 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-normal text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                                     onClick={() => handleOpenModal(booking)}
                                 >
                                     <FaDownload className="-ml-1 mr-2 h-5 w-5" aria-hidden="true"/>
@@ -216,9 +286,9 @@ const AllBooking = () => {
                 </div>
             </div>
 
-            <Modal showModal={showModal} handleClose={handleCloseModal}>
+            <CustomModal showModal={showModal} handleClose={handleCloseModal}>
                 {selectedBooking && <TestComponent data={selectedBooking}/>}
-            </Modal>
+            </CustomModal>
         </div>
     );
 };
