@@ -3,7 +3,7 @@ import {FaDownload} from "react-icons/fa6";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import {specificApis} from '../data/SpecificApis';
-import {faArrowLeft, faFilePdf, faRestroom} from "@fortawesome/free-solid-svg-icons";
+import {faArrowLeft, faEdit, faFilePdf, faRestroom} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import Image from "next/image";
 import {formatDate} from "@/helper/globalFunctions";
@@ -13,6 +13,7 @@ import html2canvas from "html2canvas";
 const TestComponent = ({data}) => {
     const [selectedTests, setSelectedTests] = useState([]);
     const [reportType, setReportType] = useState(null);
+    const [showEditReportModal, setShowEditReportModal] = useState(false);
 
     const renderTestPanelReport = (selectedTests, reportType) => {
         if (reportType === "BloodReport") {
@@ -181,6 +182,35 @@ const TestComponent = ({data}) => {
         pdf.save('report.pdf');
     };
 
+    const testtt = () => {
+        const payload = {
+            "name": "ultrasound full body",
+            "testMasterReportList": [
+                {
+                    "testMasterName": "White Blood Cell Count",
+                    "testReport": {
+                        "report_type": "UltraSoundReport",
+                        "testReportId": "048d5a5a",
+                        "testReportDate": "2024-07-03T06:07:40.178+00:00",
+                        "header": "ye pet ka ultrasound hai",
+                        "investigationValueMap": {},
+                        "body": "ye body",
+                        "impression": "kuch nhi hai thik hai"
+                    },
+                    "testMasterReports": null
+                }
+            ]
+        }
+
+        specificApis.updateTestResult("63", "cb718a44", payload)
+            .then(response => {
+                console.log(response);
+            })
+            .catch(error => {
+                console.error('Failed to update test:', error);
+            });
+    }
+
     return (
         <div className="report-modal-container">
             <div className="report-modal-header">
@@ -197,9 +227,26 @@ const TestComponent = ({data}) => {
                     </select>
                 </div>
                 <hr/>
-                <div className="download-pdf-icon"><FontAwesomeIcon onClick={generatePdf} icon={faFilePdf}/></div>
-            </div>
+                <div className="editable-icon-block flex content-end">
+                    <div className="edit-icon mr-4"><FontAwesomeIcon icon={faEdit} onClick={() => setShowEditReportModal(true)}/></div>
+                    <div className="download-pdf-icon"><FontAwesomeIcon onClick={generatePdf} icon={faFilePdf}/></div>
+                </div>
+                {
+                    showEditReportModal &&
+                    <CustomModal showModal={showEditReportModal} handleClose={() => {
+                        setShowEditReportModal(false)
+                    }}>
+                        <form>
+                            <label className="block text-sm mb-2">Test Name:</label>
+                            <input type="text" name="name" placeholder="Test Name"
+                                   className="w-full"/>
 
+                            <button type="button" onClick={testtt}>Submit</button>
+
+                        </form>
+                    </CustomModal>
+                }
+            </div>
 
             <div id="report-main-body-pdf">
                 <div id="report-main-body" className="report-main-body">
@@ -209,7 +256,7 @@ const TestComponent = ({data}) => {
                             <p>19/C, East Noyatola, Moghbazar</p>
                         </div>
                         <div className="a-right">
-                            <img style={{width:"100px"}} src="/logoreport1.png" alt="logo"/>
+                            <img style={{width: "100px"}} src="/logoreport1.png" alt="logo"/>
                         </div>
                     </div>
                     <h3 id="report-title" className="report-title">Laboratory Report</h3>
