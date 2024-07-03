@@ -110,11 +110,7 @@ const AddTestPanel = () => {
             delete data.matrixTestReportTemplate
         }
 
-        const formData = {
-            ...data,
-            testCategory: testCategories.find(category => category.id === data.testCategory)
-        };
-        specificApis.addTestPanel(formData)
+        specificApis.addTestPanel({...data})
             .then(response => {
                 console.log(response)
                 toast.success('Sucessfully Added Organizer List')
@@ -128,7 +124,7 @@ const AddTestPanel = () => {
     const testResultType = watch('testResultType');
 
     return (
-        <main className="flex min-h-screen flex-col items-center justify-center bg-gray-100 w-full">
+        <main className="flex flex-col items-center bg-gray-100 w-full">
             <div className="bg-white shadow-md rounded px-8 py-8 my-4 w-full max-w-7xl">
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                     <div className="grid grid-cols-3 gap-4">
@@ -150,14 +146,15 @@ const AddTestPanel = () => {
                         </div>
                         <div>
                             <label htmlFor="testCategory" className="block text-sm font-medium text-gray-700">
-                                Test Category 12
+                                Test Category
                             </label>
                             <div className='flex'>
                             <select
                                 {...register('testCategory')}  required={true}
                                 className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md border">
+                                 <option value={""}>Select Category</option>   
                                 {testCategories.map((category,index) => (
-                                    <option key={category.name} value={index}>{category.name}</option>
+                                    <option key={category.name} value={category.name}>{category.name}</option>
                                 ))}
                             </select>
                             <button

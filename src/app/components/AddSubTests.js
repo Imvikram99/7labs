@@ -51,7 +51,7 @@ const SubTestValues = ({control, index, register,watch,name,testUnits,setModalOp
                         <SingleReferenceValues control={control} index={index} register={register} name={`${name}.${itemIndex}`} testUnits={testUnits} setModalOpen={setModalOpen}/>
                     )}
                     {watch( `${name}.${itemIndex}.referenceValueType`) === 'RANGE' && (
-                        <AddReferenceValues control={control} index={index} register={register} name={`${name}.${itemIndex}`}/>
+                        <AddReferenceValues control={control} index={index} register={register} name={`${name}.${itemIndex}`} testUnits={testUnits} setModalOpen={setModalOpen}/>
                     )}
                     <div className="flex justify-start w-full">
                         <button type="button" onClick={() => removeSubTesteValue(itemIndex)}
