@@ -462,22 +462,28 @@ form.card {
     color: #000000;
     font-size: 14px;
     font-weight: normal;
+    overflow: hidden;
+    margin-bottom: 10px;
 }
 
 .custom-modal .card {
     box-shadow: none;
 }
 
-.custom-modal .card-body {
-    padding: 20px 30px;
+#report-main-body-pdf{
+    padding: 20px;
+}
+
+.download-pdf-icon{
+    font-size: 20px;
+    color: #1D4CAE;
+    cursor: pointer;
+    text-align: right;
 }
 
 .custom-modal .custom-modal-close {
-    display: block;
-    width: 100%;
-    float: right;
     text-align: right;
-    margin-right: 30px;
+    margin: 0 20px 20px 20px;
 }
 
 .report-main-body .test-title {
@@ -517,12 +523,12 @@ form.card {
 
 .report-main-body .report-title {
     background-color: #1D4CAE;
-    padding: 2px 20px;
+    padding: 10px 20px;
     color: #ffffff;
     text-align: center;
     font-size: 14px;
-    margin-top: 19px;
-    margin-bottom: 10px;
+    margin-top: 15px;
+    margin-bottom: 15px;
 }
 
 .report-main-body table th {
@@ -541,7 +547,7 @@ form.card {
 }
 
 .report-main-body .signature-part {
-    margin-top: 50px;
+    margin-top: 30px;
     float: right;
     display: block;
     overflow: hidden;
