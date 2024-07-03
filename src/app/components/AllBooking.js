@@ -137,7 +137,7 @@ const TestComponent = ({data}) => {
                 {testMaster.testMasterReports && (
                     <>
                         <tr style={{backgroundColor: '#484848', color: 'white', border: '1px solid aliceblue'}}>
-                            <td colSpan="100%" style={{textAlign: 'center', textTransform: 'capitalize'}}>
+                            <td colSpan="100%" style={{textAlign: 'center', textTransform: 'capitalize', paddingBottom:'10px'}}>
                                 <strong>{parentName ? `${parentName} - ${testMaster.testMasterName}` : testMaster.testMasterName}</strong>
                             </td>
                         </tr>
@@ -151,7 +151,9 @@ const TestComponent = ({data}) => {
     const generatePdf = async () => {
         const content = document.getElementById('report-main-body-pdf');
         const canvas = await html2canvas(content, {
-            scale: 1 // Adjust this value as needed
+            scale: 5,
+            allowTaint: true,
+            useCORS: true
         });
         const imgData = canvas.toDataURL('image/png');
         const pdf = new jsPDF({
@@ -176,7 +178,7 @@ const TestComponent = ({data}) => {
             heightLeft -= pageHeight;
         }
 
-        pdf.save('document.pdf');
+        pdf.save('report.pdf');
     };
 
     return (
@@ -207,10 +209,10 @@ const TestComponent = ({data}) => {
                             <p>19/C, East Noyatola, Moghbazar</p>
                         </div>
                         <div className="a-right">
-                            <Image src="/logoreport1.png" width="100" height="100" alt="logo"/>
+                            <img style={{width:"100px"}} src="/logoreport1.png" alt="logo"/>
                         </div>
                     </div>
-                    <h3 className="report-title">Laboratory Report</h3>
+                    <h3 id="report-title" className="report-title">Laboratory Report</h3>
                     <div className="personal-info-part">
                         <div className="a-left">
                             <h5><span>Name</span>
