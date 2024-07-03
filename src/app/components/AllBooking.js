@@ -3,12 +3,12 @@ import {FaDownload} from "react-icons/fa6";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import {specificApis} from '../data/SpecificApis';
-import {faArrowLeft, faRestroom} from "@fortawesome/free-solid-svg-icons";
+import {faArrowLeft, faFilePdf, faRestroom} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import Image from "next/image";
 import {formatDate} from "@/helper/globalFunctions";
 import {CustomModal} from "@/app/components/CustomModal";
-import BloodReportSample from "@/app/components/blood-report-sample";
+import html2canvas from "html2canvas";
 
 const TestComponent = ({data}) => {
     const [selectedTests, setSelectedTests] = useState([]);
@@ -136,8 +136,10 @@ const TestComponent = ({data}) => {
                 )}
                 {testMaster.testMasterReports && (
                     <>
-                        <tr style={{ backgroundColor: '#484848', color: 'white', border: '1px solid aliceblue' }}>
-                            <td colSpan="100%" style={{textAlign: 'center', textTransform: 'capitalize'}}><strong>{parentName ? `${parentName} - ${testMaster.testMasterName}` : testMaster.testMasterName}</strong></td>
+                        <tr style={{backgroundColor: '#484848', color: 'white', border: '1px solid aliceblue'}}>
+                            <td colSpan="100%" style={{textAlign: 'center', textTransform: 'capitalize', paddingBottom:'10px'}}>
+                                <strong>{parentName ? `${parentName} - ${testMaster.testMasterName}` : testMaster.testMasterName}</strong>
+                            </td>
                         </tr>
                         {renderData(testMaster.testMasterReports, testMaster.testMasterName)}
                     </>
@@ -146,63 +148,106 @@ const TestComponent = ({data}) => {
         ));
     };
 
-    return (
-        <div>
-            <label className="block text-sm mb-2">Select a Test</label>
-            <select className="mb-3" name="test-dropdown" id="test-dropdown"
-                    onChange={(e) => filterTestById(e.target.value)}>
-                <option value="">--- Select a Test ---</option>
-                {
-                    data.bookingSlip.tests.map((test) =>
-                        <option key={test.id} value={test.id}>{test.name}</option>
-                    )
-                }
-            </select>
-            <hr/>
+    const generatePdf = async () => {
+        const content = document.getElementById('report-main-body-pdf');
+        const canvas = await html2canvas(content, {
+            scale: 5,
+            allowTaint: true,
+            useCORS: true
+        });
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new jsPDF({
+            orientation: 'portrait',
+            unit: 'mm',
+            format: 'a4'
+        });
 
-            <div className="report-main-body">
-                <div className="address-part">
-                    <div className="a-left">
-                        <h5 className="hos-name">Hospital Name</h5>
-                        <p>19/C, East Noyatola, Moghbazar</p>
-                    </div>
-                    <div className="a-right">
-                        <Image src="/logoreport1.png" width="100" height="100" alt="logo"/>
-                    </div>
-                </div>
-                <h3 className="report-title">Laboratory Report</h3>
-                <div className="personal-info-part">
-                    <div className="a-left">
-                        <h5><span>Name</span>
-                            <strong>{data.patientDetails.firstName} {data.patientDetails.lastName}</strong></h5>
-                        <h5><span>DoB</span> {data.patientDetails.dob}</h5>
-                        <h5><span>Doctor</span> Alfaz Uddin</h5>
-                        <h5><span>Phone</span> {data.patientDetails.phone}</h5>
-                        <h5>
-                            <span>Address</span> {data.patientDetails.addressLine1}, {data.patientDetails.addressLine2}, {data.patientDetails.addressLine3}
-                        </h5>
-                    </div>
-                    <div className="a-right">
-                        <h5><span>Patient ID</span><strong>{data.patientDetails.patientId}</strong></h5>
-                        <h5>
-                            <span>Age</span><strong>{data.patientDetails.ageInYears}</strong>Y <strong>{data.patientDetails.ageInMonths}</strong>M <strong>{data.patientDetails.ageInDays}</strong>D
-                        </h5>
-                        <h5><span>SEX</span>{data.patientDetails.gender}</h5>
-                        <h5><span>Test ID</span>{data.patientDetails.pinCode}</h5>
-                    </div>
+        const imgWidth = 210; // A4 width in mm
+        const pageHeight = 297; // A4 height in mm
+        const imgHeight = canvas.height * imgWidth / canvas.width;
+        let heightLeft = imgHeight;
+        let position = 0;
+
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+
+        while (heightLeft >= 0) {
+            position = heightLeft - imgHeight;
+            pdf.addPage();
+            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+        }
+
+        pdf.save('report.pdf');
+    };
+
+    return (
+        <div className="report-modal-container">
+            <div className="report-modal-header">
+                <div className="flex justify-center items-center">
+                    <label className="block text-sm flex-grow whitespace-nowrap mr-2">Select a Test</label>
+                    <select name="test-dropdown" id="test-dropdown" className="flex-grow"
+                            onChange={(e) => filterTestById(e.target.value)}>
+                        <option value="">--- Select a Test ---</option>
+                        {
+                            data.bookingSlip.tests.map((test) =>
+                                <option key={test.id} value={test.id}>{test.name}</option>
+                            )
+                        }
+                    </select>
                 </div>
                 <hr/>
+                <div className="download-pdf-icon"><FontAwesomeIcon onClick={generatePdf} icon={faFilePdf}/></div>
+            </div>
 
-                {
-                    setSelectedTests.length > 0 && reportType !== '' ? renderTestPanelReport(selectedTests, reportType) :
-                        <p className="no-test-selected-msg text-center text-red-500">Please select a test name to view
-                            report</p>
-                }
 
-                <div className="signature-part">
-                    <p>Digitally signed by</p>
-                    <p><strong>Dr. Alfaz Uddin</strong></p>
-                    <p>GNU Public Key</p>
+            <div id="report-main-body-pdf">
+                <div id="report-main-body" className="report-main-body">
+                    <div className="address-part">
+                        <div className="a-left">
+                            <h5 className="hos-name">Hospital Name</h5>
+                            <p>19/C, East Noyatola, Moghbazar</p>
+                        </div>
+                        <div className="a-right">
+                            <img style={{width:"100px"}} src="/logoreport1.png" alt="logo"/>
+                        </div>
+                    </div>
+                    <h3 id="report-title" className="report-title">Laboratory Report</h3>
+                    <div className="personal-info-part">
+                        <div className="a-left">
+                            <h5><span>Name</span>
+                                <strong>{data.patientDetails.firstName} {data.patientDetails.lastName}</strong></h5>
+                            <h5><span>DoB</span>{data.patientDetails.dob}</h5>
+                            <h5><span>Doctor</span>Alfaz Uddin</h5>
+                            <h5><span>Phone</span>{data.patientDetails.phone}</h5>
+                            <h5>
+                                <span>Address</span>{data.patientDetails.addressLine1}, {data.patientDetails.addressLine2}, {data.patientDetails.addressLine3}
+                            </h5>
+                        </div>
+                        <div className="a-right">
+                            <h5><span>Patient ID</span><strong>{data.patientDetails.patientId}</strong></h5>
+                            <h5>
+                                <span>Age</span><strong>{data.patientDetails.ageInYears}</strong>Y <strong>{data.patientDetails.ageInMonths}</strong>M <strong>{data.patientDetails.ageInDays}</strong>D
+                            </h5>
+                            <h5><span>SEX</span>{data.patientDetails.gender}</h5>
+                            <h5><span>Test ID</span>{data.patientDetails.pinCode}</h5>
+                        </div>
+                    </div>
+                    <hr/>
+
+                    {
+                        setSelectedTests.length > 0 && reportType !== '' ? renderTestPanelReport(selectedTests, reportType) :
+                            <p className="no-test-selected-msg text-center text-red-500">Please select a test name to
+                                view
+                                report</p>
+                    }
+
+                    <div className="signature-part">
+                        <p>Digitally signed by</p>
+                        <p><strong>Dr. Alfaz Uddin</strong></p>
+                        <p>GNU Public Key</p>
+                        <p>&nbsp;</p>
+                    </div>
                 </div>
             </div>
         </div>
