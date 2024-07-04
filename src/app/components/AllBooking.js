@@ -5,7 +5,6 @@ import "jspdf-autotable";
 import {specificApis} from '../data/SpecificApis';
 import {faArrowLeft, faEdit, faFilePdf, faRestroom} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import Image from "next/image";
 import {formatDate} from "@/helper/globalFunctions";
 import {CustomModal} from "@/app/components/CustomModal";
 import html2canvas from "html2canvas";
@@ -16,9 +15,11 @@ const TestComponent = ({data}) => {
     const [showEditReportModal, setShowEditReportModal] = useState(false);
 
     const [inputValues, setInputValues] = useState({});
+    const [ultraInputValues, setUltraInputValues] = useState({});
 
     console.log('selectedTests: ', selectedTests);
     console.log('inputValues: ', inputValues);
+    console.log('ultraInputValues: ', ultraInputValues);
 
     const handleInputChange = (e, testReportId) => {
         setInputValues({
@@ -26,6 +27,17 @@ const TestComponent = ({data}) => {
             [testReportId]: e.target.value
         });
     };
+
+    const handleUltraInputChange = (e, testReportId, field) => {
+        const {value} = e.target;
+        setUltraInputValues(prevValues => ({
+            ...prevValues,
+            [testReportId]: {
+                ...prevValues[testReportId],
+                [field]: value
+            }
+        }));
+    }
 
     const renderTestPanelReport = (selectedTests, reportType) => {
         if (reportType === "BloodReport") {
@@ -68,9 +80,9 @@ const TestComponent = ({data}) => {
                     {
                         data.testPanelReport && data.testPanelReport.testMasterReportList.map((testMaster, index) => (
                             <div key={index} className="ultar-report-main">
-                                <p>Header: <span className="report-value">{testMaster.header}</span></p>
-                                <p>Body: <span className="report-value">{testMaster.body}</span></p>
-                                <p>Impression: <span className="report-value">{testMaster.impression}</span></p>
+                                <p>Header: <span className="report-value">{testMaster.testReport.header}</span></p>
+                                <p>Body: <span className="report-value">{testMaster.testReport.body}</span></p>
+                                <p>Impression: <span className="report-value">{testMaster.testReport.impression}</span></p>
                             </div>
                         ))
                     }
@@ -196,46 +208,74 @@ const TestComponent = ({data}) => {
     };
 
     const updateTestData = () => {
-
-        const updateReports = (reports) => {
-            return reports.map(report => {
-                if (report.testReport && inputValues[report.testReport.testReportId]) {
-                    return {
-                        ...report,
-                        testReport: {
-                            ...report.testReport,
-                            value: inputValues[report.testReport.testReportId]
-                        }
-                    };
-                }
-                if (report.testMasterReports) {
-                    return {
-                        ...report,
-                        testMasterReports: updateReports(report.testMasterReports)
-                    };
-                }
-                return report;
-            });
-        };
-
-        const updatedTests = selectedTests.map(test => {
-            return {
-                ...test,
-                testPanelReport: {
-                    ...test.testPanelReport,
-                    testMasterReportList: updateReports(test.testPanelReport.testMasterReportList)
-                }
+        let payload = {}
+        let updatedTestsData = []
+        console.log(reportType)
+        if (reportType === 'BloodReport') {
+            const updateReports = (reports) => {
+                return reports.map(report => {
+                    if (report.testReport && inputValues[report.testReport.testReportId]) {
+                        return {
+                            ...report,
+                            testReport: {
+                                ...report.testReport,
+                                value: inputValues[report.testReport.testReportId]
+                            }
+                        };
+                    }
+                    if (report.testMasterReports) {
+                        return {
+                            ...report,
+                            testMasterReports: updateReports(report.testMasterReports)
+                        };
+                    }
+                    return report;
+                });
             };
-        });
 
-        console.log(updatedTests);
+            updatedTestsData = selectedTests.map(test => {
+                return {
+                    ...test,
+                    testPanelReport: {
+                        ...test.testPanelReport,
+                        testMasterReportList: updateReports(test.testPanelReport.testMasterReportList)
+                    }
+                };
+            });
 
+            payload = updatedTestsData[0].testPanelReport;
 
-        const payload = updatedTests[0].testPanelReport;
+        } else if (reportType === 'UltraSoundReport') {
+
+            updatedTestsData = selectedTests.map(test => {
+                return {
+                    ...test,
+                    testPanelReport: {
+                        ...test.testPanelReport,
+                        testMasterReportList: test.testPanelReport.testMasterReportList.map(masterReport => {
+                            if (masterReport.testReport.testReportId in ultraInputValues) {
+                                const updatedReport = {
+                                    ...masterReport.testReport,
+                                    ...ultraInputValues[masterReport.testReport.testReportId]
+                                };
+                                return {
+                                    ...masterReport,
+                                    testReport: updatedReport
+                                };
+                            }
+                            return masterReport;
+                        })
+                    }
+                };
+            });
+
+            payload = updatedTestsData[0].testPanelReport;
+        }
 
         specificApis.updateTestResult(data.bookingSlip.receiptId, selectedTests[0].id, payload)
             .then(response => {
-                setSelectedTests(updatedTests);
+                console.log(updatedTestsData)
+                setSelectedTests(updatedTestsData);
                 console.log(response);
             })
             .catch(error => {
@@ -244,7 +284,7 @@ const TestComponent = ({data}) => {
     }
 
     const renderEditedData = (testMasters, parentName = '') => {
-        return testMasters.map((testMaster, testIndex) => ( // Add testIndex here
+        return testMasters.map((testMaster, testIndex) => (
             <React.Fragment key={'master-' + testIndex}>
                 {testMaster.testReport && (
                     <tr>
@@ -298,13 +338,8 @@ const TestComponent = ({data}) => {
                         setShowEditReportModal(false)
                     }}>
                         <form>
-                            {/*<label className="block text-sm mb-2">Test Name:</label>*/}
-                            {/*<input type="text" name="name" placeholder="Test Name"*/}
-                            {/*       className="w-full"/>*/}
-
-
                             <div className="bg-white rounded-lg">
-                                {selectedTests.length > 0 ? (
+                                {reportType === 'BloodReport' && selectedTests.length > 0 ? (
                                     <Fragment>
                                         {selectedTests.map((test, index) => (
                                             <div key={index}>
@@ -317,7 +352,32 @@ const TestComponent = ({data}) => {
                                             </div>
                                         ))}
                                     </Fragment>
-                                ) : <p className="text-gray-600">Please select a test to view the report.</p>}
+                                ) : reportType === 'UltraSoundReport' ? <Fragment>
+                                    <div>
+                                        <h2 className="test-title">{selectedTests[0].name}</h2>
+                                        {
+                                            selectedTests[0].testPanelReport && selectedTests[0].testPanelReport.testMasterReportList.map((testMaster, index) => {
+                                                const fields = ['header', 'body', 'impression'];
+                                                return (
+                                                    <div key={index} className="ultar-report-main">
+                                                        {fields.map(field => (
+                                                            <p key={field}>
+                                                                {`${field.charAt(0).toUpperCase() + field.slice(1)}: `}
+                                                                <span className="report-value">
+                                                                    <input type="text"
+                                                                           value={ultraInputValues[testMaster.testReport.testReportId]?.[field] || testMaster.testReport[field]}
+                                                                           onChange={(e) => handleUltraInputChange(e, testMaster.testReport.testReportId, field)}
+                                                                    />
+                                                                </span>
+                                                            </p>
+                                                        ))}
+                                                    </div>
+                                                );
+                                            })
+                                        }
+                                    </div>
+                                </Fragment> : reportType === 'MatrixTestReportTemplate' ? 'MatrixTestReportTemplate' :
+                                    <p className="text-gray-600">Please select a test to view the report.</p>}
                             </div>
 
                             <button type="button" className="w-full" onClick={updateTestData}>Submit</button>
