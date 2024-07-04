@@ -15,6 +15,18 @@ const TestComponent = ({data}) => {
     const [reportType, setReportType] = useState(null);
     const [showEditReportModal, setShowEditReportModal] = useState(false);
 
+    const [inputValues, setInputValues] = useState({});
+
+    console.log('selectedTests: ', selectedTests);
+    console.log('inputValues: ', inputValues);
+
+    const handleInputChange = (e, testReportId) => {
+        setInputValues({
+            ...inputValues,
+            [testReportId]: e.target.value
+        });
+    };
+
     const renderTestPanelReport = (selectedTests, reportType) => {
         if (reportType === "BloodReport") {
             return (
@@ -138,7 +150,8 @@ const TestComponent = ({data}) => {
                 {testMaster.testMasterReports && (
                     <>
                         <tr style={{backgroundColor: '#484848', color: 'white', border: '1px solid aliceblue'}}>
-                            <td colSpan="100%" style={{textAlign: 'center', textTransform: 'capitalize', paddingBottom:'10px'}}>
+                            <td colSpan="100%"
+                                style={{textAlign: 'center', textTransform: 'capitalize', paddingBottom: '10px'}}>
                                 <strong>{parentName ? `${parentName} - ${testMaster.testMasterName}` : testMaster.testMasterName}</strong>
                             </td>
                         </tr>
@@ -182,34 +195,80 @@ const TestComponent = ({data}) => {
         pdf.save('report.pdf');
     };
 
-    const testtt = () => {
-        const payload = {
-            "name": "ultrasound full body",
-            "testMasterReportList": [
-                {
-                    "testMasterName": "White Blood Cell Count",
-                    "testReport": {
-                        "report_type": "UltraSoundReport",
-                        "testReportId": "048d5a5a",
-                        "testReportDate": "2024-07-03T06:07:40.178+00:00",
-                        "header": "ye pet ka ultrasound hai",
-                        "investigationValueMap": {},
-                        "body": "ye body",
-                        "impression": "kuch nhi hai thik hai"
-                    },
-                    "testMasterReports": null
-                }
-            ]
-        }
+    const updateTestData = () => {
 
-        specificApis.updateTestResult("63", "cb718a44", payload)
+        const updateReports = (reports) => {
+            return reports.map(report => {
+                if (report.testReport && inputValues[report.testReport.testReportId]) {
+                    return {
+                        ...report,
+                        testReport: {
+                            ...report.testReport,
+                            value: inputValues[report.testReport.testReportId]
+                        }
+                    };
+                }
+                if (report.testMasterReports) {
+                    return {
+                        ...report,
+                        testMasterReports: updateReports(report.testMasterReports)
+                    };
+                }
+                return report;
+            });
+        };
+
+        const updatedTests = selectedTests.map(test => {
+            return {
+                ...test,
+                testPanelReport: {
+                    ...test.testPanelReport,
+                    testMasterReportList: updateReports(test.testPanelReport.testMasterReportList)
+                }
+            };
+        });
+
+        console.log(updatedTests);
+
+
+        const payload = updatedTests[0].testPanelReport;
+
+        specificApis.updateTestResult(data.bookingSlip.receiptId, selectedTests[0].id, payload)
             .then(response => {
+                setSelectedTests(updatedTests);
                 console.log(response);
             })
             .catch(error => {
                 console.error('Failed to update test:', error);
             });
     }
+
+    const renderEditedData = (testMasters, parentName = '') => {
+        return testMasters.map((testMaster, testIndex) => ( // Add testIndex here
+            <React.Fragment key={'master-' + testIndex}>
+                {testMaster.testReport && (
+                    <tr>
+                        <td className="capitalize">{testMaster.testMasterName}</td>
+                        {Object.entries(testMaster.testReport).filter(([key, _]) => key === "investigation" || key === "value").map(([key, value]) => (
+                            <td key={key}>{key === 'value' ?
+                                <input type="text" value={inputValues[testMaster.testReport.testReportId] || value}
+                                       onChange={(e) => handleInputChange(e, testMaster.testReport.testReportId)}/> : value}</td>))}
+                    </tr>
+                )}
+                {testMaster.testMasterReports && (
+                    <>
+                        <tr style={{backgroundColor: '#484848', color: 'white', border: '1px solid aliceblue'}}>
+                            <td colSpan="100%"
+                                style={{textAlign: 'center', textTransform: 'capitalize', paddingBottom: '10px'}}>
+                                <strong>{parentName ? `${parentName} - ${testMaster.testMasterName}` : testMaster.testMasterName}</strong>
+                            </td>
+                        </tr>
+                        {renderEditedData(testMaster.testMasterReports, testMaster.testMasterName)}
+                    </>
+                )}
+            </React.Fragment>
+        ));
+    };
 
     return (
         <div className="report-modal-container">
@@ -228,7 +287,9 @@ const TestComponent = ({data}) => {
                 </div>
                 <hr/>
                 <div className="editable-icon-block flex content-end">
-                    <div className="edit-icon mr-4"><FontAwesomeIcon icon={faEdit} onClick={() => setShowEditReportModal(true)}/></div>
+                    <div className="edit-icon mr-4"><FontAwesomeIcon icon={faEdit}
+                                                                     onClick={() => setShowEditReportModal(true)}/>
+                    </div>
                     <div className="download-pdf-icon"><FontAwesomeIcon onClick={generatePdf} icon={faFilePdf}/></div>
                 </div>
                 {
@@ -237,11 +298,29 @@ const TestComponent = ({data}) => {
                         setShowEditReportModal(false)
                     }}>
                         <form>
-                            <label className="block text-sm mb-2">Test Name:</label>
-                            <input type="text" name="name" placeholder="Test Name"
-                                   className="w-full"/>
+                            {/*<label className="block text-sm mb-2">Test Name:</label>*/}
+                            {/*<input type="text" name="name" placeholder="Test Name"*/}
+                            {/*       className="w-full"/>*/}
 
-                            <button type="button" onClick={testtt}>Submit</button>
+
+                            <div className="bg-white rounded-lg">
+                                {selectedTests.length > 0 ? (
+                                    <Fragment>
+                                        {selectedTests.map((test, index) => (
+                                            <div key={index}>
+                                                <h2 className="text-lg font-bold mb-2 text-center uppercase">{test.name}</h2>
+                                                <table className="table-auto w-full mb-4">
+                                                    <tbody>
+                                                    {renderEditedData(test.testPanelReport.testMasterReportList)}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        ))}
+                                    </Fragment>
+                                ) : <p className="text-gray-600">Please select a test to view the report.</p>}
+                            </div>
+
+                            <button type="button" className="w-full" onClick={updateTestData}>Submit</button>
 
                         </form>
                     </CustomModal>
