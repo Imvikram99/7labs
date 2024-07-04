@@ -34,6 +34,11 @@ function AddTestModal({ isOpen, onClose, onSave }) {
   };
 
   const onSubmit = (data) => {
+    if(data.subTests.length > 0){
+      delete  data.singleReferenceValues
+      delete data.referenceValues
+      delete data.referenceValueType
+    }
     onSave(data);
     onClose();
     reset()
@@ -60,7 +65,9 @@ function AddTestModal({ isOpen, onClose, onSave }) {
 
           {/* <label className="block text-green-700 text-sm font-bold mb-2">Cost:</label>
           <input type="text" name="cost" {...register(`cost`)} placeholder="Cost" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" onChange={handleChange} value={testDetails.cost} /> */}
-          {/* <div className='mb-3 mt-2'>
+         {(watch(`subTests`) || []).length == 0 && (
+          <>
+              <div className='mb-3 mt-2'>
             <label
               className="block text-sm font-medium text-green-700">
               Reference Value Type
@@ -72,15 +79,17 @@ function AddTestModal({ isOpen, onClose, onSave }) {
               <option value="RANGE">RANGE</option>
               <option value="NONE">NONE</option>
             </select>
-          </div> */}
-         {/* <div className='mb-3'>
+          </div>
+         <div className='mb-3'>
          {watch(`referenceValueType`) === 'SINGLE_STRING' && (
             <SingleReferenceValues control={control}  register={register} name={``} testUnits={testUnits} setModalOpen={setModalOpen}/>
           )}
           {watch(`referenceValueType`) === 'RANGE' && (
             <AddReferenceValues control={control} register={register} name={``} />
           )}
-         </div> */}
+         </div>
+          </>
+         )}
           <AddSubTests control={control} register={register} watch={watch} name={``} testUnits={testUnits} setModalOpen={setModalOpen}/>
           <div className="flex justify-between items-center mt-4">
             <button type="submit" className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Save Test</button>

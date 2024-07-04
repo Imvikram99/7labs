@@ -88,6 +88,11 @@ const AddTestPanel = () => {
             if(e.referenceValueType === "SINGLE_STRING"){
                 delete e.matrixTestReportTemplate
             }
+            if(e.subTests.length > 0){
+              delete  e.singleReferenceValues
+              delete e.referenceValues
+              delete e.referenceValueType
+            }
             e.subTests = e.subTests?.map((a)=>{
                 a.id = e.id
                 return a
@@ -150,7 +155,7 @@ const AddTestPanel = () => {
                             </label>
                             <div className='flex'>
                             <select
-                                {...register('testCategory')}  required={true}
+                                {...register('testCategory.name')}  required={true}
                                 className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md border">
                                  <option value={""}>Select Category</option>   
                                 {testCategories.map((category,index) => (
@@ -235,7 +240,7 @@ const AddTestPanel = () => {
                             {testFields.map((item, index) => (
                                 <div key={item.id} className="space-y-4 border border-slate-500 rounded-2xl p-4">
                                     <span className="font-bold">Test {index + 1}</span>
-                                    <div className="grid grid-cols-2 gap-4">
+                                    <div className="grid grid-cols-3 gap-4">
                                         <div className='hidden'>
                                             <label htmlFor={`tests.${index}.id`}
                                                    className="block text-sm font-medium text-gray-700">Test ID</label>
@@ -258,7 +263,8 @@ const AddTestPanel = () => {
                                             <input {...register(`tests.${index}.name`)}  required={true}
                                                    className="mt-1 border border-gray-300 rounded px-2 py-1 w-full text-gray-700"/>
                                         </div>
-                                        {/* <div>
+                                        {(watch(`tests.${index}.subTests`) || []).length == 0 && (
+                                        <div>
                                             <label htmlFor={`tests.${index}.referenceValueType`}
                                                    className="block text-sm font-medium text-gray-700">
                                                 Reference Value Type
@@ -270,14 +276,19 @@ const AddTestPanel = () => {
                                                 <option value="RANGE">RANGE</option>
                                                 <option value="NONE">NONE</option>
                                             </select>
-                                        </div> */}
+                                        </div>
+                                        )}
                                     </div>
-                                    {/* {watch(`tests.${index}.referenceValueType`) === 'SINGLE_STRING' && (
+                                    {(watch(`tests.${index}.subTests`) || []).length == 0 && (
+                                        <>
+                                    {watch(`tests.${index}.referenceValueType`) === 'SINGLE_STRING' && (
                                         <SingleReferenceValues control={control} index={index} register={register} name={`tests.${index}`} testUnits={testUnits} setModalOpen={setModalOpen}/>
                                     )}
                                     {watch(`tests.${index}.referenceValueType`) === 'RANGE' && (
-                                        <AddReferenceValues control={control} index={index} register={register} name={`tests.${index}`}/>
-                                    )} */}
+                                        <AddReferenceValues control={control} index={index} register={register} name={`tests.${index}`} testUnits={testUnits} setModalOpen={setModalOpen}/>
+                                    )}
+                                    </>
+                                )}
                                     <AddSubTests control={control} index={index} register={register} watch={watch} name={`tests.${index}`} testUnits={testUnits} setModalOpen={setModalOpen}/>
                                     <div className="flex justify-end w-full">
                                         <button
