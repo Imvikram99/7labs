@@ -8,6 +8,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {formatDate} from "@/helper/globalFunctions";
 import {CustomModal} from "@/app/components/CustomModal";
 import html2canvas from "html2canvas";
+import toast from "react-hot-toast";
 
 const TestComponent = ({data}) => {
     const [selectedTests, setSelectedTests] = useState([]);
@@ -17,11 +18,6 @@ const TestComponent = ({data}) => {
     const [inputValues, setInputValues] = useState({});
     const [ultraInputValues, setUltraInputValues] = useState({});
     const [matrixInputValues, setMatrixInputValues] = useState({});
-
-    console.log('selectedTests: ', selectedTests);
-    console.log('inputValues: ', inputValues);
-    console.log('ultraInputValues: ', ultraInputValues);
-    console.log('matrixInputValues: ', matrixInputValues);
 
     const handleInputChange = (e, testReportId) => {
         setInputValues({
@@ -80,7 +76,7 @@ const TestComponent = ({data}) => {
                 <div>
                     <h2 className="test-title">{data.name}</h2>
                     {
-                        data.testPanelReport && data.testPanelReport.testMasterReportList.map((testMaster, index) => (
+                        data.testPanelReport && data.testPanelReport.testMasterReportList !== null && data.testPanelReport.testMasterReportList.map((testMaster, index) => (
                             <div key={index} className="ultar-report-main">
                                 <p>Header: <span className="report-value">{testMaster.testReport.header}</span></p>
                                 <p>Body: <span className="report-value">{testMaster.testReport.body}</span></p>
@@ -148,7 +144,6 @@ const TestComponent = ({data}) => {
         }
     }
 
-
     const renderData = (testMasters, parentName = '') => {
         return testMasters.map((testMaster, index) => (
             <React.Fragment key={'master-' + index}>
@@ -212,7 +207,7 @@ const TestComponent = ({data}) => {
     const updateTestData = () => {
         let payload = {}
         let updatedTestsData = []
-        console.log(reportType)
+
         if (reportType === 'BloodReport') {
             const updateReports = (reports) => {
                 return reports.map(report => {
@@ -272,7 +267,9 @@ const TestComponent = ({data}) => {
             });
 
             payload = updatedTestsData[0].testPanelReport;
-        }else if (reportType === 'MatrixTestReportTemplate') {
+
+        } else if (reportType === 'MatrixTestReportTemplate') {
+
             updatedTestsData = selectedTests.map(test => {
                 return {
                     ...test,
@@ -308,14 +305,13 @@ const TestComponent = ({data}) => {
             });
 
             payload = updatedTestsData[0].testPanelReport;
-            console.log(payload)
+
         }
 
         specificApis.updateTestResult(data.bookingSlip.receiptId, selectedTests[0].id, payload)
             .then(response => {
-                console.log(updatedTestsData)
                 setSelectedTests(updatedTestsData);
-                console.log(response);
+                toast.success('Data updated successfully')
             })
             .catch(error => {
                 console.error('Failed to update test:', error);
@@ -365,12 +361,15 @@ const TestComponent = ({data}) => {
                     </select>
                 </div>
                 <hr/>
-                <div className="editable-icon-block flex content-end">
-                    <div className="edit-icon mr-4"><FontAwesomeIcon icon={faEdit}
-                                                                     onClick={() => setShowEditReportModal(true)}/>
+                {
+                    reportType !== null && reportType.length > 0 && <div className="editable-icon-block flex justify-end">
+                        <div className="edit-icon mr-4">
+                            <FontAwesomeIcon icon={faEdit} onClick={() => setShowEditReportModal(true)}/>
+                        </div>
+                        <div className="download-pdf-icon"><FontAwesomeIcon onClick={generatePdf} icon={faFilePdf}/></div>
                     </div>
-                    <div className="download-pdf-icon"><FontAwesomeIcon onClick={generatePdf} icon={faFilePdf}/></div>
-                </div>
+                }
+
                 {
                     showEditReportModal &&
                     <CustomModal showModal={showEditReportModal} handleClose={() => {
@@ -393,7 +392,7 @@ const TestComponent = ({data}) => {
                                     </Fragment>
                                 ) : reportType === 'UltraSoundReport' ? <Fragment>
                                     <div>
-                                        <h2 className="test-title">{selectedTests[0].name}</h2>
+                                        <h2 className="text-lg font-bold mb-2 text-center uppercase">{selectedTests[0].name}</h2>
                                         {
                                             selectedTests[0].testPanelReport && selectedTests[0].testPanelReport.testMasterReportList.map((testMaster, index) => {
                                                 const fields = ['header', 'body', 'impression'];
@@ -401,9 +400,9 @@ const TestComponent = ({data}) => {
                                                     <div key={index} className="ultar-report-main">
                                                         {fields.map(field => (
                                                             <p key={field}>
-                                                                {`${field.charAt(0).toUpperCase() + field.slice(1)}: `}
+                                                                <label className="block text-sm mb-2 capitalize">{field}</label>
                                                                 <span className="report-value">
-                                                                    <input type="text"
+                                                                    <input className="w-full mb-3 text-black" type="text"
                                                                            value={ultraInputValues[testMaster.testReport.testReportId]?.[field] || testMaster.testReport[field]}
                                                                            onChange={(e) => handleUltraInputChange(e, testMaster.testReport.testReportId, field)}
                                                                     />
@@ -417,7 +416,7 @@ const TestComponent = ({data}) => {
                                     </div>
                                 </Fragment> : reportType === 'MatrixTestReportTemplate' ? (
                                         <div>
-                                            <h2 className="test-title">{selectedTests[0].name}</h2>
+                                            <h2 className="text-lg font-bold mb-2 text-center uppercase">{selectedTests[0].name}</h2>
                                             <table className="text-start w-100">
                                                 <thead>
                                                 <tr>
@@ -472,7 +471,7 @@ const TestComponent = ({data}) => {
                                     <p className="text-gray-600">Please select a test to view the report.</p>}
                             </div>
 
-                            <button type="button" className="w-full" onClick={updateTestData}>Submit</button>
+                            <button type="button" className="w-full bg-blue-600 hover:bg-blue-700 py-3 text-white rounded-md" onClick={updateTestData}>Submit</button>
 
                         </form>
                     </CustomModal>
