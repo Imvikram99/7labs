@@ -130,7 +130,6 @@ const Booking = () => {
         fetchTestPanel();
     }, []);
 
-    console.log(testPanel, "data");
 
     const handleChange = (e, index) => {
         const {name, value} = e.target;

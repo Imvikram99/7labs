@@ -63,7 +63,7 @@ export default function SidebarWithHeader({children}) {
         "Verify Reports": <VerifyReports/>,
         "Financial Analysis": <FinancialAnalysis/>,
         "Test List": <TestList/>,
-        "Organisation List": <OrganisationList/>,
+        "Test Panel": <OrganisationList/>,
         Employees: <EmployeeList/>,
         Center: <LabCenter/>,
         "Lab Profile": <LabProfile/>,
@@ -205,14 +205,20 @@ function SidebarContent({handleComponentChange}) {
             subItems: null
         },
         {
-            label: "Test List",
+            label: "Test",
             icon: faList,
-            subItems: null
-        },
-        {
-            label: "Organisation List",
-            icon: faList,
-            subItems: null
+            subItems: [
+                {
+                    label: "Test List",
+                    icon: faList,
+                    subItems: null
+                },
+                {
+                    label: "Test Panel",
+                    icon: faList,
+                    subItems: null
+                },
+            ]
         },
         {
             label: "Employees",

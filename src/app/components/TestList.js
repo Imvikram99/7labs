@@ -12,21 +12,21 @@ export default function TestItem() {
     const [editFormData, setEditFormData] = useState({});
 
     useEffect(() => {
-        async function fetchTests() {
-            try {
-                const fetchedTests = await specificApis.fetchTestList();
-                setTests(fetchedTests);
-                setLoading(false);
-            } catch (error) {
-                console.error('Failed to fetch tests:', error);
-                setLoading(false);
-            }
-        }
-
         fetchTests();
     }, []);
+
+    async function fetchTests() {
+        try {
+            const fetchedTests = await specificApis.fetchTestList();
+            setTests(fetchedTests);
+            setLoading(false);
+        } catch (error) {
+            console.error('Failed to fetch tests:', error);
+            setLoading(false);
+        }
+    }
+
     const openAddModal = () => {
-        console.log("Opening modal");  // Check if this is being logged
         setAddModalOpen(true);
     };
 
@@ -54,18 +54,15 @@ export default function TestItem() {
         }
     };
     const handleAddTest = async (testDetails) => {
-        try {
-            // Call the API to add the new test
-            await specificApis.addTest(testDetails);
-            // If the add is successful, fetch the latest list of tests
-            fetchTests();
-            // Close the modal upon successful addition
-            setAddModalOpen(false);
-        } catch (error) {
-            // Log the error to the console
-            console.error('Error adding test:', error);
-            // Optionally, you can handle UI feedback here, such as displaying an error message to the user
-        }
+        return new Promise((resolve, reject)=> {
+            specificApis.addTest(testDetails).then((response)=>{
+                resolve(response)
+                fetchTests();
+                setAddModalOpen(false);
+            }).catch((err)=> {
+                reject(err)
+            })
+        })
     };
 
     return (
@@ -74,74 +71,81 @@ export default function TestItem() {
             </h6>
             <hr/>
             <div className="card">
-                <div className="card-body">
-                    <button onClick={openAddModal}
-                            className="mb-4 bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded float-end">Add
-                        Test
-                    </button>
-                    <AddTestModal isOpen={addModalOpen} onClose={() => setAddModalOpen(false)} onSave={handleAddTest}/>
-                    {loading ? (
-                        <div>Loading...</div>
-                    ) : (
-                        <table className="table-auto w-full">
-                            <thead>
-                            <tr>
-                                <th>Test Name</th>
-                                <th>Test Code</th>
-                                <th>Department</th>
-                                <th>Sample Type</th>
-                                <th>Cost</th>
-                                <th>Actions</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {tests.map((test) => (
-                                <tr key={test.id}>
-                                    {editTestId === test.id ? (
-                                        <>
-                                            <td><input className="border-white" type="text" name="name" placeholder="Name"
-                                                                                    value={editFormData.name}
-                                                                                    onChange={(e) => handleChange(e, 'name')}/>
-                                            </td>
-                                            <td><input className="border-white" type="text" name="code"
-                                                                                    value={editFormData.code}
-                                                                                    onChange={(e) => handleChange(e, 'code')}/>
-                                            </td>
-                                            <td><input className="border-white" type="text" name="department"
-                                                                                    value={editFormData.department}
-                                                                                    onChange={(e) => handleChange(e, 'department')}/>
-                                            </td>
-                                            <td><input className="border-white" type="text" name="sampleType"
-                                                                                    value={editFormData.sampleType}
-                                                                                    onChange={(e) => handleChange(e, 'sampleType')}/>
-                                            </td>
-                                            <td><input className="border-white" type="text" name="cost"
-                                                                                    value={editFormData.cost}
-                                                                                    onChange={(e) => handleChange(e, 'cost')}/>
-                                            </td>
-                                            <td>
-                                                <FontAwesomeIcon className="f-aw-save me-1" icon={faCheck} onClick={() => handleSave(test.id)}/>
-                                                <FontAwesomeIcon className="f-aw-cancel" icon={faCancel} onClick={handleCancel}/>
-                                            </td>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <td>{test.name}</td>
-                                            <td>{test.code}</td>
-                                            <td>{test.department}</td>
-                                            <td>{test.sampleType}</td>
-                                            <td>{test.cost}</td>
-                                            <td>
-                                                <FontAwesomeIcon className="f-aw-edit me-1" icon={faEdit} onClick={() => handleEditClick(test)}/>
-                                            </td>
-                                        </>
-                                    )}
+                {addModalOpen ? (
+                    <AddTestModal onClose={() => setAddModalOpen(false)} onSave={handleAddTest}/>
+                ) : (
+                    <div className="card-body">
+                        <button onClick={openAddModal}
+                                className="mb-4 bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded float-end">Add
+                            Test
+                        </button>
+                        {loading ? (
+                            <div>Loading...</div>
+                        ) : (
+                            <table className="table-auto w-full">
+                                <thead>
+                                <tr>
+                                    <th>Test Name</th>
+                                    <th>Test Code</th>
+                                    <th>Department</th>
+                                    <th>Sample Type</th>
+                                    <th>Cost</th>
+                                    <th>Actions</th>
                                 </tr>
-                            ))}
-                            </tbody>
-                        </table>
-                    )}
-                </div>
+                                </thead>
+                                <tbody>
+                                {tests.map((test) => (
+                                    <tr key={test.id}>
+                                        {editTestId === test.id ? (
+                                            <>
+                                                <td><input className="border-white" type="text" name="name"
+                                                           placeholder="Name"
+                                                           value={editFormData.name}
+                                                           onChange={(e) => handleChange(e, 'name')}/>
+                                                </td>
+                                                <td><input className="border-white" type="text" name="code"
+                                                           value={editFormData.code}
+                                                           onChange={(e) => handleChange(e, 'code')}/>
+                                                </td>
+                                                <td><input className="border-white" type="text" name="department"
+                                                           value={editFormData.department}
+                                                           onChange={(e) => handleChange(e, 'department')}/>
+                                                </td>
+                                                <td><input className="border-white" type="text" name="sampleType"
+                                                           value={editFormData.sampleType}
+                                                           onChange={(e) => handleChange(e, 'sampleType')}/>
+                                                </td>
+                                                <td><input className="border-white" type="text" name="cost"
+                                                           value={editFormData.cost}
+                                                           onChange={(e) => handleChange(e, 'cost')}/>
+                                                </td>
+                                                <td>
+                                                    <FontAwesomeIcon className="f-aw-save me-1" icon={faCheck}
+                                                                     onClick={() => handleSave(test.id)}/>
+                                                    <FontAwesomeIcon className="f-aw-cancel" icon={faCancel}
+                                                                     onClick={handleCancel}/>
+                                                </td>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <td>{test.name}</td>
+                                                <td>{test.code}</td>
+                                                <td>{test.department}</td>
+                                                <td>{test.sampleType}</td>
+                                                <td>{test.cost}</td>
+                                                <td>
+                                                    <FontAwesomeIcon className="f-aw-edit me-1" icon={faEdit}
+                                                                     onClick={() => handleEditClick(test)}/>
+                                                </td>
+                                            </>
+                                        )}
+                                    </tr>
+                                ))}
+                                </tbody>
+                            </table>
+                        )}
+                    </div>
+                )}
             </div>
         </div>
     );

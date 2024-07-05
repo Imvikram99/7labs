@@ -82,6 +82,12 @@ const AddTestPanel = () => {
         const code = []
         data.tests = data.tests.map((e)=>{
             code.push(e.code)
+            if(e.referenceValueType == 'NONE'){
+                e.subTests = []
+                delete  e.singleReferenceValues
+                delete e.referenceValues
+                return e
+            }
             if(e.referenceValueType === "RANGE"){
                 delete e.matrixTestReportTemplate
             }
@@ -95,6 +101,17 @@ const AddTestPanel = () => {
             }
             e.subTests = e.subTests?.map((a)=>{
                 a.id = e.id
+                if(a.referenceValueType == 'NONE'){
+                    delete  a.singleReferenceValues
+                    delete a.referenceValues
+                    return a
+                }
+                if(e.referenceValueType === "RANGE"){
+                    delete a.matrixTestReportTemplate
+                }
+                if(e.referenceValueType === "SINGLE_STRING"){
+                    delete a.matrixTestReportTemplate
+                }
                 return a
             })
             return e
@@ -117,12 +134,14 @@ const AddTestPanel = () => {
 
         specificApis.addTestPanel({...data})
             .then(response => {
-                console.log(response)
                 toast.success('Successfully Added Organizer List')
             })
             .catch(error => {
-                toast.error('Failed To add Organizer List. Please Verify Data')
-                console.error(error)
+                if (error.response.data.error === "DuplicateKeyException") {
+                    toast.error('Test Panel Code should be unique.')
+                } else {
+                    toast.error('Failed To add Organizer List. Please Verify Data');
+                }
             });
     };
 
@@ -159,7 +178,7 @@ const AddTestPanel = () => {
                                 className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md border">
                                  <option value={""}>Select Category</option>   
                                 {testCategories.map((category,index) => (
-                                    <option key={category.name} value={category.name}>{category.name}</option>
+                                    <option key={category.name+index} value={category.name}>{category.name}</option>
                                 ))}
                             </select>
                             <button
@@ -238,13 +257,13 @@ const AddTestPanel = () => {
                                     />
                                 </div>
                             {testFields.map((item, index) => (
-                                <div key={item.id} className="space-y-4 border border-slate-500 rounded-2xl p-4">
+                                <div key={item.id+index} className="space-y-4 border border-slate-500 rounded-2xl p-4">
                                     <span className="font-bold">Test {index + 1}</span>
                                     <div className="grid grid-cols-3 gap-4">
                                         <div className='hidden'>
                                             <label htmlFor={`tests.${index}.id`}
                                                    className="block text-sm font-medium text-gray-700">Test ID</label>
-                                            <input {...register(`tests.${index}.id`)}
+                                            <input {...register(`tests.${index}.id`)} required={false}
                                                    className="mt-1 border border-gray-300 rounded px-2 py-1 w-full text-gray-700"/>
                                         </div>
                                         <div>

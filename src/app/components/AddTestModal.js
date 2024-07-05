@@ -6,7 +6,7 @@ import AddSubTests from '@/app/components/AddSubTests'
 import { specificApis } from '../data/SpecificApis';
 import AddNewPossibleValueModal from './OrganizationListContents/AddNewPossibleValueModal';
 
-function AddTestModal({ isOpen, onClose, onSave }) {
+function AddTestModal({ onClose, onSave }) {
   const { register, control, watch, handleSubmit,reset } = useForm();
   const [testUnits, setTestUnits] = useState([]);
 
@@ -39,37 +39,33 @@ function AddTestModal({ isOpen, onClose, onSave }) {
       delete data.referenceValues
       delete data.referenceValueType
     }
-    onSave(data);
-    onClose();
-    reset()
+    onSave(data).then(()=>reset());
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0  bg-opacity-50 flex justify-center items-center overflow-auto">
-      <div className="bg-white p-5 rounded-lg shadow-lg w-full max-w-2xl overflow-auto" style={{maxHeight:'calc(100vh - 100px)'}}>
+    <div className="bg-opacity-50 flex justify-center items-center">
+      <div className="bg-white p-5 rounded-lg shadow-lg w-full">
         <h2 className="text-xl font-bold text-gray-700 mb-4">Add New Test</h2>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <label className="block text-green-700 text-sm font-bold mb-2">Test Name:</label>
-          <input type="text" name="name" placeholder="Test Name" {...register(`name`)} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"  />
+          <div className="mb-3">
+            <label className="block text-green-700 text-sm font-bold mb-2">Test Name:</label>
+            <input
+                type="text" name="name" placeholder="Test Name" {...register(`name`)}
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            />
+          </div>
 
-          <label className="block text-green-700 text-sm font-bold mb-2">Test Code:</label>
-          <input type="text" name="code" placeholder="Test Code" {...register(`code`)} className="shadow mb-3 appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"  />
-
-          {/* <label className="block text-green-700 text-sm font-bold mb-2">Department:</label>
-          <input type="text" name="department" {...register(`department`)} placeholder="Department" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" onChange={handleChange} value={testDetails.department} /> */}
-
-          {/* <label className="block text-green-700 text-sm font-bold mb-2">Sample Type:</label>
-          <input type="text" name="sampleType" {...register(`sampleType`)} placeholder="Sample Type" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" onChange={handleChange} value={testDetails.sampleType} /> */}
-
-          {/* <label className="block text-green-700 text-sm font-bold mb-2">Cost:</label>
-          <input type="text" name="cost" {...register(`cost`)} placeholder="Cost" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" onChange={handleChange} value={testDetails.cost} /> */}
+          <div>
+            <label className="block text-green-700 text-sm font-bold mb-2">Test Code:</label>
+            <input
+                type="text" name="code" placeholder="Test Code" {...register(`code`)}
+                className="shadow mb-3 appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            />
+          </div>
          {(watch(`subTests`) || []).length == 0 && (
           <>
               <div className='mb-3 mt-2'>
-            <label
-              className="block text-sm font-medium text-green-700">
+            <label className="block text-green-700 text-sm font-bold mb-2">
               Reference Value Type
             </label>
             <select {...register(`referenceValueType`)} required={true}
@@ -91,20 +87,20 @@ function AddTestModal({ isOpen, onClose, onSave }) {
           </>
          )}
           <AddSubTests control={control} register={register} watch={watch} name={``} testUnits={testUnits} setModalOpen={setModalOpen}/>
-          <div className="flex justify-between items-center mt-4">
-            <button type="submit" className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Save Test</button>
+          <div className="flex justify-end items-center mt-4 gap-3">
             <button type="button" onClick={onClose} className="bg-pink-500 hover:bg-pink-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Cancel</button>
+            <button type="submit" className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Save Test</button>
           </div>
         </form>
       </div>
       {activeModal && (
-                <AddNewPossibleValueModal
-                    closeModal={closeModal}
-                    title={'Test Unit'}
-                    getReferenceValues={()=>getTestUnits()}
-                    apiFunction={'addTestUnits'}
-                />
-            )}
+          <AddNewPossibleValueModal
+              closeModal={closeModal}
+              title={'Test Unit'}
+              getReferenceValues={()=>getTestUnits()}
+              apiFunction={'addTestUnits'}
+          />
+      )}
     </div>
   );
 }
