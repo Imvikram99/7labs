@@ -82,6 +82,12 @@ const AddTestPanel = () => {
         const code = []
         data.tests = data.tests.map((e)=>{
             code.push(e.code)
+            if(e.referenceValueType == 'NONE'){
+                e.subTests = []
+                delete  e.singleReferenceValues
+                delete e.referenceValues
+                return e
+            }
             if(e.referenceValueType === "RANGE"){
                 delete e.matrixTestReportTemplate
             }
@@ -95,6 +101,17 @@ const AddTestPanel = () => {
             }
             e.subTests = e.subTests?.map((a)=>{
                 a.id = e.id
+                if(a.referenceValueType == 'NONE'){
+                    delete  a.singleReferenceValues
+                    delete a.referenceValues
+                    return a
+                }
+                if(e.referenceValueType === "RANGE"){
+                    delete a.matrixTestReportTemplate
+                }
+                if(e.referenceValueType === "SINGLE_STRING"){
+                    delete a.matrixTestReportTemplate
+                }
                 return a
             })
             return e
@@ -159,7 +176,7 @@ const AddTestPanel = () => {
                                 className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md border">
                                  <option value={""}>Select Category</option>   
                                 {testCategories.map((category,index) => (
-                                    <option key={category.name} value={category.name}>{category.name}</option>
+                                    <option key={category.name+index} value={category.name}>{category.name}</option>
                                 ))}
                             </select>
                             <button
@@ -238,7 +255,7 @@ const AddTestPanel = () => {
                                     />
                                 </div>
                             {testFields.map((item, index) => (
-                                <div key={item.id} className="space-y-4 border border-slate-500 rounded-2xl p-4">
+                                <div key={item.id+index} className="space-y-4 border border-slate-500 rounded-2xl p-4">
                                     <span className="font-bold">Test {index + 1}</span>
                                     <div className="grid grid-cols-3 gap-4">
                                         <div className='hidden'>
