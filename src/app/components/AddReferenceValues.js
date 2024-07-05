@@ -14,16 +14,16 @@ const ReferenceValues = ({control, index, register,name,testUnits,setModalOpen})
     return (
         <div className="space-y-4 ml-7">
             {referenceValueFields.map((refItem, refIndex) => (
-                <div key={refItem.id} className="space-y-2 border p-4 relative">
+                <div key={refItem.id+refIndex} className="space-y-2 border p-4 relative">
                     <div className="grid grid-cols-3 gap-4">
                         <div>
                             <label className="block text-sm font-medium text-gray-700">Min Age</label>
-                            <input {...register(`${name}.referenceValues.${refIndex}.minAge`)}  required={true}
+                            <input {...register(`${name}.referenceValues.${refIndex}.minAge`)}  type="number" required={true}
                                    className="mt-1 border border-gray-300 rounded px-2 py-1 w-full text-gray-700"/>
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700">Max Age</label>
-                            <input {...register(`${name}.referenceValues.${refIndex}.maxAge`)}  required={true}
+                            <input {...register(`${name}.referenceValues.${refIndex}.maxAge`)}  required={true} type="number"
                                    className="mt-1 border border-gray-300 rounded px-2 py-1 w-full text-gray-700"/>
                         </div>
                         <div>

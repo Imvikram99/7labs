@@ -13,7 +13,7 @@ const SubTestValues = ({control, index, register,watch,name,testUnits,setModalOp
     return (
         <>
             {subTestFields.map((item, itemIndex) => (
-                <div key={item.id} className="space-y-4 border border-slate-500 rounded-2xl p-4 relative mb-2">
+                <div key={item.id+itemIndex} className="space-y-4 border border-slate-500 rounded-2xl p-4 relative mb-2">
                     <span className="font-bold">Sub Test {itemIndex + 1}</span>
                     <div className="grid grid-cols-3 gap-4">
                         <div>
