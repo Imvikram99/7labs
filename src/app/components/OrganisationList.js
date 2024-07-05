@@ -117,12 +117,14 @@ const AddTestPanel = () => {
 
         specificApis.addTestPanel({...data})
             .then(response => {
-                console.log(response)
                 toast.success('Successfully Added Organizer List')
             })
             .catch(error => {
-                toast.error('Failed To add Organizer List. Please Verify Data')
-                console.error(error)
+                if (error.response.data.error === "DuplicateKeyException") {
+                    toast.error('Test Panel Code should be unique.')
+                } else {
+                    toast.error('Failed To add Organizer List. Please Verify Data');
+                }
             });
     };
 
@@ -244,7 +246,7 @@ const AddTestPanel = () => {
                                         <div className='hidden'>
                                             <label htmlFor={`tests.${index}.id`}
                                                    className="block text-sm font-medium text-gray-700">Test ID</label>
-                                            <input {...register(`tests.${index}.id`)}
+                                            <input {...register(`tests.${index}.id`)} required={false}
                                                    className="mt-1 border border-gray-300 rounded px-2 py-1 w-full text-gray-700"/>
                                         </div>
                                         <div>

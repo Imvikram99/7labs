@@ -1,5 +1,6 @@
 // SpecificApis.js
 import { apiService } from './ApiService';
+import toast from "react-hot-toast";
 
 class SpecificApis {
   async fetchPatientList(searchQuery,searchQueryType) {
@@ -62,13 +63,17 @@ class SpecificApis {
     }
   }
   async addTest(testData) {
-    try {
-      const response = await apiService.postData('api/v1/lab/labtest',testData);
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching test list:', error);
-      throw error;
-    }
+    return new Promise((resolve, reject)=> {
+        apiService.postData('api/v1/lab/labtest',testData)
+            .then((response)=>{
+              toast.success("Lab Test added successfully.");
+              resolve(response)
+            })
+            .catch((err)=>{
+              toast.error("Error while creating new test list");
+              reject(err.response.data)
+            })
+    })
   }
 
   async fetchOrganisationList() {
@@ -134,7 +139,7 @@ class SpecificApis {
         formData.append('file', report);
         const response = await apiService.postData(url, formData, {
             headers: {
-                'Content-Type': 'multipart/form-data' 
+                'Content-Type': 'multipart/form-data'
             }
         });
 
@@ -190,7 +195,7 @@ class SpecificApis {
       throw error;
     }
   }
-  
+
 
   async createBooking(bookingSlipRequest, updatePatient) {
     try {
@@ -233,7 +238,7 @@ class SpecificApis {
         throw error;
       }
   };
-  
+
    async fetchTestUnits() {
     try {
         const response = await apiService.fetchData(`api/v1/lab/testpanel/testunit`);
@@ -282,8 +287,8 @@ class SpecificApis {
       throw error;
     }
   }
-  
-  
+
+
 }
 
 
