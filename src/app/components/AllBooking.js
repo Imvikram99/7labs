@@ -16,10 +16,12 @@ const TestComponent = ({data}) => {
 
     const [inputValues, setInputValues] = useState({});
     const [ultraInputValues, setUltraInputValues] = useState({});
+    const [matrixInputValues, setMatrixInputValues] = useState({});
 
     console.log('selectedTests: ', selectedTests);
     console.log('inputValues: ', inputValues);
     console.log('ultraInputValues: ', ultraInputValues);
+    console.log('matrixInputValues: ', matrixInputValues);
 
     const handleInputChange = (e, testReportId) => {
         setInputValues({
@@ -270,6 +272,43 @@ const TestComponent = ({data}) => {
             });
 
             payload = updatedTestsData[0].testPanelReport;
+        }else if (reportType === 'MatrixTestReportTemplate') {
+            updatedTestsData = selectedTests.map(test => {
+                return {
+                    ...test,
+                    testPanelReport: {
+                        ...test.testPanelReport,
+                        testMasterReportList: test.testPanelReport.testMasterReportList.map(masterReport => {
+                            const updatedColumns = Object.entries(masterReport.testReport.columns).reduce((acc, [week, data]) => {
+                                if (week in matrixInputValues[masterReport.testReport.testReportId]) {
+                                    return {
+                                        ...acc,
+                                        [week]: {
+                                            ...data,
+                                            ...matrixInputValues[masterReport.testReport.testReportId][week]
+                                        }
+                                    };
+                                }
+                                return {
+                                    ...acc,
+                                    [week]: data
+                                };
+                            }, {});
+
+                            return {
+                                ...masterReport,
+                                testReport: {
+                                    ...masterReport.testReport,
+                                    columns: updatedColumns
+                                }
+                            };
+                        })
+                    }
+                };
+            });
+
+            payload = updatedTestsData[0].testPanelReport;
+            console.log(payload)
         }
 
         specificApis.updateTestResult(data.bookingSlip.receiptId, selectedTests[0].id, payload)
@@ -376,7 +415,60 @@ const TestComponent = ({data}) => {
                                             })
                                         }
                                     </div>
-                                </Fragment> : reportType === 'MatrixTestReportTemplate' ? 'MatrixTestReportTemplate' :
+                                </Fragment> : reportType === 'MatrixTestReportTemplate' ? (
+                                        <div>
+                                            <h2 className="test-title">{selectedTests[0].name}</h2>
+                                            <table className="text-start w-100">
+                                                <thead>
+                                                <tr>
+                                                    <th>Week</th>
+                                                    <th>Growth Measurement</th>
+                                                    <th>Comments</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                {Object.entries(selectedTests[0].testPanelReport.testMasterReportList[0].testReport.columns).map(([week, data]) => (
+                                                    <tr key={week}>
+                                                        <td className="capitalize text-blue-700"
+                                                            style={{textAlign: 'center'}}>{week}</td>
+                                                        <td>
+                                                            <input
+                                                                type="text"
+                                                                value={matrixInputValues[selectedTests[0].testPanelReport.testMasterReportList[0].testReport.testReportId]?.[week]?.growth_measurement || data.growth_measurement}
+                                                                onChange={(e) => setMatrixInputValues(prev => ({
+                                                                    ...prev,
+                                                                    [selectedTests[0].testPanelReport.testMasterReportList[0].testReport.testReportId]: {
+                                                                        ...prev[selectedTests[0].testPanelReport.testMasterReportList[0].testReport.testReportId],
+                                                                        [week]: {
+                                                                            ...prev[selectedTests[0].testPanelReport.testMasterReportList[0].testReport.testReportId]?.[week],
+                                                                            growth_measurement: e.target.value
+                                                                        }
+                                                                    }
+                                                                }))}
+                                                            />
+                                                        </td>
+                                                        <td>
+                                                            <input
+                                                                type="text"
+                                                                value={matrixInputValues[selectedTests[0].testPanelReport.testMasterReportList[0].testReport.testReportId]?.[week]?.comments || data.comments}
+                                                                onChange={(e) => setMatrixInputValues(prev => ({
+                                                                    ...prev,
+                                                                    [selectedTests[0].testPanelReport.testMasterReportList[0].testReport.testReportId]: {
+                                                                        ...prev[selectedTests[0].testPanelReport.testMasterReportList[0].testReport.testReportId],
+                                                                        [week]: {
+                                                                            ...prev[selectedTests[0].testPanelReport.testMasterReportList[0].testReport.testReportId]?.[week],
+                                                                            comments: e.target.value
+                                                                        }
+                                                                    }
+                                                                }))}
+                                                            />
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    ) :
                                     <p className="text-gray-600">Please select a test to view the report.</p>}
                             </div>
 
