@@ -10,7 +10,6 @@ const SubTestValues = ({control, index, register,watch,name,testUnits,setModalOp
         name: name ? `${name}.subTests` : 'subTests'
     });
     name =  `${name}.subTests` ?? 'subTests'
-    console.log(subTestFields);
     return (
         <>
             {subTestFields.map((item, itemIndex) => (

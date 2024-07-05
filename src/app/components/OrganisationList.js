@@ -118,10 +118,10 @@ const AddTestPanel = () => {
         specificApis.addTestPanel({...data})
             .then(response => {
                 console.log(response)
-                toast.success('Sucessfully Added Organizer List')
+                toast.success('Successfully Added Organizer List')
             })
             .catch(error => {
-                toast.error('Faild To add Organizer List. Please Verify Data')
+                toast.error('Failed To add Organizer List. Please Verify Data')
                 console.error(error)
             });
     };
@@ -244,7 +244,7 @@ const AddTestPanel = () => {
                                         <div className='hidden'>
                                             <label htmlFor={`tests.${index}.id`}
                                                    className="block text-sm font-medium text-gray-700">Test ID</label>
-                                            <input {...register(`tests.${index}.id`)}  required={true}
+                                            <input {...register(`tests.${index}.id`)}
                                                    className="mt-1 border border-gray-300 rounded px-2 py-1 w-full text-gray-700"/>
                                         </div>
                                         <div>
