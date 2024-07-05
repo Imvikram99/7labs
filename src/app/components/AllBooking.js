@@ -3,16 +3,39 @@ import {FaDownload} from "react-icons/fa6";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import {specificApis} from '../data/SpecificApis';
-import {faArrowLeft, faFilePdf, faRestroom} from "@fortawesome/free-solid-svg-icons";
+import {faArrowLeft, faEdit, faFilePdf, faRestroom} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import Image from "next/image";
 import {formatDate} from "@/helper/globalFunctions";
 import {CustomModal} from "@/app/components/CustomModal";
 import html2canvas from "html2canvas";
+import toast from "react-hot-toast";
 
 const TestComponent = ({data}) => {
     const [selectedTests, setSelectedTests] = useState([]);
     const [reportType, setReportType] = useState(null);
+    const [showEditReportModal, setShowEditReportModal] = useState(false);
+
+    const [inputValues, setInputValues] = useState({});
+    const [ultraInputValues, setUltraInputValues] = useState({});
+    const [matrixInputValues, setMatrixInputValues] = useState({});
+
+    const handleInputChange = (e, testReportId) => {
+        setInputValues({
+            ...inputValues,
+            [testReportId]: e.target.value
+        });
+    };
+
+    const handleUltraInputChange = (e, testReportId, field) => {
+        const {value} = e.target;
+        setUltraInputValues(prevValues => ({
+            ...prevValues,
+            [testReportId]: {
+                ...prevValues[testReportId],
+                [field]: value
+            }
+        }));
+    }
 
     const renderTestPanelReport = (selectedTests, reportType) => {
         if (reportType === "BloodReport") {
@@ -53,11 +76,11 @@ const TestComponent = ({data}) => {
                 <div>
                     <h2 className="test-title">{data.name}</h2>
                     {
-                        data.testPanelReport && data.testPanelReport.testMasterReportList.map((testMaster, index) => (
+                        data.testPanelReport && data.testPanelReport.testMasterReportList !== null && data.testPanelReport.testMasterReportList.map((testMaster, index) => (
                             <div key={index} className="ultar-report-main">
-                                <p>Header: <span className="report-value">{testMaster.header}</span></p>
-                                <p>Body: <span className="report-value">{testMaster.body}</span></p>
-                                <p>Impression: <span className="report-value">{testMaster.impression}</span></p>
+                                <p>Header: <span className="report-value">{testMaster.testReport.header}</span></p>
+                                <p>Body: <span className="report-value">{testMaster.testReport.body}</span></p>
+                                <p>Impression: <span className="report-value">{testMaster.testReport.impression}</span></p>
                             </div>
                         ))
                     }
@@ -121,7 +144,6 @@ const TestComponent = ({data}) => {
         }
     }
 
-
     const renderData = (testMasters, parentName = '') => {
         return testMasters.map((testMaster, index) => (
             <React.Fragment key={'master-' + index}>
@@ -137,7 +159,8 @@ const TestComponent = ({data}) => {
                 {testMaster.testMasterReports && (
                     <>
                         <tr style={{backgroundColor: '#484848', color: 'white', border: '1px solid aliceblue'}}>
-                            <td colSpan="100%" style={{textAlign: 'center', textTransform: 'capitalize', paddingBottom:'10px'}}>
+                            <td colSpan="100%"
+                                style={{textAlign: 'center', textTransform: 'capitalize', paddingBottom: '10px'}}>
                                 <strong>{parentName ? `${parentName} - ${testMaster.testMasterName}` : testMaster.testMasterName}</strong>
                             </td>
                         </tr>
@@ -181,6 +204,147 @@ const TestComponent = ({data}) => {
         pdf.save('report.pdf');
     };
 
+    const updateTestData = () => {
+        let payload = {}
+        let updatedTestsData = []
+
+        if (reportType === 'BloodReport') {
+            const updateReports = (reports) => {
+                return reports.map(report => {
+                    if (report.testReport && inputValues[report.testReport.testReportId]) {
+                        return {
+                            ...report,
+                            testReport: {
+                                ...report.testReport,
+                                value: inputValues[report.testReport.testReportId]
+                            }
+                        };
+                    }
+                    if (report.testMasterReports) {
+                        return {
+                            ...report,
+                            testMasterReports: updateReports(report.testMasterReports)
+                        };
+                    }
+                    return report;
+                });
+            };
+
+            updatedTestsData = selectedTests.map(test => {
+                return {
+                    ...test,
+                    testPanelReport: {
+                        ...test.testPanelReport,
+                        testMasterReportList: updateReports(test.testPanelReport.testMasterReportList)
+                    }
+                };
+            });
+
+            payload = updatedTestsData[0].testPanelReport;
+
+        } else if (reportType === 'UltraSoundReport') {
+
+            updatedTestsData = selectedTests.map(test => {
+                return {
+                    ...test,
+                    testPanelReport: {
+                        ...test.testPanelReport,
+                        testMasterReportList: test.testPanelReport.testMasterReportList.map(masterReport => {
+                            if (masterReport.testReport.testReportId in ultraInputValues) {
+                                const updatedReport = {
+                                    ...masterReport.testReport,
+                                    ...ultraInputValues[masterReport.testReport.testReportId]
+                                };
+                                return {
+                                    ...masterReport,
+                                    testReport: updatedReport
+                                };
+                            }
+                            return masterReport;
+                        })
+                    }
+                };
+            });
+
+            payload = updatedTestsData[0].testPanelReport;
+
+        } else if (reportType === 'MatrixTestReportTemplate') {
+
+            updatedTestsData = selectedTests.map(test => {
+                return {
+                    ...test,
+                    testPanelReport: {
+                        ...test.testPanelReport,
+                        testMasterReportList: test.testPanelReport.testMasterReportList.map(masterReport => {
+                            const updatedColumns = Object.entries(masterReport.testReport.columns).reduce((acc, [week, data]) => {
+                                if (week in matrixInputValues[masterReport.testReport.testReportId]) {
+                                    return {
+                                        ...acc,
+                                        [week]: {
+                                            ...data,
+                                            ...matrixInputValues[masterReport.testReport.testReportId][week]
+                                        }
+                                    };
+                                }
+                                return {
+                                    ...acc,
+                                    [week]: data
+                                };
+                            }, {});
+
+                            return {
+                                ...masterReport,
+                                testReport: {
+                                    ...masterReport.testReport,
+                                    columns: updatedColumns
+                                }
+                            };
+                        })
+                    }
+                };
+            });
+
+            payload = updatedTestsData[0].testPanelReport;
+
+        }
+
+        specificApis.updateTestResult(data.bookingSlip.receiptId, selectedTests[0].id, payload)
+            .then(response => {
+                setSelectedTests(updatedTestsData);
+                toast.success('Data updated successfully')
+            })
+            .catch(error => {
+                console.error('Failed to update test:', error);
+            });
+    }
+
+    const renderEditedData = (testMasters, parentName = '') => {
+        return testMasters.map((testMaster, testIndex) => (
+            <React.Fragment key={'master-' + testIndex}>
+                {testMaster.testReport && (
+                    <tr>
+                        <td className="capitalize">{testMaster.testMasterName}</td>
+                        {Object.entries(testMaster.testReport).filter(([key, _]) => key === "investigation" || key === "value").map(([key, value]) => (
+                            <td key={key}>{key === 'value' ?
+                                <input type="text" value={inputValues[testMaster.testReport.testReportId] || value}
+                                       onChange={(e) => handleInputChange(e, testMaster.testReport.testReportId)}/> : value}</td>))}
+                    </tr>
+                )}
+                {testMaster.testMasterReports && (
+                    <>
+                        <tr style={{backgroundColor: '#484848', color: 'white', border: '1px solid aliceblue'}}>
+                            <td colSpan="100%"
+                                style={{textAlign: 'center', textTransform: 'capitalize', paddingBottom: '10px'}}>
+                                <strong>{parentName ? `${parentName} - ${testMaster.testMasterName}` : testMaster.testMasterName}</strong>
+                            </td>
+                        </tr>
+                        {renderEditedData(testMaster.testMasterReports, testMaster.testMasterName)}
+                    </>
+                )}
+            </React.Fragment>
+        ));
+    };
+
     return (
         <div className="report-modal-container">
             <div className="report-modal-header">
@@ -197,9 +361,122 @@ const TestComponent = ({data}) => {
                     </select>
                 </div>
                 <hr/>
-                <div className="download-pdf-icon"><FontAwesomeIcon onClick={generatePdf} icon={faFilePdf}/></div>
-            </div>
+                {
+                    reportType !== null && reportType.length > 0 && <div className="editable-icon-block flex justify-end">
+                        <div className="edit-icon mr-4">
+                            <FontAwesomeIcon icon={faEdit} onClick={() => setShowEditReportModal(true)}/>
+                        </div>
+                        <div className="download-pdf-icon"><FontAwesomeIcon onClick={generatePdf} icon={faFilePdf}/></div>
+                    </div>
+                }
 
+                {
+                    showEditReportModal &&
+                    <CustomModal showModal={showEditReportModal} handleClose={() => {
+                        setShowEditReportModal(false)
+                    }}>
+                        <form>
+                            <div className="bg-white rounded-lg">
+                                {reportType === 'BloodReport' && selectedTests.length > 0 ? (
+                                    <Fragment>
+                                        {selectedTests.map((test, index) => (
+                                            <div key={index}>
+                                                <h2 className="text-lg font-bold mb-2 text-center uppercase">{test.name}</h2>
+                                                <table className="table-auto w-full mb-4">
+                                                    <tbody>
+                                                    {renderEditedData(test.testPanelReport.testMasterReportList)}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        ))}
+                                    </Fragment>
+                                ) : reportType === 'UltraSoundReport' ? <Fragment>
+                                    <div>
+                                        <h2 className="text-lg font-bold mb-2 text-center uppercase">{selectedTests[0].name}</h2>
+                                        {
+                                            selectedTests[0].testPanelReport && selectedTests[0].testPanelReport.testMasterReportList.map((testMaster, index) => {
+                                                const fields = ['header', 'body', 'impression'];
+                                                return (
+                                                    <div key={index} className="ultar-report-main">
+                                                        {fields.map(field => (
+                                                            <p key={field}>
+                                                                <label className="block text-sm mb-2 capitalize">{field}</label>
+                                                                <span className="report-value">
+                                                                    <input className="w-full mb-3 text-black" type="text"
+                                                                           value={ultraInputValues[testMaster.testReport.testReportId]?.[field] || testMaster.testReport[field]}
+                                                                           onChange={(e) => handleUltraInputChange(e, testMaster.testReport.testReportId, field)}
+                                                                    />
+                                                                </span>
+                                                            </p>
+                                                        ))}
+                                                    </div>
+                                                );
+                                            })
+                                        }
+                                    </div>
+                                </Fragment> : reportType === 'MatrixTestReportTemplate' ? (
+                                        <div>
+                                            <h2 className="text-lg font-bold mb-2 text-center uppercase">{selectedTests[0].name}</h2>
+                                            <table className="text-start w-100">
+                                                <thead>
+                                                <tr>
+                                                    <th>Week</th>
+                                                    <th>Growth Measurement</th>
+                                                    <th>Comments</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                {Object.entries(selectedTests[0].testPanelReport.testMasterReportList[0].testReport.columns).map(([week, data]) => (
+                                                    <tr key={week}>
+                                                        <td className="capitalize text-blue-700"
+                                                            style={{textAlign: 'center'}}>{week}</td>
+                                                        <td>
+                                                            <input
+                                                                type="text"
+                                                                value={matrixInputValues[selectedTests[0].testPanelReport.testMasterReportList[0].testReport.testReportId]?.[week]?.growth_measurement || data.growth_measurement}
+                                                                onChange={(e) => setMatrixInputValues(prev => ({
+                                                                    ...prev,
+                                                                    [selectedTests[0].testPanelReport.testMasterReportList[0].testReport.testReportId]: {
+                                                                        ...prev[selectedTests[0].testPanelReport.testMasterReportList[0].testReport.testReportId],
+                                                                        [week]: {
+                                                                            ...prev[selectedTests[0].testPanelReport.testMasterReportList[0].testReport.testReportId]?.[week],
+                                                                            growth_measurement: e.target.value
+                                                                        }
+                                                                    }
+                                                                }))}
+                                                            />
+                                                        </td>
+                                                        <td>
+                                                            <input
+                                                                type="text"
+                                                                value={matrixInputValues[selectedTests[0].testPanelReport.testMasterReportList[0].testReport.testReportId]?.[week]?.comments || data.comments}
+                                                                onChange={(e) => setMatrixInputValues(prev => ({
+                                                                    ...prev,
+                                                                    [selectedTests[0].testPanelReport.testMasterReportList[0].testReport.testReportId]: {
+                                                                        ...prev[selectedTests[0].testPanelReport.testMasterReportList[0].testReport.testReportId],
+                                                                        [week]: {
+                                                                            ...prev[selectedTests[0].testPanelReport.testMasterReportList[0].testReport.testReportId]?.[week],
+                                                                            comments: e.target.value
+                                                                        }
+                                                                    }
+                                                                }))}
+                                                            />
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    ) :
+                                    <p className="text-gray-600">Please select a test to view the report.</p>}
+                            </div>
+
+                            <button type="button" className="w-full bg-blue-600 hover:bg-blue-700 py-3 text-white rounded-md" onClick={updateTestData}>Submit</button>
+
+                        </form>
+                    </CustomModal>
+                }
+            </div>
 
             <div id="report-main-body-pdf">
                 <div id="report-main-body" className="report-main-body">
@@ -209,7 +486,7 @@ const TestComponent = ({data}) => {
                             <p>19/C, East Noyatola, Moghbazar</p>
                         </div>
                         <div className="a-right">
-                            <img style={{width:"100px"}} src="/logoreport1.png" alt="logo"/>
+                            <img style={{width: "100px"}} src="/logoreport1.png" alt="logo"/>
                         </div>
                     </div>
                     <h3 id="report-title" className="report-title">Laboratory Report</h3>

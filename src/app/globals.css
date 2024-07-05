@@ -474,11 +474,11 @@ form.card {
     padding: 20px;
 }
 
-.download-pdf-icon{
+.download-pdf-icon, .edit-icon{
     font-size: 20px;
     color: #1D4CAE;
     cursor: pointer;
-    text-align: right;
+    /*text-align: right;*/
 }
 
 .custom-modal .custom-modal-close {

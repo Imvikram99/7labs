@@ -46,6 +46,10 @@ class ApiService {
   postData(url, data, headers) {
     return this.client.post(url, data, headers);
   }
+
+  putData(url, data, headers) {
+    return this.client.put(url, data, headers);
+  }
 }
 
 export const apiService = new ApiService(); // Export an instance to be used across the application
