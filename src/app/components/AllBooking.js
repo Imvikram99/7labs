@@ -19,6 +19,13 @@ const TestComponent = ({data}) => {
     const [ultraInputValues, setUltraInputValues] = useState({});
     const [matrixInputValues, setMatrixInputValues] = useState({});
 
+    const [reportData, setReportData] = useState({
+        testReportDate: null,
+        primarySampleType: null
+    });
+
+    console.log(reportData)
+
     const handleInputChange = (e, testReportId) => {
         setInputValues({
             ...inputValues,
@@ -46,6 +53,7 @@ const TestComponent = ({data}) => {
                             {selectedTests.map((test, index) => (
                                 <div key={index}>
                                     <h2 className="text-lg font-bold mb-2 text-center uppercase">{test.name}</h2>
+                                    <p>{reportData.testReportDate}</p>
                                     <table className="table-auto w-full mb-4">
                                         <thead>
                                         <tr>
@@ -55,9 +63,6 @@ const TestComponent = ({data}) => {
                                             <th className="px-4 py-2">Unit</th>
                                             <th className="px-4 py-2">Min</th>
                                             <th className="px-4 py-2">Max</th>
-                                            <th className="px-4 py-2">Test Report ID</th>
-                                            <th className="px-4 py-2">Report Date</th>
-                                            <th className="px-4 py-2">Sample Type</th>
                                         </tr>
                                         </thead>
                                         <tbody>
@@ -150,10 +155,18 @@ const TestComponent = ({data}) => {
                 {testMaster.testReport && (
                     <tr>
                         <td className="capitalize">{testMaster.testMasterName}</td>
-                        {Object.entries(testMaster.testReport).filter(([key, _]) => key !== "report_type").map(([key, value]) => (
-                            <td key={key}>{key === 'investigation' ? <span
-                                className="capitalize">{value}</span> : key === 'testReportDate' ? formatDate(value) : value}</td>
-                        ))}
+                        {Object.entries(testMaster.testReport)
+                            .filter(([key, _]) => key === "investigation" || key === 'value' || key === 'unit' || key === 'minReferenceValue' || key === 'maxReferenceValue')
+                            .map(([key, value]) => {
+
+                                return (
+                                    <td key={key}>
+                                        {key === 'investigation' ? <span
+                                            className="capitalize">{value}</span> : key === 'testReportDate' ? formatDate(value) : value}
+                                    </td>
+                                );
+                            })
+                        }
                     </tr>
                 )}
                 {testMaster.testMasterReports && (
@@ -362,11 +375,13 @@ const TestComponent = ({data}) => {
                 </div>
                 <hr/>
                 {
-                    reportType !== null && reportType.length > 0 && <div className="editable-icon-block flex justify-end">
+                    reportType !== null && reportType.length > 0 &&
+                    <div className="editable-icon-block flex justify-end">
                         <div className="edit-icon mr-4">
                             <FontAwesomeIcon icon={faEdit} onClick={() => setShowEditReportModal(true)}/>
                         </div>
-                        <div className="download-pdf-icon"><FontAwesomeIcon onClick={generatePdf} icon={faFilePdf}/></div>
+                        <div className="download-pdf-icon"><FontAwesomeIcon onClick={generatePdf} icon={faFilePdf}/>
+                        </div>
                     </div>
                 }
 
@@ -400,9 +415,11 @@ const TestComponent = ({data}) => {
                                                     <div key={index} className="ultar-report-main">
                                                         {fields.map(field => (
                                                             <p key={field}>
-                                                                <label className="block text-sm mb-2 capitalize">{field}</label>
+                                                                <label
+                                                                    className="block text-sm mb-2 capitalize">{field}</label>
                                                                 <span className="report-value">
-                                                                    <input className="w-full mb-3 text-black" type="text"
+                                                                    <input className="w-full mb-3 text-black"
+                                                                           type="text"
                                                                            value={ultraInputValues[testMaster.testReport.testReportId]?.[field] || testMaster.testReport[field]}
                                                                            onChange={(e) => handleUltraInputChange(e, testMaster.testReport.testReportId, field)}
                                                                     />
@@ -471,7 +488,10 @@ const TestComponent = ({data}) => {
                                     <p className="text-gray-600">Please select a test to view the report.</p>}
                             </div>
 
-                            <button type="button" className="w-full bg-blue-600 hover:bg-blue-700 py-3 text-white rounded-md" onClick={updateTestData}>Submit</button>
+                            <button type="button"
+                                    className="w-full bg-blue-600 hover:bg-blue-700 py-3 text-white rounded-md"
+                                    onClick={updateTestData}>Submit
+                            </button>
 
                         </form>
                     </CustomModal>
