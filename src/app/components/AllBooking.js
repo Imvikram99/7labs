@@ -19,12 +19,9 @@ const TestComponent = ({data}) => {
     const [ultraInputValues, setUltraInputValues] = useState({});
     const [matrixInputValues, setMatrixInputValues] = useState({});
 
-    const [reportData, setReportData] = useState({
-        testReportDate: null,
-        primarySampleType: null
-    });
+    const [primarySampleType, setPrimarySampleType] = useState(null);
+    const [testReportDate, setTestReportDate] = useState(null);
 
-    console.log(reportData)
 
     const handleInputChange = (e, testReportId) => {
         setInputValues({
@@ -53,7 +50,6 @@ const TestComponent = ({data}) => {
                             {selectedTests.map((test, index) => (
                                 <div key={index}>
                                     <h2 className="text-lg font-bold mb-2 text-center uppercase">{test.name}</h2>
-                                    <p>{reportData.testReportDate}</p>
                                     <table className="table-auto w-full mb-4">
                                         <thead>
                                         <tr>
@@ -134,7 +130,11 @@ const TestComponent = ({data}) => {
                 reports.forEach(report => {
                     // Check if testReport exists and has a report_type
                     if (report.testReport && report.testReport.report_type) {
+                        setTestReportDate(report.testReport.testReportDate)
                         setReportType(report.testReport.report_type);
+                        if (report.testReport.primarySampleType) {
+                            setPrimarySampleType(report.testReport.primarySampleType);
+                        }
                     }
                     // Check if testMasterReports exists
                     if (report.testMasterReports) {
@@ -528,6 +528,15 @@ const TestComponent = ({data}) => {
                             </h5>
                             <h5><span>SEX</span>{data.patientDetails.gender}</h5>
                             <h5><span>Test ID</span>{data.patientDetails.pinCode}</h5>
+                            {
+                                primarySampleType && reportType === "BloodReport" && <h5><span>Sample Type</span><span
+                                    className="capitalize text-blue-700 italic">{primarySampleType}</span></h5>
+                            }
+                            {
+                                testReportDate && reportType !== "" && <h5><span>Report Date</span><span
+                                    className="capitalize text-blue-700 italic">{formatDate(testReportDate)}</span>
+                                </h5>
+                            }
                         </div>
                     </div>
                     <hr/>
