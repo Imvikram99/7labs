@@ -250,7 +250,6 @@ class SpecificApis {
   };
 
   async addTestUnits(formData) {
-    console.log(formData);
     try {
         const response = await apiService.postData(`api/v1/lab/testpanel/testunit`,formData);
         return response.data;
