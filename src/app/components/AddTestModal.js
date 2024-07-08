@@ -42,6 +42,7 @@ function AddTestModal({ onClose, onSave }) {
     onSave(data).then(()=>reset());
   };
 
+  const fieldProps = {watch,control,register};
   return (
     <div className="bg-opacity-50 flex justify-center items-center">
       <div className="bg-white p-5 rounded-lg shadow-lg w-full">
@@ -65,28 +66,40 @@ function AddTestModal({ onClose, onSave }) {
          {(watch(`subTests`) || []).length == 0 && (
           <>
               <div className='mb-3 mt-2'>
-            <label className="block text-green-700 text-sm font-bold mb-2">
-              Reference Value Type
-            </label>
-            <select {...register(`referenceValueType`)} required={true}
-              className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md border">
-              <option value="">Select Value</option>
-              <option value="SINGLE_STRING">SINGLE_STRING</option>
-              <option value="RANGE">RANGE</option>
-              <option value="NONE">NONE</option>
-            </select>
-          </div>
-         <div className='mb-3'>
-         {watch(`referenceValueType`) === 'SINGLE_STRING' && (
-            <SingleReferenceValues control={control}  register={register} name={``} testUnits={testUnits} setModalOpen={setModalOpen}/>
-          )}
-          {watch(`referenceValueType`) === 'RANGE' && (
-            <AddReferenceValues control={control} register={register} name={``} />
-          )}
-         </div>
+                <label className="block text-green-700 text-sm font-bold mb-2">
+                  Reference Value Type
+                </label>
+                <select {...register(`referenceValueType`)} required={true}
+                  className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md border">
+                  <option value="">Select Value</option>
+                  <option value="SINGLE_STRING">SINGLE_STRING</option>
+                  <option value="RANGE">RANGE</option>
+                  <option value="NONE">NONE</option>
+                </select>
+              </div>
+             <div className='mb-3'>
+               {watch(`referenceValueType`) === 'SINGLE_STRING' && (
+                  <SingleReferenceValues
+                      {...fieldProps}
+                      name=""
+                      testUnits={testUnits}
+                      setModalOpen={setModalOpen}
+                  />
+                )}
+                {watch(`referenceValueType`) === 'RANGE' && (
+                  <AddReferenceValues {...fieldProps} name=""/>
+                )}
+             </div>
           </>
          )}
-          <AddSubTests control={control} register={register} watch={watch} name={``} testUnits={testUnits} setModalOpen={setModalOpen}/>
+          <AddSubTests
+              name=""
+              control={control}
+              register={register}
+              watch={watch}
+              testUnits={testUnits}
+              setModalOpen={setModalOpen}
+          />
           <div className="flex justify-end items-center mt-4 gap-3">
             <button type="button" onClick={onClose} className="bg-pink-500 hover:bg-pink-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Cancel</button>
             <button type="submit" className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Save Test</button>

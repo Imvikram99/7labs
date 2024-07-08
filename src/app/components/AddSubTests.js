@@ -9,7 +9,9 @@ const SubTestValues = ({control, index, register,watch,name,testUnits,setModalOp
         control,
         name: name ? `${name}.subTests` : 'subTests'
     });
-    name =  `${name}.subTests` ?? 'subTests'
+    name =  `${name}.subTests` ?? 'subTests';
+
+    const fieldProps = {watch,control,register};
     return (
         <>
             {subTestFields.map((item, itemIndex) => (
@@ -47,10 +49,21 @@ const SubTestValues = ({control, index, register,watch,name,testUnits,setModalOp
                         </div>
                     </div>
                     {watch( `${name}.${itemIndex}.referenceValueType`) === 'SINGLE_STRING' && (
-                        <SingleReferenceValues control={control} index={index} register={register} name={`${name}.${itemIndex}`} testUnits={testUnits} setModalOpen={setModalOpen}/>
+                        <SingleReferenceValues
+                            {...fieldProps}
+                            index={index}
+                            name={`${name}.${itemIndex}`}
+                            testUnits={testUnits}
+                            setModalOpen={setModalOpen}/>
                     )}
                     {watch( `${name}.${itemIndex}.referenceValueType`) === 'RANGE' && (
-                        <AddReferenceValues control={control} index={index} register={register} name={`${name}.${itemIndex}`} testUnits={testUnits} setModalOpen={setModalOpen}/>
+                        <AddReferenceValues
+                            {...fieldProps}
+                            index={index}
+                            name={`${name}.${itemIndex}`}
+                            testUnits={testUnits}
+                            setModalOpen={setModalOpen}
+                        />
                     )}
                     <div className="flex justify-start w-full">
                         <button type="button" onClick={() => removeSubTesteValue(itemIndex)}

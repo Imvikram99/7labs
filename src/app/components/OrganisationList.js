@@ -146,7 +146,7 @@ const AddTestPanel = () => {
     };
 
     const testResultType = watch('testResultType');
-
+    const fieldProps = {watch,control,register};
     return (
         <main className="flex flex-col items-center bg-gray-100 w-full">
             <div className="bg-white shadow-md rounded px-8 py-8 my-4 w-full max-w-7xl">
@@ -300,14 +300,26 @@ const AddTestPanel = () => {
                                     </div>
                                     {(watch(`tests.${index}.subTests`) || []).length == 0 && (
                                         <>
-                                    {watch(`tests.${index}.referenceValueType`) === 'SINGLE_STRING' && (
-                                        <SingleReferenceValues control={control} index={index} register={register} name={`tests.${index}`} testUnits={testUnits} setModalOpen={setModalOpen}/>
+                                            {watch(`tests.${index}.referenceValueType`) === 'SINGLE_STRING' && (
+                                                <SingleReferenceValues
+                                                    {...fieldProps}
+                                                    index={index}
+                                                    name={`tests.${index}`}
+                                                    testUnits={testUnits}
+                                                    setModalOpen={setModalOpen}
+                                                />
+                                            )}
+                                            {watch(`tests.${index}.referenceValueType`) === 'RANGE' && (
+                                                <AddReferenceValues
+                                                    {...fieldProps}
+                                                    index={index}
+                                                    name={`tests.${index}`}
+                                                    testUnits={testUnits}
+                                                    setModalOpen={setModalOpen}
+                                                />
+                                            )}
+                                        </>
                                     )}
-                                    {watch(`tests.${index}.referenceValueType`) === 'RANGE' && (
-                                        <AddReferenceValues control={control} index={index} register={register} name={`tests.${index}`} testUnits={testUnits} setModalOpen={setModalOpen}/>
-                                    )}
-                                    </>
-                                )}
                                     <AddSubTests control={control} index={index} register={register} watch={watch} name={`tests.${index}`} testUnits={testUnits} setModalOpen={setModalOpen}/>
                                     <div className="flex justify-end w-full">
                                         <button

@@ -1,13 +1,22 @@
 import React, {useEffect, useState} from 'react';
 import {specificApis} from "../../../data/SpecificApis";
 import Select from "react-select";
-import {Controller, useForm} from "react-hook-form";
+import {Controller} from "react-hook-form";
 import AddNewPossibleValueModal from "../AddNewPossibleValueModal";
 
-const SingleReferenceValues = ({register, name, nested,control,testUnits,setModalOpen}) => {
-    const [possibleValues, setPossibleValues] = useState([]);
-    const {setValue} = useForm();
+const SingleReferenceValues = (props) => {
+    const {
+        register,
+        name,
+        nested,
+        control,
+        testUnits,
+        setModalOpen,
+        watch,
+        index = 0
+    } = props;
 
+    const [possibleValues, setPossibleValues] = useState([]);
     const [activeModal, setActiveModal] = useState(null);
 
     const openModal = () => {
@@ -46,24 +55,24 @@ const SingleReferenceValues = ({register, name, nested,control,testUnits,setModa
                                     <Controller
                                         name={`${name}.singleReferenceValues.allPossibleValues`}
                                         control={control}
-                                        render={({ field: { onChange, value } }) => (
-                                        <Select
-                                            className="w-full"
-                                            options={possibleValues}
-                                      
-                                            defaultValue={(value || []).map((e)=>{
-                                                if(typeof e == 'string'){
-                                                    return {value:e,label:e}
-                                                }
-                                                return e
-                                            })}
-                                            isMulti
-                                            onChange={(selectedOptions) => {
-                                                const values = selectedOptions.map((option) => option.value);
-                                                onChange(values);
-                                            }}
-                                        />
-                                    )}
+                                        render={({field: {onChange, value}}) => (
+                                            <Select
+                                                className="w-full"
+                                                options={possibleValues}
+
+                                                defaultValue={(value || []).map((e) => {
+                                                    if (typeof e == 'string') {
+                                                        return {value: e, label: e}
+                                                    }
+                                                    return e
+                                                })}
+                                                isMulti
+                                                onChange={(selectedOptions) => {
+                                                    const values = selectedOptions.map((option) => option.value);
+                                                    onChange(values);
+                                                }}
+                                            />
+                                        )}
                                     />
                                     <button
                                         type="button"
@@ -95,31 +104,59 @@ const SingleReferenceValues = ({register, name, nested,control,testUnits,setModa
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700">Reference Value</label>
-                                    <select
-                                {...register(`${name}.singleReferenceValues.referenceValue`)} required={true}
-                                className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md border">
-                                 <option value={""}>Select Category</option>   
-                                {possibleValues.map((category,index) => (
-                                    <option key={category.label+index} value={category.value}>{category.label}</option>
-                                ))}
-                            </select>
+                        <select
+                            {...register(`${name}.singleReferenceValues.referenceValue`)} required={true}
+                            className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md border">
+                            <option value={""}>Select Category</option>
+                            {possibleValues.map((category, index) => (
+                                <option key={category.label + index} value={category.value}>{category.label}</option>
+                            ))}
+                        </select>
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700">Unit</label>
-                         <div className='flex'>
-                         <select {...register(`${name}.singleReferenceValues.unit`)}>
-                                 {(testUnits || []).map((e,index) => <option value={e.name} key={index}>{e.name}</option>)}
-                        </select>    
-                               <button
-                                        type="button"
-                                        className="bg-green-500 text-white p-2 rounded ml-2"
-                                        onClick={() => setModalOpen("unit")}
-                                    >
-                                        Add
-                                </button>
-                        </div>     
+                        <div className='flex'>
+                            <select {...register(`${name}.singleReferenceValues.unit`)}>
+                                {(testUnits || []).map((e, index) => (
+                                    <option value={e.name} key={index}>{e.name}</option>
+                                ))}
+                            </select>
+                            <button
+                                type="button"
+                                className="bg-green-500 text-white p-2 rounded ml-2"
+                                onClick={() => setModalOpen("unit")}
+                            >
+                                Add
+                            </button>
+                        </div>
                     </div>
                 </div>
+                <div>
+                    <div className="flex items-center">
+                        <input type="checkbox"
+                               id={`isRatio_${index}`}
+                               className="w-fit"
+                               {...register(`${name}.isRatio`)}
+                        />
+                        <label htmlFor={`isRatio_${index}`} className="ml-2">Is Ratio</label>
+                    </div>
+                </div>
+                {watch(`${name}.isRatio`) && (
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Test Code Numerator</label>
+                            <input {...register(`${name}.testCodeNumerator`)} type='text'
+                                   required={true}
+                                   className="mt-1 border border-gray-300 rounded px-2 py-1 w-full text-gray-700"/>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Test Code Denominator</label>
+                            <input {...register(`${name}.testCodeDenominator`)} type='text'
+                                   required={true}
+                                   className="mt-1 border border-gray-300 rounded px-2 py-1 w-full text-gray-700"/>
+                        </div>
+                    </div>
+                )}
             </div>
             {activeModal && (
                 <AddNewPossibleValueModal

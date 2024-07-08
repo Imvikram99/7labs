@@ -2,6 +2,8 @@ import React, {useState, useEffect} from "react";
 import {IoSearchOutline} from "react-icons/io5";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faRestroom} from "@fortawesome/free-solid-svg-icons";
+import PatientRegistrationStep from "@/app/components/BookingPageContent/PatientRegistrationStep";
+import BookingInfoStep from "@/app/components/BookingPageContent/BookingInfoStep";
 
 const Booking = () => {
     const initialTest = {
@@ -12,6 +14,7 @@ const Booking = () => {
         code: "",
     };
     const [testPanel, setTestPanel] = useState([]);
+    const [activeStep, setActiveStep] = useState(1);
     const [pdfData, setPdfData] = useState([]);
     const [updateProfile, setUpdateProfile] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
@@ -74,7 +77,6 @@ const Booking = () => {
         }
         // setSearchQueryType(searchQueryType);
     };
-    console.log(searchResults, "search");
 
     const [formData, setFormData] = useState({
         bookingSlip: {
@@ -190,43 +192,49 @@ const Booking = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (updateProfile) {
-            const response = await fetch(
-                "http://ec2-13-233-207-62.ap-south-1.compute.amazonaws.com:8080/api/v1/lab/bookings?updateProfile=true",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-API-KEY": "test123",
-                        "X-PARTNER-ID": "PYTHONMAN2",
-                    },
-                    //   body: JSON.stringify(formData),
-                    body: JSON.stringify({
-                        ...formData,
-                        patientId: searchResults.patientId, // Adding patientId to the formData
-                    }),
-                }
-            );
-            const result = await response.json();
-            setPdfData(result);
-            console.log(result);
-        } else {
-            const response = await fetch(
-                "http://ec2-13-233-207-62.ap-south-1.compute.amazonaws.com:8080/api/v1/lab/bookings",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-API-KEY": "test123",
-                        "X-PARTNER-ID": "PYTHONMAN2",
-                    },
-                    body: JSON.stringify(formData),
-                }
-            );
-            const result = await response.json();
-            setPdfData(result);
-            console.log(result);
+        if (activeStep === 1) {
+            console.log(formData.patientDetails)
         }
+        if (activeStep === 2) {
+
+        }
+        // if (updateProfile) {
+        //     const response = await fetch(
+        //         "http://ec2-13-233-207-62.ap-south-1.compute.amazonaws.com:8080/api/v1/lab/bookings?updateProfile=true",
+        //         {
+        //             method: "POST",
+        //             headers: {
+        //                 "Content-Type": "application/json",
+        //                 "X-API-KEY": "test123",
+        //                 "X-PARTNER-ID": "PYTHONMAN2",
+        //             },
+        //             //   body: JSON.stringify(formData),
+        //             body: JSON.stringify({
+        //                 ...formData,
+        //                 patientId: searchResults.patientId, // Adding patientId to the formData
+        //             }),
+        //         }
+        //     );
+        //     const result = await response.json();
+        //     setPdfData(result);
+        //     console.log(result);
+        // } else {
+        //     const response = await fetch(
+        //         "http://ec2-13-233-207-62.ap-south-1.compute.amazonaws.com:8080/api/v1/lab/bookings",
+        //         {
+        //             method: "POST",
+        //             headers: {
+        //                 "Content-Type": "application/json",
+        //                 "X-API-KEY": "test123",
+        //                 "X-PARTNER-ID": "PYTHONMAN2",
+        //             },
+        //             body: JSON.stringify(formData),
+        //         }
+        //     );
+        //     const result = await response.json();
+        //     setPdfData(result);
+        //     console.log(result);
+        // }
     };
 
     return (
@@ -241,744 +249,49 @@ const Booking = () => {
                 <h2 className="text-2xl font-bold mb-4">Booking Form</h2>
 
                 {/* Patient Details */}
-                <div className="search-patient-main flex items-center border rounded-lg overflow-hidden">
-                    <input
-                        type="search"
-                        placeholder="Search"
-                        className="w-full search-patient"
-                        onChange={(event) => setSearchQuery(event.target.value)}
+          {/*      <div className="search-patient-main flex items-center border rounded-lg overflow-hidden">*/}
+          {/*          <input*/}
+          {/*              type="search"*/}
+          {/*              placeholder="Search"*/}
+          {/*              className="w-full search-patient"*/}
+          {/*              onChange={(event) => setSearchQuery(event.target.value)}*/}
+          {/*          />*/}
+          {/*          <button*/}
+          {/*              className="px-3 py-3 bg-gray-200 hover:bg-gray-300 text-gray-600"*/}
+          {/*              onClick={handleSearch}*/}
+          {/*          >*/}
+          {/*              <IoSearchOutline*/}
+          {/*                  className="text-black-500 test-2xl*/}
+          {/*"*/}
+          {/*              />*/}
+          {/*          </button>*/}
+          {/*      </div>*/}
+
+                {activeStep === 1 && (
+                    <PatientRegistrationStep
+                        formData={formData}
+                        searchResults={searchResults}
+                        updateProfile={true}
+                        setUpdateProfile={setUpdateProfile}
+                        setFormData={setFormData}
+                        handleChange={handleChange}
                     />
-                    <button
-                        className="px-3 py-3 bg-gray-200 hover:bg-gray-300 text-gray-600"
-                        onClick={handleSearch}
-                    >
-                        <IoSearchOutline
-                            className="text-black-500 test-2xl
-          "
-                        />
-                    </button>
-                </div>
+                )}
+                {activeStep === 2 && (
+                    <BookingInfoStep
+                        formData={formData}
+                        testPanel={testPanel}
+                        setFormData={setFormData}
+                        addTest={addTest}
+                    />
+                )}
 
-                <div className="mb-4">
-                    <div className="flex justify-between mt-4">
-                        {" "}
-                        <h3 className="text-xl font-bolder mb-2 base-blue">Patient Details</h3>
-                        {Object.keys(searchResults).length > 0 && (
-                            <button
-                                className=" py-2 px-3 bg-blue-500 hover:bg-blue-600 text-white rounded-md"
-                                onClick={() => {
-                                    setUpdateProfile(true);
-                                }}
-                            >
-                                Update Profile
-                            </button>
-                        )}
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label
-                                className="block text-sm mb-2"
-                                htmlFor="designation"
-                            >
-                                Designation
-                            </label>
-                            <input
-                                type="text"
-                                name="patientDetails.designation"
-                                value={formData.patientDetails.designation}
-                                readOnly={!updateProfile}
-                                onChange={(e) =>
-                                    setFormData((prevData) => ({
-                                        ...prevData,
-                                        patientDetails: {
-                                            ...prevData.patientDetails,
-                                            designation: e.target.value,
-                                        },
-                                    }))
-                                }
-                                className="w-full"
-                            />
-                        </div>
-                        <div>
-                            <label
-                                className="block text-sm mb-2"
-                                htmlFor="firstName"
-                            >
-                                First Name
-                            </label>
-                            <input
-                                type="text"
-                                readOnly={!updateProfile}
-                                name="patientDetails.firstName"
-                                value={formData.patientDetails.firstName}
-                                onChange={(e) =>
-                                    setFormData((prevData) => ({
-                                        ...prevData,
-                                        patientDetails: {
-                                            ...prevData.patientDetails,
-                                            firstName: e.target.value,
-                                        },
-                                    }))
-                                }
-                                className="w-full"
-                            />
-                        </div>
-                        <div>
-                            <label
-                                className="block text-sm mb-2"
-                                htmlFor="lastName"
-                            >
-                                Last Name
-                            </label>
-                            <input
-                                readOnly={!updateProfile}
-                                type="text"
-                                name="patientDetails.lastName"
-                                value={formData.patientDetails.lastName}
-                                onChange={(e) =>
-                                    setFormData((prevData) => ({
-                                        ...prevData,
-                                        patientDetails: {
-                                            ...prevData.patientDetails,
-                                            lastName: e.target.value,
-                                        },
-                                    }))
-                                }
-                                className="w-full"
-                            />
-                        </div>
-                        <div>
-                            <label
-                                className="block text-sm mb-2"
-                                htmlFor="phone"
-                            >
-                                Phone
-                            </label>
-                            <input
-                                readOnly={!updateProfile}
-                                type="text"
-                                name="patientDetails.phone"
-                                value={formData.patientDetails.phone}
-                                onChange={(e) =>
-                                    setFormData((prevData) => ({
-                                        ...prevData,
-                                        patientDetails: {
-                                            ...prevData.patientDetails,
-                                            phone: e.target.value,
-                                        },
-                                    }))
-                                }
-                                className="w-full"
-                            />
-                        </div>
-                        <div>
-                            <label
-                                className="block text-sm mb-2"
-                                htmlFor="gender"
-                            >
-                                Gender
-                            </label>
-                            <select
-                                disabled={!updateProfile}
-                                name="patientDetails.gender"
-                                value={formData.patientDetails.gender}
-                                onChange={(e) =>
-                                    setFormData((prevData) => ({
-                                        ...prevData,
-                                        patientDetails: {
-                                            ...prevData.patientDetails,
-                                            gender: e.target.value,
-                                        },
-                                    }))
-                                }
-                                className="w-full"
-                            >
-                                <option value="MALE">Male</option>
-                                <option value="FEMALE">Female</option>
-                                <option value="OTHER">Other</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label
-                                className="block text-sm mb-2"
-                                htmlFor="email"
-                            >
-                                Email
-                            </label>
-                            <input
-                                readOnly={!updateProfile}
-                                type="email"
-                                name="patientDetails.email"
-                                value={formData.patientDetails.email}
-                                onChange={(e) =>
-                                    setFormData((prevData) => ({
-                                        ...prevData,
-                                        patientDetails: {
-                                            ...prevData.patientDetails,
-                                            email: e.target.value,
-                                        },
-                                    }))
-                                }
-                                className="w-full"
-                            />
-                        </div>
-                        <div>
-                            <label
-                                className="block text-sm mb-2"
-                                htmlFor="addressLine1"
-                            >
-                                Address Line 1
-                            </label>
-                            <input
-                                type="text"
-                                readOnly={!updateProfile}
-                                name="patientDetails.addressLine1"
-                                value={formData.patientDetails.addressLine1}
-                                onChange={(e) =>
-                                    setFormData((prevData) => ({
-                                        ...prevData,
-                                        patientDetails: {
-                                            ...prevData.patientDetails,
-                                            addressLine1: e.target.value,
-                                        },
-                                    }))
-                                }
-                                className="w-full"
-                            />
-                        </div>
-                        <div>
-                            <label
-                                className="block text-sm mb-2"
-                                htmlFor="addressLine2"
-                            >
-                                Address Line 2
-                            </label>
-                            <input
-                                type="text"
-                                readOnly={!updateProfile}
-                                name="patientDetails.addressLine2"
-                                value={formData.patientDetails.addressLine2}
-                                onChange={(e) =>
-                                    setFormData((prevData) => ({
-                                        ...prevData,
-                                        patientDetails: {
-                                            ...prevData.patientDetails,
-                                            addressLine2: e.target.value,
-                                        },
-                                    }))
-                                }
-                                className="w-full"
-                            />
-                        </div>
-                        <div>
-                            <label
-                                className="block text-sm mb-2"
-                                htmlFor="addressLine3"
-                            >
-                                Address Line 3
-                            </label>
-                            <input
-                                readOnly={!updateProfile}
-                                type="text"
-                                name="patientDetails.addressLine3"
-                                value={formData.patientDetails.addressLine3}
-                                onChange={(e) =>
-                                    setFormData((prevData) => ({
-                                        ...prevData,
-                                        patientDetails: {
-                                            ...prevData.patientDetails,
-                                            addressLine3: e.target.value,
-                                        },
-                                    }))
-                                }
-                                className="w-full"
-                            />
-                        </div>
-                        <div>
-                            <label
-                                className="block text-sm mb-2"
-                                htmlFor="pinCode"
-                            >
-                                Pin Code
-                            </label>
-                            <input
-                                readOnly={!updateProfile}
-                                type="text"
-                                name="patientDetails.pinCode"
-                                value={formData.patientDetails.pinCode}
-                                onChange={(e) =>
-                                    setFormData((prevData) => ({
-                                        ...prevData,
-                                        patientDetails: {
-                                            ...prevData.patientDetails,
-                                            pinCode: e.target.value,
-                                        },
-                                    }))
-                                }
-                                className="w-full"
-                            />
-                        </div>
-                        <div>
-                            <label
-                                className="block text-sm mb-2"
-                                htmlFor="ageInYears"
-                            >
-                                Age (Years)
-                            </label>
-                            <input
-                                readOnly={!updateProfile}
-                                type="number"
-                                name="patientDetails.ageInYears"
-                                value={formData.patientDetails.ageInYears}
-                                onChange={(e) =>
-                                    setFormData((prevData) => ({
-                                        ...prevData,
-                                        patientDetails: {
-                                            ...prevData.patientDetails,
-                                            ageInYears: parseInt(e.target.value),
-                                        },
-                                    }))
-                                }
-                                className="w-full"
-                            />
-                        </div>
-                        <div>
-                            <label
-                                className="block text-sm mb-2"
-                                htmlFor="ageInMonths"
-                            >
-                                Age (Months)
-                            </label>
-                            <input
-                                type="number"
-                                readOnly={!updateProfile}
-                                name="patientDetails.ageInMonths"
-                                value={formData.patientDetails.ageInMonths}
-                                onChange={(e) =>
-                                    setFormData((prevData) => ({
-                                        ...prevData,
-                                        patientDetails: {
-                                            ...prevData.patientDetails,
-                                            ageInMonths: parseInt(e.target.value),
-                                        },
-                                    }))
-                                }
-                                className="w-full"
-                            />
-                        </div>
-                        <div>
-                            <label
-                                className="block text-sm mb-2"
-                                htmlFor="ageInDays"
-                            >
-                                Age (Days)
-                            </label>
-                            <input
-                                readOnly={!updateProfile}
-                                type="number"
-                                name="patientDetails.ageInDays"
-                                value={formData.patientDetails.ageInDays}
-                                onChange={(e) =>
-                                    setFormData((prevData) => ({
-                                        ...prevData,
-                                        patientDetails: {
-                                            ...prevData.patientDetails,
-                                            ageInDays: parseInt(e.target.value),
-                                        },
-                                    }))
-                                }
-                                className="w-full"
-                            />
-                        </div>
-                        <div>
-                            <label
-                                className="block text-sm mb-2"
-                                htmlFor="dob"
-                            >
-                                Date of Birth
-                            </label>
-                            <input
-                                type="date"
-                                readOnly={!updateProfile}
-                                name="patientDetails.dob"
-                                value={formData.patientDetails.dob}
-                                onChange={(e) =>
-                                    setFormData((prevData) => ({
-                                        ...prevData,
-                                        patientDetails: {
-                                            ...prevData.patientDetails,
-                                            dob: e.target.value,
-                                        },
-                                    }))
-                                }
-                                className="w-full"
-                            />
-                        </div>
-                    </div>
-                </div>
-
-                {/* Tests */}
-                <div className="mb-4">
-                    <h3 className="text-xl font-bolder mb-2 base-blue">Tests</h3>
-                    {formData.bookingSlip.tests.map((test, index) => (
-                        <div
-                            key={index}
-                            className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4"
-                        >
-                            <div>
-                                <label
-                                    className="block text-sm mb-2"
-                                    htmlFor={`testName-${index}`}
-                                >
-                                    Test Name
-                                </label>
-                                <select
-                                    name="name"
-                                    value={test.name}
-                                    //   onChange={(e) => handleChange(e, index)}
-                                    onChange={(e) => handleChange(e, index)}
-                                    // onChange={(e)=>{
-
-                                    // }}
-                                    className="w-full"
-                                >
-                                    <option value="">Select a test</option>
-                                    {testPanel?.map((testOption) => (
-                                        <option key={testOption.id} value={testOption.name}>
-                                            {testOption.name}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-
-                            <div>
-                                <label
-                                    className="block text-sm mb-2"
-                                    htmlFor={`testName-${index}`}
-                                >
-                                    Test Name
-                                </label>
-                                <input
-                                    type="text"
-                                    name={`name`}
-                                    value={test.name}
-                                    onChange={(e) => handleChange(e, index)}
-                                    className="w-full"
-                                />
-                            </div>
-                            <div>
-                                <label
-                                    className="block text-sm mb-2"
-                                    htmlFor={`barCode-${index}`}
-                                >
-                                    Bar Code
-                                </label>
-                                <input
-                                    type="text"
-                                    name={`barCode`}
-                                    value={test.barCode}
-                                    onChange={(e) => handleChange(e, index)}
-                                    className="w-full"
-                                />
-                            </div>
-                            <div>
-                                <label
-                                    className="block text-sm mb-2"
-                                    htmlFor={`cost-${index}`}
-                                >
-                                    Cost
-                                </label>
-                                <input
-                                    type="number"
-                                    name={`cost`}
-                                    value={test.cost}
-                                    onChange={(e) => handleChange(e, index)}
-                                    className="w-full"
-                                />
-                            </div>
-                            <div>
-                                <label
-                                    className="block text-sm mb-2"
-                                    htmlFor={`code-${index}`}
-                                >
-                                    Code
-                                </label>
-                                <input
-                                    type="text"
-                                    name={`code`}
-                                    value={test.code}
-                                    onChange={(e) => handleChange(e, index)}
-                                    className="w-full"
-                                />
-                            </div>
-                            <div className="flex items-end">
-                                {index === formData.bookingSlip.tests.length - 1 && (
-                                    <button
-                                        type="button"
-                                        onClick={addTest}
-                                        className="ml-2 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md bg-blue-500 hover:bg-blue-600 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                                    >
-                                        Add Test
-                                    </button>
-                                )}
-                                {formData.bookingSlip.tests.length > 1 && (
-                                    <button
-                                        type="button"
-                                        onClick={() => removeTest(index)}
-                                        className="ml-2 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
-                                    >
-                                        Remove Test
-                                    </button>
-                                )}
-                            </div>
-                        </div>
-                    ))}
-                </div>
-
-                {/* Additional Booking Slip Details */}
-                <div className="mb-4">
-                    <h3 className="text-xl font-bolder mb-2 base-blue">Booking Slip Details</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label
-                                className="block text-sm mb-2"
-                                htmlFor="referralDoctorId"
-                            >
-                                Referral Doctor ID
-                            </label>
-                            <input
-                                type="text"
-                                name="bookingSlip.referralDoctorId"
-                                value={formData.bookingSlip.referralDoctorId}
-                                onChange={(e) =>
-                                    setFormData((prevData) => ({
-                                        ...prevData,
-                                        bookingSlip: {
-                                            ...prevData.bookingSlip,
-                                            referralDoctorId: e.target.value,
-                                        },
-                                    }))
-                                }
-                                className="w-full"
-                            />
-                        </div>
-                        <div>
-                            <label
-                                className="block text-sm mb-2"
-                                htmlFor="paymentMode"
-                            >
-                                Payment Mode
-                            </label>
-                            <input
-                                type="text"
-                                name="bookingSlip.paymentMode"
-                                value={formData.bookingSlip.paymentMode}
-                                onChange={(e) =>
-                                    setFormData((prevData) => ({
-                                        ...prevData,
-                                        bookingSlip: {
-                                            ...prevData.bookingSlip,
-                                            paymentMode: e.target.value,
-                                        },
-                                    }))
-                                }
-                                className="w-full"
-                            />
-                        </div>
-                        <div>
-                            <label
-                                className="block text-sm mb-2"
-                                htmlFor="net"
-                            >
-                                Net Amount
-                            </label>
-                            <input
-                                type="number"
-                                name="bookingSlip.net"
-                                value={formData.bookingSlip.net}
-                                onChange={(e) =>
-                                    setFormData((prevData) => ({
-                                        ...prevData,
-                                        bookingSlip: {
-                                            ...prevData.bookingSlip,
-                                            net: parseFloat(e.target.value),
-                                        },
-                                    }))
-                                }
-                                className="w-full"
-                            />
-                        </div>
-                        <div>
-                            <label
-                                className="block text-sm mb-2"
-                                htmlFor="paid"
-                            >
-                                Paid Amount
-                            </label>
-                            <input
-                                type="number"
-                                name="bookingSlip.paid"
-                                value={formData.bookingSlip.paid}
-                                onChange={(e) =>
-                                    setFormData((prevData) => ({
-                                        ...prevData,
-                                        bookingSlip: {
-                                            ...prevData.bookingSlip,
-                                            paid: parseFloat(e.target.value),
-                                        },
-                                    }))
-                                }
-                                className="w-full"
-                            />
-                        </div>
-                        <div>
-                            <label
-                                className="block text-sm mb-2"
-                                htmlFor="balance"
-                            >
-                                Balance Amount
-                            </label>
-                            <input
-                                type="number"
-                                name="bookingSlip.balance"
-                                value={formData.bookingSlip.balance}
-                                onChange={(e) =>
-                                    setFormData((prevData) => ({
-                                        ...prevData,
-                                        bookingSlip: {
-                                            ...prevData.bookingSlip,
-                                            balance: parseFloat(e.target.value),
-                                        },
-                                    }))
-                                }
-                                className="w-full"
-                            />
-                        </div>
-                        <div>
-                            <label
-                                className="block text-sm mb-2"
-                                htmlFor="sampleBy"
-                            >
-                                Sample By
-                            </label>
-                            <input
-                                type="text"
-                                name="bookingSlip.sampleBy"
-                                value={formData.bookingSlip.sampleBy}
-                                onChange={(e) =>
-                                    setFormData((prevData) => ({
-                                        ...prevData,
-                                        bookingSlip: {
-                                            ...prevData.bookingSlip,
-                                            sampleBy: e.target.value,
-                                        },
-                                    }))
-                                }
-                                className="w-full"
-                            />
-                        </div>
-                        <div>
-                            <label
-                                className="block text-sm mb-2"
-                                htmlFor="billedBy"
-                            >
-                                Billed By
-                            </label>
-                            <input
-                                type="text"
-                                name="bookingSlip.billedBy"
-                                value={formData.bookingSlip.billedBy}
-                                onChange={(e) =>
-                                    setFormData((prevData) => ({
-                                        ...prevData,
-                                        bookingSlip: {
-                                            ...prevData.bookingSlip,
-                                            billedBy: e.target.value,
-                                        },
-                                    }))
-                                }
-                                className="w-full"
-                            />
-                        </div>
-                        <div>
-                            <label
-                                className="block text-sm mb-2"
-                                htmlFor="date"
-                            >
-                                Date
-                            </label>
-                            <input
-                                type="date"
-                                name="bookingSlip.date"
-                                value={formData.bookingSlip.date}
-                                onChange={(e) =>
-                                    setFormData((prevData) => ({
-                                        ...prevData,
-                                        bookingSlip: {
-                                            ...prevData.bookingSlip,
-                                            date: e.target.value,
-                                        },
-                                    }))
-                                }
-                                className="w-full"
-                            />
-                        </div>
-                        <div>
-                            <label
-                                className="block text-sm mb-2"
-                                htmlFor="time"
-                            >
-                                Time
-                            </label>
-                            <input
-                                type="time"
-                                name="bookingSlip.time"
-                                value={formData.bookingSlip.time}
-                                onChange={(e) =>
-                                    setFormData((prevData) => ({
-                                        ...prevData,
-                                        bookingSlip: {
-                                            ...prevData.bookingSlip,
-                                            time: e.target.value,
-                                        },
-                                    }))
-                                }
-                                className="w-full"
-                            />
-                        </div>
-                        <div>
-                            <label
-                                className="block text-sm mb-2"
-                                htmlFor="centerCode"
-                            >
-                                Center Code
-                            </label>
-                            <input
-                                type="text"
-                                name="bookingSlip.centerCode"
-                                value={formData.bookingSlip.centerCode}
-                                onChange={(e) =>
-                                    setFormData((prevData) => ({
-                                        ...prevData,
-                                        bookingSlip: {
-                                            ...prevData.bookingSlip,
-                                            centerCode: e.target.value,
-                                        },
-                                    }))
-                                }
-                                className="w-full"
-                            />
-                        </div>
-                    </div>
-                </div>
-
-                {/* Submit Button */}
                 <div className="mt-4">
                     <button
                         type="submit"
                         className="w-full py-2 bg-blue-500 hover:bg-blue-600 text-white px-4 rounded-lg"
                     >
-                        Submit
+                        {activeStep === 1 ? "Next" : "Submit"}
                     </button>
                 </div>
             </form>
