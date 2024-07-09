@@ -35,7 +35,7 @@ function AddTestModal({ onClose, onSave }) {
 
   const onSubmit = (data) => {
     if(data.subTests.length > 0){
-      delete  data.singleReferenceValues
+      delete data.singleReferenceValues
       delete data.referenceValues
       delete data.referenceValueType
     }
