@@ -116,6 +116,11 @@ const AddTestPanel = () => {
                 delete e.referenceValueType
             }
             delete e.isRatio
+            e = handleSubTest(e)
+            return e
+        })
+
+        function handleSubTest(e){
             e.subTests = e.subTests?.map((a) => {
                 a.id = e.id
                 if (a.referenceValueType == 'NONE') {
@@ -127,16 +132,19 @@ const AddTestPanel = () => {
                     delete a.testCodeDenominator
                 }
                 if (a.referenceValueType === "RANGE") {
-                    delete a.matrixTestReportTemplate
+                    delete a.singleReferenceValues
                 }
                 if (a.referenceValueType === "SINGLE_STRING") {
-                    delete a.matrixTestReportTemplate
+                    delete a.referenceValues
                 }
                 delete a.isRatio
+                if(a.subTests?.length > 0){
+                    a.subTests = handleSubTest(a.subTests)
+                }
                 return a
             })
             return e
-        })
+        }
 
         if (code.length !== [...new Set(code)].length) {
             toast.error('Please Add Unique Test Code For Every TestPanel')

@@ -70,33 +70,6 @@ const ReferenceValues = (props) => {
                             </div>
                         </div>
                     </div>
-
-                    <div>
-                        <div className="flex items-center">
-                            <input type="checkbox"
-                                   id="isRatio"
-                                   className="w-fit"
-                                   {...register(`${name}.isRatio`)}
-                            />
-                            <label htmlFor="isRatio" className="ml-2">Is Ratio</label>
-                        </div>
-                    </div>
-                    {watch(`${name}.isRatio`) && (
-                        <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700">Test Code Numerator</label>
-                                <input {...register(`${name}.testCodeNumerator`)} type='text'
-                                       required={true}
-                                       className="mt-1 border border-gray-300 rounded px-2 py-1 w-full text-gray-700"/>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700">Test Code Denominator</label>
-                                <input {...register(`${name}.testCodeDenominator`)} type='text'
-                                       required={true}
-                                       className="mt-1 border border-gray-300 rounded px-2 py-1 w-full text-gray-700"/>
-                            </div>
-                        </div>
-                    )}
                     <button
                         type="button"
                         onClick={() => removeReferenceValue(refIndex)}
