@@ -1,7 +1,11 @@
-import React, {useState, useEffect} from "react";
+import React, {useState, useEffect, useContext} from "react";
 import {IoSearchOutline} from "react-icons/io5";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faRestroom} from "@fortawesome/free-solid-svg-icons";
+import { specificApis } from "../data/SpecificApis";
+import { CustomModal } from "./CustomModal";
+import { TestComponent } from "./AllBooking";
+import { ActiveComponent } from "./SidebarWithHeader";
 
 const Booking = () => {
     const initialTest = {
@@ -16,13 +20,49 @@ const Booking = () => {
     const [updateProfile, setUpdateProfile] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
     const [searchResults, setSearchResults] = useState({});
+    const [centers, setCenters] = useState([]);
+    const [showModal, setShowModal] = useState(false);
+    const [selectedBooking, setSelectedBooking] = useState(null);
+    const context = useContext(ActiveComponent);  
+
+    useEffect(()=>{
+        fetchCenters();
+        handleSearch()
+    },[])
+
+    async function fetchCenters() {
+        try {
+            const fetchedCenters = await specificApis.fetchCenters();
+            setCenters(fetchedCenters);
+        } catch (error) {
+            console.error('Failed to fetch center information:', error);
+        }
+    }
+
+    const handleOpenModal = (booking) => {
+        setSelectedBooking(booking)
+        setShowModal(true);
+    };
+
+    const handleCloseModal = () => {
+        setShowModal(false);
+        setSelectedBooking(null);
+        context.handleComponentChange('All Booking')
+    };
 
     const handleSearch = async (event) => {
-        event.preventDefault();
-
+        event?.preventDefault();
         // let url;
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const myParam = urlParams.get('email');
+
+        if(myParam == undefined && searchQuery == ""){
+            return
+        }
+
         let searchQueryType;
-        if (/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/.test(searchQuery)) {
+        if (/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/.test(myParam ?? searchQuery)) {
             searchQueryType = "email";
         } else if (/^\d+$/.test(searchQuery)) {
             searchQueryType = "mobile";
@@ -32,7 +72,7 @@ const Booking = () => {
         }
 
         const url = `http://ec2-13-233-207-62.ap-south-1.compute.amazonaws.com:8080/api/v1/lab/patient?searchQuery=${encodeURIComponent(
-            searchQuery
+            myParam ??  searchQuery
         )}&searchQueryType=${encodeURIComponent(searchQueryType)}`;
         const response = await fetch(url, {
             method: "GET",
@@ -43,17 +83,21 @@ const Booking = () => {
             },
             //   body: JSON.stringify({}),
         });
-
+         
         const data = await response.json();
-
+        window.history.pushState({}, document.title, window.location.pathname);
         // setSearchResults(data[0]);
         // console.log(searchResults, "search");
         if (data.length > 0) {
             setSearchResults(data[0]);
             setFormData((prevState) => ({
-                ...prevState,
+                bookingSlip:{
+                    patientId:data[0].patientId,
+                    ...prevState.bookingSlip
+                },
                 patientDetails: {
                     designation: data[0].designation,
+
                     firstName: data[0].firstName,
                     lastName: data[0].lastName,
                     phone: data[0].phone,
@@ -79,7 +123,7 @@ const Booking = () => {
     const [formData, setFormData] = useState({
         bookingSlip: {
             tests: [initialTest],
-            referralDoctorId: "",
+            referralSourceId: "",
             paymentMode: "Credit",
             net: 0.0,
             paid: 0.0,
@@ -131,6 +175,14 @@ const Booking = () => {
     }, []);
 
     console.log(testPanel, "data");
+
+    function getTestTotal(){
+        let sum = 0;
+        (formData?.bookingSlip?.tests || []).map((e)=>{
+            sum += Number(e.cost) ?? 0
+        })
+        return sum
+    }
 
     const handleChange = (e, index) => {
         const {name, value} = e.target;
@@ -225,6 +277,9 @@ const Booking = () => {
                 }
             );
             const result = await response.json();
+           if(result.message == undefined){
+            handleOpenModal({bookingSlip:result,patientDetails:formData.patientDetails})
+           }
             setPdfData(result);
             console.log(result);
         }
@@ -644,8 +699,8 @@ const Booking = () => {
                                     className="w-full"
                                 >
                                     <option value="">Select a test</option>
-                                    {testPanel?.map((testOption) => (
-                                        <option key={testOption.id} value={testOption.name}>
+                                    {testPanel?.map((testOption,i) => (
+                                        <option key={i} value={testOption.name}>
                                             {testOption.name}
                                         </option>
                                     ))}
@@ -750,13 +805,13 @@ const Booking = () => {
                             <input
                                 type="text"
                                 name="bookingSlip.referralDoctorId"
-                                value={formData.bookingSlip.referralDoctorId}
+                                value={formData.bookingSlip.referralSourceId}
                                 onChange={(e) =>
                                     setFormData((prevData) => ({
                                         ...prevData,
                                         bookingSlip: {
                                             ...prevData.bookingSlip,
-                                            referralDoctorId: e.target.value,
+                                            referralSourceId: e.target.value,
                                         },
                                     }))
                                 }
@@ -796,7 +851,7 @@ const Booking = () => {
                             <input
                                 type="number"
                                 name="bookingSlip.net"
-                                value={formData.bookingSlip.net}
+                                value={getTestTotal()}
                                 onChange={(e) =>
                                     setFormData((prevData) => ({
                                         ...prevData,
@@ -842,7 +897,7 @@ const Booking = () => {
                             <input
                                 type="number"
                                 name="bookingSlip.balance"
-                                value={formData.bookingSlip.balance}
+                                value={getTestTotal() - formData.bookingSlip.paid}
                                 onChange={(e) =>
                                     setFormData((prevData) => ({
                                         ...prevData,
@@ -954,8 +1009,7 @@ const Booking = () => {
                             >
                                 Center Code
                             </label>
-                            <input
-                                type="text"
+                            <select
                                 name="bookingSlip.centerCode"
                                 value={formData.bookingSlip.centerCode}
                                 onChange={(e) =>
@@ -968,7 +1022,12 @@ const Booking = () => {
                                     }))
                                 }
                                 className="w-full"
-                            />
+                            >
+                                <option value={""}>Select Center</option>
+                                {centers.map((e,i)=>{
+                                    return <option key={e.id+i} value={e.id}>{e.name}</option>
+                                })}
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -983,6 +1042,9 @@ const Booking = () => {
                     </button>
                 </div>
             </form>
+            <CustomModal showModal={showModal} handleClose={handleCloseModal}>
+                {selectedBooking && <TestComponent data={selectedBooking}/>}
+            </CustomModal>
         </div>
     );
 };

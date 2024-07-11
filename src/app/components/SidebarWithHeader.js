@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from "react";
+import React, {useState, useEffect, createContext} from "react";
 import {
     Box,
     Flex,
@@ -48,6 +48,8 @@ import {
     faUserTie,
     faClipboardList, faBars
 } from '@fortawesome/free-solid-svg-icons';
+
+export const ActiveComponent = createContext(null);
 
 export default function SidebarWithHeader({children}) {
     const {isOpen, onOpen, onClose} = useDisclosure();
@@ -135,9 +137,11 @@ export default function SidebarWithHeader({children}) {
             <Flex className="right-sidebar-container" id="right-sidebar-container">
                 {/*<MobileNav onOpen={onOpen} className="hello"/>*/}
                 {/*<hr/>*/}
+                <ActiveComponent.Provider value={{handleComponentChange}}>
                 <Box flex="1" p="4" className="body-content-main">
                     {activeComponent}
                 </Box>
+                </ActiveComponent.Provider>
             </Flex>
         </Flex>
     );

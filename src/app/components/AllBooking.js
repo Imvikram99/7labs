@@ -10,10 +10,11 @@ import {CustomModal} from "@/app/components/CustomModal";
 import html2canvas from "html2canvas";
 import toast from "react-hot-toast";
 
-const TestComponent = ({data}) => {
+export const TestComponent = ({data}) => {
     const [selectedTests, setSelectedTests] = useState([]);
     const [reportType, setReportType] = useState(null);
     const [showEditReportModal, setShowEditReportModal] = useState(false);
+    const [centers, setCenters] = useState({});
 
     const [inputValues, setInputValues] = useState({});
     const [ultraInputValues, setUltraInputValues] = useState({});
@@ -29,6 +30,21 @@ const TestComponent = ({data}) => {
             [testReportId]: e.target.value
         });
     };
+    useEffect(()=>{
+        fetchCenters()
+    },[])
+
+    async function fetchCenters() {
+        try {
+            const fetchedCenters = await specificApis.fetchCenters();
+            const find = fetchedCenters.find((e)=>e.id == data.bookingSlip.centerCode)
+            if(find){
+                setCenters(find);
+            }
+        } catch (error) {
+            console.error('Failed to fetch center information:', error);
+        }
+    }
 
     const handleUltraInputChange = (e, testReportId, field) => {
         const {value} = e.target;
@@ -502,8 +518,8 @@ const TestComponent = ({data}) => {
                 <div id="report-main-body" className="report-main-body">
                     <div className="address-part">
                         <div className="a-left">
-                            <h5 className="hos-name">Hospital Name</h5>
-                            <p>19/C, East Noyatola, Moghbazar</p>
+                            <h5 className="hos-name">{centers.name}</h5>
+                            <p>{centers.address}</p>
                         </div>
                         <div className="a-right">
                             <img style={{width: "100px"}} src="/logoreport1.png" alt="logo"/>

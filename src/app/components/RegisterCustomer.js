@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   Box,
   Button,
@@ -25,6 +25,7 @@ import {
 import { AddIcon } from "@chakra-ui/icons";
 import { specificApis } from "../data/SpecificApis";
 import NewBill from "./NewBill";
+import { ActiveComponent } from "./SidebarWithHeader";
 
 export default function RegisterCustomer() {
   const [formData, setFormData] = useState({
@@ -38,9 +39,11 @@ export default function RegisterCustomer() {
     addressLine1: "",
     addressLine2: "",
     addressLine3: "",
-    pincode: "",
-    age: "",
-    ageType: "Years",
+    pinCode: "",
+    ageInMonths:0,
+    ageInDays:0,
+    ageInYears:0,
+    dob:"",
     sampleCollector: "",
     organisation: "",
     sampleCollectedAt: "",
@@ -54,6 +57,7 @@ export default function RegisterCustomer() {
   const [patientList, setPatientList] = useState([]);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [activeModal, setActiveModal] = useState(null);
+  const context = useContext(ActiveComponent);  
 
   const openModal = (modalType) => {
     setActiveModal(modalType);
@@ -67,6 +71,18 @@ export default function RegisterCustomer() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    if(name == 'dob'){
+    const age =  calculateAge(value)
+    setFormData((prev) => ({ ...prev, [name]: value,ageInMonths:age.months,
+      ageInDays:age.days,
+      ageInYears:age.years }));
+    return
+    }
+
+    if(name == 'designation'){
+      setFormData((prev) => ({ ...prev, [name]: value,gender: value == 'Mr' ? 'MALE' : 'FEMALE' }));
+      return
+      }
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
   const handleSearch = (event) => {
@@ -83,7 +99,7 @@ export default function RegisterCustomer() {
       addressLine1: "",
       addressLine2: "",
       addressLine3: "",
-      pincode: "",
+      pinCode: "",
       age: "",
       ageType: "Years", // Default to 'Years'
       sampleCollector: "",
@@ -93,6 +109,10 @@ export default function RegisterCustomer() {
       doctorHospitalName: "",
       degree: "",
       complements: "",
+      ageInMonths:0,
+      ageInDays:0,
+      ageInYears:0,
+      dob:"",
       searchQuery: formData.searchQuery, // Keep the search query for re-display or further use
     });
     specificApis
@@ -152,12 +172,36 @@ export default function RegisterCustomer() {
       addressLine1: patient.addressLine1,
       addressLine2: patient.addressLine2,
       addressLine3: patient.addressLine3,
-      pincode: patient.pincode,
-      age: patient.age, // Make sure the age is in the correct format or converted if needed
-      ageType: patient.ageType,
+      pinCode: patient.pinCode,
     });
     closeModal();
   };
+
+  function calculateAge(birthdate) {
+    const today = new Date();
+    const birthDate = new Date(birthdate);
+
+    let years = today.getFullYear() - birthDate.getFullYear();
+    let months = today.getMonth() - birthDate.getMonth();
+    let days = today.getDate() - birthDate.getDate();
+
+    if (days < 0) {
+        months--;
+        const prevMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+        days += prevMonth.getDate();
+    }
+
+    if (months < 0) {
+        years--;
+        months += 12;
+    }
+
+    return {
+        years: years,
+        months: months,
+        days: days
+    };
+}
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -184,6 +228,12 @@ export default function RegisterCustomer() {
         .registerPatient(fieldsToSend)
         .then((response) => {
           console.log("Patient registered, ID:", response.patientId);
+          if ('URLSearchParams' in window) {
+            const url = new URL(window.location)
+            url.searchParams.set("email",fieldsToSend.email)
+            history.pushState(null, '', url);
+          }
+          context.handleComponentChange('Create Booking')
           openNewBill(response.patientId, {
             ...formData,
             patientId: response.patientId,
@@ -279,7 +329,7 @@ export default function RegisterCustomer() {
               </div>
             </div>
             <div className="flex flex-col sm:flex-row sm:space-x-4">
-              <div className="w-full sm:w-1/3">
+              <div className="w-full sm:w-1/2">
                 <label className="block text-gray-700">Email ID</label>
                 <input
                   name="email"
@@ -289,27 +339,7 @@ export default function RegisterCustomer() {
                   onChange={handleInputChange}
                 />
               </div>
-              <div className="w-full sm:w-1/4">
-                <label className="block text-gray-700">Age</label>
-                <div className="flex items-center">
-                  <input
-                    name="age"
-                    type="number"
-                    className="border border-gray-300 rounded p-2 w-full text-gray-700"
-                    value={formData.age}
-                    onChange={handleInputChange}
-                  />
-                  <select
-                    name="ageType"
-                    className="border border-gray-300 rounded p-2 w-full text-gray-700 ml-2"
-                    value={formData.ageType}
-                    onChange={handleInputChange}
-                  >
-                    <option value="Years">Years</option>
-                    <option value="Months">Months</option>
-                  </select>
-                </div>
-              </div>
+             
               <div className="w-full sm:w-1/4">
                 <label className="block text-gray-700">Gender</label>
                 <select
@@ -319,13 +349,45 @@ export default function RegisterCustomer() {
                   onChange={handleInputChange}
                 >
                   <option value="">Select gender</option>
-                  <option value="Male">Male</option>
-                  <option value="Female">Female</option>
-                  <option value="Other">Other</option>
+                  <option value="MALE">Male</option>
+                  <option value="FEMALE">Female</option>
+                  <option value="OTHER">Other</option>
                 </select>
               </div>
             </div>
-
+            <div className="w-full">
+                <label className="block text-gray-700">Age</label>
+                <div className="flex items-center">
+                  <input
+                    name="dob"
+                    type="date"
+                    className="border border-gray-300 rounded p-2 w-full text-gray-700"
+                    value={formData.dob}
+                    onChange={handleInputChange}
+                  />
+                  <input
+                    name="ageInYears"
+                    type="number"
+                    className="border border-gray-300 rounded p-2 w-full text-gray-700"
+                    value={formData.ageInYears}
+                    onChange={handleInputChange}
+                  />
+                  <input
+                    name="ageInMonths"
+                    type="number"
+                    className="border border-gray-300 rounded p-2 w-full text-gray-700"
+                    value={formData.ageInMonths}
+                    onChange={handleInputChange}
+                  />
+                   <input
+                    name="ageInDays"
+                    type="number"
+                    className="border border-gray-300 rounded p-2 w-full text-gray-700"
+                    value={formData.ageInDays}
+                    onChange={handleInputChange}
+                  />
+                </div>
+              </div>  
             <div className="flex flex-col sm:flex-row sm:space-x-4 flex-wrap">
               <div className="w-full sm:w-1/4 mb-4">
                 <label className="block text-gray-700">Address Line 1</label>
@@ -357,9 +419,9 @@ export default function RegisterCustomer() {
               <div className="w-full sm:w-1/4 mb-4 margin-left-0">
                 <label className="block text-gray-700">Pincode</label>
                 <input
-                  name="pincode"
+                  name="pinCode"
                   className="border border-gray-300 rounded p-2 w-full text-gray-700"
-                  value={formData.pincode}
+                  value={formData.pinCode}
                   onChange={handleInputChange}
                 />
               </div>
