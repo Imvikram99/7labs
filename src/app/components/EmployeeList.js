@@ -1,11 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { specificApis } from '../data/SpecificApis'; // Import API handling class
 import AddEmployeeModal from './AddEmployeeModal';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faFileUpload } from '@fortawesome/free-solid-svg-icons';
+import FileUpload from './FileUpload/FileUpload';
+import { CustomModal } from './CustomModal';
 
 export default function EmployeeList() {
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [selectedCenter, setSelectedCenter] = useState({});
+  
 
   useEffect(() => {
     fetchEmployees();
@@ -25,6 +32,11 @@ export default function EmployeeList() {
       setLoading(false);
     }
   };
+
+  const handleDetailsModal = () => {
+    fetchEmployees();
+    setShowDetailsModal(prevState => !prevState);
+};
 
   const handleAddEmployee = async (newEmployee) => {
     try {
@@ -56,6 +68,7 @@ export default function EmployeeList() {
                 <th className="px-4 py-2 text-left text-gray-600">Address</th>
                 <th className="px-4 py-2 text-left text-gray-600">DOB/</th>
                 <th className="px-4 py-2 text-left text-gray-600">Joining Date/</th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody>
@@ -69,7 +82,14 @@ export default function EmployeeList() {
                     {employee.addressLine1}, {employee.addressLine2 ? `${employee.addressLine2}, ` : ''}{employee.addressLine3 ? `${employee.addressBuffer3}, ` : ''}{employee.pincode}
                   </td>
                   <td className="border px-4 py-2">{employee.dob}</td>
-                  <td className="border px-4 py-2"> {employee.joiningDate }</td>
+                  <td className="border px-4 py-2"> {employee.joiningDate}</td>
+                  <td>
+                    <FontAwesomeIcon className="f-aw-upload me-1" icon={faFileUpload}
+                      onClick={() => {
+                        handleDetailsModal();
+                        setSelectedCenter(employee)
+                      }} />
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -78,6 +98,15 @@ export default function EmployeeList() {
           <div>No employees found. Please add some employees.</div>
         )}
       </div>
+      {
+                showDetailsModal && (
+                    <CustomModal showModal={showDetailsModal} handleClose={handleDetailsModal}>
+                        <h2 className="text-xl font-bold text-gray-700 mb-4">Lab Center Profile</h2>
+                        <hr/>
+                        <FileUpload center={selectedCenter} apiFunction={'addEmployeeSignature'} type={'employee'}/>
+                    </CustomModal>
+                )
+            }
     </main>
   );
 }

@@ -14,7 +14,10 @@ export const TestComponent = ({data}) => {
     const [selectedTests, setSelectedTests] = useState([]);
     const [reportType, setReportType] = useState(null);
     const [showEditReportModal, setShowEditReportModal] = useState(false);
-    const [centers, setCenters] = useState({});
+    const [centers, setCenters] = useState([]);
+    const [employees, setEmployees] = useState([]);
+    const [selectedEmployees, setselectedEmployees] = useState({});
+    const [imagePreviewUrl, setImagePreviewUrl] = useState('/logoreport1.png');
 
     const [inputValues, setInputValues] = useState({});
     const [ultraInputValues, setUltraInputValues] = useState({});
@@ -32,6 +35,7 @@ export const TestComponent = ({data}) => {
     };
     useEffect(()=>{
         fetchCenters()
+        fetchEmployees()
     },[])
 
     async function fetchCenters() {
@@ -45,6 +49,35 @@ export const TestComponent = ({data}) => {
             console.error('Failed to fetch center information:', error);
         }
     }
+
+    async function getImgUrl(id){
+        if(id == undefined){
+            setImagePreviewUrl("/logoreport1.png")
+            return 
+        }
+        const response = await specificApis.downloadFile(id);
+        const url  = URL.createObjectURL(response);
+        setImagePreviewUrl(url)
+    }
+
+    function setEmployeesData(id){
+      const find = (employees || []).find((a)=> a.empId == id)
+      setselectedEmployees(find ?? {})
+      getImgUrl(find?.signatureUrl)
+    }
+
+    const fetchEmployees = async () => {
+        try {
+          const fetchedEmployees = await specificApis.fetchEmployeeList();
+          if (Array.isArray(fetchedEmployees)) {
+            setEmployees(fetchedEmployees);
+          } else {
+            setEmployees([]);
+          }
+        } catch (error) {
+          console.error('Failed to fetch employees:', error);
+        }
+      };
 
     const handleUltraInputChange = (e, testReportId, field) => {
         const {value} = e.target;
@@ -172,13 +205,21 @@ export const TestComponent = ({data}) => {
                     <tr>
                         <td className="capitalize">{testMaster.testMasterName}</td>
                         {Object.entries(testMaster.testReport)
-                            .filter(([key, _]) => key === "investigation" || key === 'value' || key === 'unit' || key === 'minReferenceValue' || key === 'maxReferenceValue')
+                            .filter(([key, _]) => key === "investigation" || key == 'isRatio' || key === 'value' || key === 'unit' || key === 'minReferenceValue' || key === 'maxReferenceValue')
                             .map(([key, value]) => {
 
                                 return (
                                     <td key={key}>
+                                        {key == 'value' && testMaster.testReport?.isRatio ? (
+                                            <>
+                                             {(value - testMaster.testReport.minReferenceValue) / (testMaster.testReport.maxReferenceValue - testMaster.testReport.minReferenceValue)}
+                                            </>
+                                        ) : (
+                                            <>
                                         {key === 'investigation' ? <span
                                             className="capitalize">{value}</span> : key === 'testReportDate' ? formatDate(value) : value}
+                                            </>
+                                        ) }
                                     </td>
                                 );
                             })
@@ -336,7 +377,7 @@ export const TestComponent = ({data}) => {
             payload = updatedTestsData[0].testPanelReport;
 
         }
-
+        payload.verifiedByEmpId = selectedEmployees.empId ? [selectedEmployees.empId] : payload.verifiedByEmpId
         specificApis.updateTestResult(data.bookingSlip.receiptId, selectedTests[0].id, payload)
             .then(response => {
                 setSelectedTests(updatedTestsData);
@@ -563,12 +604,25 @@ export const TestComponent = ({data}) => {
                                 view
                                 report</p>
                     }
-
+                      <div className="flex justify-end">
+                    <div  className="max-w-40">
+                    <label>Verified By</label>
+                   <select onChange={(e)=> setEmployeesData(e.target.value)}>
+                        <option>Select Value</option>
+                        {(employees || []).map((a,i)=>{
+                            return  <option key={i} value={a.empId}>{a.firstName} {a.lastName}</option>
+                        })}
+                    </select>
+                    </div>
+                   </div> 
                     <div className="signature-part">
                         <p>Digitally signed by</p>
-                        <p><strong>Dr. Alfaz Uddin</strong></p>
-                        <p>GNU Public Key</p>
+                        <p><strong>{selectedEmployees.firstName} {selectedEmployees.lastName}</strong></p>
+                        <p>{selectedEmployees.designation}</p>
                         <p>&nbsp;</p>
+                        <div className="a-right">
+                            <img style={{width: "100px"}} src={imagePreviewUrl} alt="logo"/>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -132,6 +132,23 @@ class SpecificApis {
     }
   }
 
+  async addEmployeeSignature(file,employeeId) {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      const response = await apiService.putData(`api/v1/lab/employees/signature/upload?empId=${encodeURIComponent(employeeId)}`,formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      }
+    );
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching center information:', error);
+      throw error;
+    }
+  }
+
   async addReportToPatient(patientId, date, report) {
     try {
         const url = `api/v1/lab/upload/${encodeURIComponent(patientId)}/report/upload?date=${encodeURIComponent(date)}`;
