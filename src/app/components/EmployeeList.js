@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFileUpload } from '@fortawesome/free-solid-svg-icons';
 import FileUpload from './FileUpload/FileUpload';
 import { CustomModal } from './CustomModal';
+import toast from "react-hot-toast";
 
 export default function EmployeeList() {
   const [employees, setEmployees] = useState([]);
@@ -40,9 +41,11 @@ export default function EmployeeList() {
 
   const handleAddEmployee = async (newEmployee) => {
     try {
-      await specificApis.addEmployee(newEmployee);
-      fetchEmployees();
-      setModalOpen(false);
+      await specificApis.addEmployee(newEmployee).then(()=>{
+        toast.success('Employee Added successfully.')
+        fetchEmployees();
+        setModalOpen(false);
+      })
     } catch (error) {
       console.error('Error adding employee:', error);
     }
