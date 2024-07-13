@@ -10,9 +10,13 @@ import AddReferenceValues from "@/app/components/AddReferenceValues"
 import Select from "react-select";
 import toast from 'react-hot-toast';
 import AddNewPossibleValueModal from './OrganizationListContents/AddNewPossibleValueModal';
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faCancel, faCheck, faEdit, faL, faList} from "@fortawesome/free-solid-svg-icons";
 
-const AddTestPanel = () => {
-    const { register, control, watch, handleSubmit, setValue } = useForm();
+const AddTestPanel = ({isEdit,data,onClose}) => {
+    const { register, control, watch, handleSubmit, setValue } = useForm({
+        defaultValues: data ?? {}
+      });
     const { fields: testFields, append: appendTest, remove: removeTest , update } = useFieldArray({ control, name: 'tests' });
 
     const [testCategories, setTestCategories] = useState([]);
@@ -69,7 +73,7 @@ const AddTestPanel = () => {
 
 
     const onSubmit = data => {
-        const matrixColumns = data.matrixTestReportTemplate ? data.matrixTestReportTemplate.columns.reduce((acc, column) => {
+        const matrixColumns = data.matrixTestReportTemplate ? (data.matrixTestReportTemplate.columns || []).reduce((acc, column) => {
             const inputKey = column.inputKey;
             const inputComment = column.inputComment;
             const inputName = column.inputName;
@@ -81,7 +85,7 @@ const AddTestPanel = () => {
             return acc;
         }, {}) : {};
 
-        const columnStyles = data.matrixTestReportTemplate ? data.matrixTestReportTemplate.columns.reduce((acc, style) => {
+        const columnStyles = data.matrixTestReportTemplate ? (data.matrixTestReportTemplate.columns || []).reduce((acc, style) => {
             const styleName = style.inputName;
             acc[styleName] = {
                 width: style.width,
@@ -161,9 +165,10 @@ const AddTestPanel = () => {
             delete data.matrixTestReportTemplate
         }
 
-        specificApis.addTestPanel({ ...data })
+        specificApis[isEdit ? 'updateTestPanel' : 'addTestPanel']({ ...data },isEdit)
             .then(response => {
                 toast.success('Successfully Added Organizer List')
+                onClose()
             })
             .catch(error => {
                 if (error.response.data.error === "DuplicateKeyException") {
@@ -178,7 +183,7 @@ const AddTestPanel = () => {
     const fieldProps = { watch, control, register };
     return (
         <main className="flex flex-col items-center bg-gray-100 w-full">
-            <div className="bg-white shadow-md rounded px-8 py-8 my-4 w-full max-w-7xl">
+            <div className="bg-white rounded px-8 py-8 my-4 w-full max-w-7xl">
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                     <div className="grid grid-cols-3 gap-4">
                         <div>
@@ -202,14 +207,20 @@ const AddTestPanel = () => {
                                 Test Category
                             </label>
                             <div className='flex'>
+                            <Controller
+                                        name={`testCategory.name`}
+                                        control={control}
+                                        render={({field: {onChange, value}}) => (
                                 <select
-                                    {...register('testCategory.name')} required={true}
+                                   required={true} value={value} onChange={onChange}
                                     className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md border">
                                     <option value={""}>Select Category</option>
                                     {testCategories.map((category, index) => (
                                         <option key={category.name + index} value={category.name}>{category.name}</option>
                                     ))}
                                 </select>
+                                 )}
+                                 />
                                 <button
                                     type="button"
                                     className="bg-green-500 text-white p-2 rounded ml-2"
@@ -444,10 +455,15 @@ const AddTestPanel = () => {
                     {testResultType === 'MATRIX' && (
                         <MatrixTemplate register={register} control={control} />
                     )}
+                    <div className='flex justify-end'>
+                    <button type="button" onClick={()=>onClose()}
+                        className="inline-flex mr-2 items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-pink-600 hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500">Cancel
+                    </button>
                     <button type="submit"
-                        className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Add
+                        className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">{isEdit ? 'Save ' : 'Add '}
                         Test Panel
                     </button>
+                    </div>
                 </form>
             </div>
             {open.show && (
@@ -581,4 +597,97 @@ const MatrixTemplate = ({ register, control }) => {
     );
 };
 
-export default AddTestPanel;
+
+function TestPanelItem() {
+    const [tests, setTests] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [addModalOpen, setAddModalOpen] = useState(false);
+    const [editTestId, setEditTestId] = useState(false);
+    const [editFormData, setEditFormData] = useState({});
+
+    useEffect(() => {
+        fetchTests();
+    }, []);
+
+    async function fetchTests() {
+        try {
+            const fetchedTests = await specificApis.getTestPanel();
+            setTests(fetchedTests);
+            setLoading(false);
+        } catch (error) {
+            console.error('Failed to fetch tests:', error);
+            setLoading(false);
+        }
+    }
+
+    const openAddModal = () => {
+        setAddModalOpen(true);
+    };
+
+    const handleEditClick = (test) => {
+        setEditTestId(test.testPanelId);
+        setEditFormData(test);
+        openAddModal()
+    };
+
+    const handleCancel = () => {
+        setAddModalOpen(false)
+        setEditTestId(false);
+        setEditFormData({});
+        fetchTests()
+    };
+
+    return (
+        <div className="max-w-7xl mx-auto">
+            <h6 className="uppercase font-extrabold text-xl text-white"><FontAwesomeIcon icon={faList}/> | Test List
+            </h6>
+            <hr/>
+            <div className="card">
+                {addModalOpen ? (
+                    <AddTestPanel onClose={() => handleCancel()} data={editFormData} isEdit={editTestId}/>
+                ) : (
+                    <div className="card-body">
+                        <button onClick={openAddModal}
+                                className="mb-4 bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded float-end">Add
+                            Test Panel
+                        </button>
+                        {loading ? (
+                            <div>Loading...</div>
+                        ) : (
+                            <table className="table-auto w-full">
+                                <thead>
+                                <tr>
+                                    <th>Test Name</th>
+                                    <th>Instrument</th>
+                                    <th>Method</th>
+                                    <th>Code</th>
+                                    <th>Cost</th>
+                                    <th>Actions</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {tests.map((test) => (
+                                    <tr key={test.id}>
+                                                <td>{test.name}</td>
+                                                <td>{test.instrument}</td>
+                                                <td>{test.method}</td>
+                                                <td>{test.testPanelCode}</td>
+                                                <td>{test.cost}</td>
+                                                <td>
+                                                    <FontAwesomeIcon className="f-aw-edit me-1" icon={faEdit}
+                                                                     onClick={() => handleEditClick(test)}/>
+                                                </td>
+                                       
+                                    </tr>
+                                ))}
+                                </tbody>
+                            </table>
+                        )}
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+}
+
+export default TestPanelItem;

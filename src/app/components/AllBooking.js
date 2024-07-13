@@ -9,6 +9,7 @@ import {formatDate} from "@/helper/globalFunctions";
 import {CustomModal} from "@/app/components/CustomModal";
 import html2canvas from "html2canvas";
 import toast from "react-hot-toast";
+import Booking from "./Booking";
 
 export const TestComponent = ({data}) => {
     const [selectedTests, setSelectedTests] = useState([]);
@@ -396,7 +397,7 @@ export const TestComponent = ({data}) => {
                         <td className="capitalize">{testMaster.testMasterName}</td>
                         {Object.entries(testMaster.testReport).filter(([key, _]) => key === "investigation" || key === "value").map(([key, value]) => (
                             <td key={key}>{key === 'value' ?
-                                <input type="text" value={inputValues[testMaster.testReport.testReportId] || value}
+                                <input type="text" value={inputValues[testMaster.testReport.testReportId] ?? value}
                                        onChange={(e) => handleInputChange(e, testMaster.testReport.testReportId)}/> : value}</td>))}
                     </tr>
                 )}
@@ -418,17 +419,28 @@ export const TestComponent = ({data}) => {
     return (
         <div className="report-modal-container">
             <div className="report-modal-header">
-                <div className="flex justify-center items-center">
+                <div className="grid grid-cols-2 gap-3">
+                    <div className="w-full">
                     <label className="block text-sm flex-grow whitespace-nowrap mr-2">Select a Test</label>
                     <select name="test-dropdown" id="test-dropdown" className="flex-grow"
                             onChange={(e) => filterTestById(e.target.value)}>
                         <option value="">--- Select a Test ---</option>
                         {
-                            data.bookingSlip.tests.map((test) =>
+                            (data.bookingSlip.tests || []).map((test) =>
                                 <option key={test.id} value={test.id}>{test.name}</option>
                             )
                         }
                     </select>
+                    </div>
+                    <div  className="w-full">
+                    <label className="block text-sm flex-grow whitespace-nowrap mr-2">Verified By</label>
+                   <select onChange={(e)=> setEmployeesData(e.target.value)}>
+                        <option>Select Value</option>
+                        {(employees || []).map((a,i)=>{
+                            return  <option key={i} value={a.empId}>{a.firstName} {a.lastName}</option>
+                        })}
+                    </select>
+                    </div>
                 </div>
                 <hr/>
                 {
@@ -604,21 +616,10 @@ export const TestComponent = ({data}) => {
                                 view
                                 report</p>
                     }
-                      <div className="flex justify-end">
-                    <div  className="max-w-40">
-                    <label>Verified By</label>
-                   <select onChange={(e)=> setEmployeesData(e.target.value)}>
-                        <option>Select Value</option>
-                        {(employees || []).map((a,i)=>{
-                            return  <option key={i} value={a.empId}>{a.firstName} {a.lastName}</option>
-                        })}
-                    </select>
-                    </div>
-                   </div> 
                     <div className="signature-part">
                         <p>Digitally signed by</p>
-                        <p><strong>{selectedEmployees.firstName} {selectedEmployees.lastName}</strong></p>
-                        <p>{selectedEmployees.designation}</p>
+                        <p><strong>{selectedEmployees?.firstName} {selectedEmployees?.lastName}</strong></p>
+                        <p>{selectedEmployees?.designation}</p>
                         <p>&nbsp;</p>
                         <div className="a-right">
                             <img style={{width: "100px"}} src={imagePreviewUrl} alt="logo"/>
@@ -635,9 +636,14 @@ const AllBooking = () => {
     const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
     const [showModal, setShowModal] = useState(false);
     const [selectedBooking, setSelectedBooking] = useState(null);
+    const [editBooking,setEditBooking] = useState(false)
 
 
     useEffect(() => {
+        getBooking()
+    }, [date]);
+
+    function getBooking(){
         specificApis.getBookings(date, "")
             .then(response => {
                 setBookings(response);
@@ -645,7 +651,7 @@ const AllBooking = () => {
             .catch(error => {
                 console.error('Failed to fetch bookings:', error);
             });
-    }, [date]);
+    }
 
     const handleOpenModal = (booking) => {
         setSelectedBooking(booking)
@@ -657,7 +663,15 @@ const AllBooking = () => {
         setSelectedBooking(null);
     };
 
+    function onClose(){
+        setEditBooking(false)
+        setSelectedBooking(null)
+        getBooking()
+    }
+
     return (
+        <>
+        {editBooking ?  <Booking isEdit={true} data={selectedBooking} onClose={onClose}/> : (
         <div className="max-w-7xl mx-auto">
             <h6 className="uppercase font-extrabold text-xl"><FontAwesomeIcon icon={faRestroom}/> | ALL
                 Bookings</h6>
@@ -677,10 +691,17 @@ const AllBooking = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {bookings.map((booking) => (
                         <div key={booking.id} className="card overflow-hidden shadow rounded-lg">
-                            <div className="card-body">
+                            <div className="card-body flex justify-between">
                                 <h2 className="text-lg card-title font-bold">
                                     {booking.patientDetails.firstName} {booking.patientDetails.lastName}
                                 </h2>
+                                <span>
+                                <FontAwesomeIcon className="f-aw-edit me-1" icon={faEdit}
+                                                                         onClick={() => {
+                                                                            setEditBooking(booking.bookingSlip.receiptId)
+                                                                            setSelectedBooking(booking)
+                                                                        }}/>
+                                </span>
                             </div>
                             <div className="card-body-out">
                                 <p className="mt-1 max-w-2xl text-sm">
@@ -711,6 +732,8 @@ const AllBooking = () => {
                 {selectedBooking && <TestComponent data={selectedBooking}/>}
             </CustomModal>
         </div>
+        )}
+        </>
     );
 };
 

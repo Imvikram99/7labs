@@ -6,8 +6,10 @@ import AddSubTests from '@/app/components/AddSubTests'
 import { specificApis } from '../data/SpecificApis';
 import AddNewPossibleValueModal from './OrganizationListContents/AddNewPossibleValueModal';
 
-function AddTestModal({ onClose, onSave }) {
-  const { register, control, watch, handleSubmit,reset } = useForm();
+function AddTestModal({ onClose, onSave,data,isEdit }) {
+  const { register, control, watch, handleSubmit,reset } = useForm({
+    defaultValues: data ?? {}
+  });
   const [testUnits, setTestUnits] = useState([]);
 
   useEffect(()=>{
@@ -46,7 +48,7 @@ function AddTestModal({ onClose, onSave }) {
   return (
     <div className="bg-opacity-50 flex justify-center items-center">
       <div className="bg-white p-5 rounded-lg shadow-lg w-full">
-        <h2 className="text-xl font-bold text-gray-700 mb-4">Add New Test</h2>
+        <h2 className="text-xl font-bold text-gray-700 mb-4"> {isEdit ? 'Edit' : 'Add New'} Test</h2>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="mb-3">
             <label className="block text-green-700 text-sm font-bold mb-2">Test Name:</label>

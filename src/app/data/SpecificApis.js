@@ -226,12 +226,52 @@ class SpecificApis {
     }
   }
 
+  async updateBooking(updateBooking) {
+    try {
+      const response = await apiService.putData(`api/v1/lab/bookings/${updateBooking.bookingSlip.receiptId}`, updateBooking);
+      return response.data;
+    } catch (error) {
+              console.error('Error creating booking:', error);
+      throw error;
+    }
+  }
+
+  async getTestPanel() {
+    try {
+      const response = await apiService.fetchData('api/v1/lab/testpanel');
+      return response.data;
+    } catch (error) {
+              console.error('Error creating booking:', error);
+      throw error;
+    }
+  }
+
+  async updateTestPanel(updateTestPanel,id) {
+    try {
+      const response = await apiService.putData(`api/v1/lab/testpanel?testPanelId=${id}`, updateTestPanel);
+      return response.data;
+    } catch (error) {
+              console.error('Error creating booking:', error);
+      throw error;
+    }
+  }
+
   async updateTestResult(receiptId, testId, updatedTestReport) {
     try {
       const response = await apiService.putData(`api/v1/lab/bookings/${receiptId}/tests/${testId}`, updatedTestReport);
       return response.data;
     } catch (error) {
       console.error('Error updating test result:', error);
+      throw error;
+    }
+  }
+
+  async updateTest(updatedTest){
+    try {
+      const response = await apiService.putData(`api/v1/lab/labtest?id=${updatedTest.id}`, updatedTest);
+      return response.data;
+    } catch (error) {
+      console.error('Error updating test:', error);
       throw error;
     }
   }

@@ -104,14 +104,20 @@ const SingleReferenceValues = (props) => {
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700">Reference Value</label>
+                        <Controller
+                                        name={`${name}.singleReferenceValues.referenceValue`}
+                                        control={control}
+                                        render={({field: {onChange, value}}) => (
                         <select
-                            {...register(`${name}.singleReferenceValues.referenceValue`)} required={true}
+                             required={true} value={value} onChange={onChange}
                             className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md border">
                             <option value={""}>Select Category</option>
-                            {possibleValues.map((category, index) => (
-                                <option key={category.label + index} value={category.value}>{category.label}</option>
-                            ))}
+                            {possibleValues.map((category, index) => {
+                               return <option key={category.label + index} value={category.value}>{category.label}</option>
+                            })}
                         </select>
+                         )}
+                         />
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700">Unit</label>

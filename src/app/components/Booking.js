@@ -7,7 +7,7 @@ import { CustomModal } from "./CustomModal";
 import { TestComponent } from "./AllBooking";
 import { ActiveComponent } from "./SidebarWithHeader";
 
-const Booking = () => {
+const Booking = ({isEdit,data,onClose}) => {
     const initialTest = {
         // id: "",
         name: "",
@@ -27,7 +27,9 @@ const Booking = () => {
 
     useEffect(()=>{
         fetchCenters();
-        handleSearch()
+        if(isEdit){
+            setFormData(data)  
+        }
     },[])
 
     async function fetchCenters() {
@@ -54,15 +56,8 @@ const Booking = () => {
         event?.preventDefault();
         // let url;
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const myParam = urlParams.get('email');
-
-        if(myParam == undefined && searchQuery == ""){
-            return
-        }
-
         let searchQueryType;
-        if (/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/.test(myParam ?? searchQuery)) {
+        if (/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/.test(searchQuery)) {
             searchQueryType = "email";
         } else if (/^\d+$/.test(searchQuery)) {
             searchQueryType = "mobile";
@@ -72,7 +67,7 @@ const Booking = () => {
         }
 
         const url = `http://ec2-13-233-207-62.ap-south-1.compute.amazonaws.com:8080/api/v1/lab/patient?searchQuery=${encodeURIComponent(
-            myParam ??  searchQuery
+           searchQuery
         )}&searchQueryType=${encodeURIComponent(searchQueryType)}`;
         const response = await fetch(url, {
             method: "GET",
@@ -263,7 +258,7 @@ const Booking = () => {
             const result = await response.json();
             setPdfData(result);
             console.log(result);
-        } else {
+        } else if(!isEdit) {
             const response = await fetch(
                 "http://ec2-13-233-207-62.ap-south-1.compute.amazonaws.com:8080/api/v1/lab/bookings",
                 {
@@ -282,6 +277,14 @@ const Booking = () => {
            }
             setPdfData(result);
             console.log(result);
+        }else{
+           await specificApis.updateBooking(formData)
+            .then(response => {
+                onClose()
+            })
+            .catch(error => {
+                console.error('Failed to Update bookings:', error);
+            });
         }
     };
 
@@ -691,6 +694,7 @@ const Booking = () => {
                                 <select
                                     name="name"
                                     value={test.name}
+                                    required
                                     //   onChange={(e) => handleChange(e, index)}
                                     onChange={(e) => handleChange(e, index)}
                                     // onChange={(e)=>{
@@ -718,6 +722,7 @@ const Booking = () => {
                                     type="text"
                                     name={`name`}
                                     value={test.name}
+                                    disabled
                                     onChange={(e) => handleChange(e, index)}
                                     className="w-full"
                                 />
@@ -733,6 +738,7 @@ const Booking = () => {
                                     type="text"
                                     name={`barCode`}
                                     value={test.barCode}
+                                    required
                                     onChange={(e) => handleChange(e, index)}
                                     className="w-full"
                                 />
@@ -747,6 +753,7 @@ const Booking = () => {
                                 <input
                                     type="number"
                                     name={`cost`}
+                                    required
                                     value={test.cost}
                                     onChange={(e) => handleChange(e, index)}
                                     className="w-full"
@@ -763,6 +770,7 @@ const Booking = () => {
                                     type="text"
                                     name={`code`}
                                     value={test.code}
+                                    required
                                     onChange={(e) => handleChange(e, index)}
                                     className="w-full"
                                 />
@@ -805,6 +813,7 @@ const Booking = () => {
                             <input
                                 type="text"
                                 name="bookingSlip.referralDoctorId"
+                                required
                                 value={formData.bookingSlip.referralSourceId}
                                 onChange={(e) =>
                                     setFormData((prevData) => ({
@@ -829,6 +838,7 @@ const Booking = () => {
                                 type="text"
                                 name="bookingSlip.paymentMode"
                                 value={formData.bookingSlip.paymentMode}
+                                required
                                 onChange={(e) =>
                                     setFormData((prevData) => ({
                                         ...prevData,
@@ -852,6 +862,7 @@ const Booking = () => {
                                 type="number"
                                 name="bookingSlip.net"
                                 value={getTestTotal()}
+                                required
                                 onChange={(e) =>
                                     setFormData((prevData) => ({
                                         ...prevData,
@@ -875,6 +886,7 @@ const Booking = () => {
                                 type="number"
                                 name="bookingSlip.paid"
                                 value={formData.bookingSlip.paid}
+                                required
                                 onChange={(e) =>
                                     setFormData((prevData) => ({
                                         ...prevData,
@@ -898,6 +910,7 @@ const Booking = () => {
                                 type="number"
                                 name="bookingSlip.balance"
                                 value={getTestTotal() - formData.bookingSlip.paid}
+                                required
                                 onChange={(e) =>
                                     setFormData((prevData) => ({
                                         ...prevData,
@@ -921,6 +934,7 @@ const Booking = () => {
                                 type="text"
                                 name="bookingSlip.sampleBy"
                                 value={formData.bookingSlip.sampleBy}
+                                required
                                 onChange={(e) =>
                                     setFormData((prevData) => ({
                                         ...prevData,
@@ -944,6 +958,7 @@ const Booking = () => {
                                 type="text"
                                 name="bookingSlip.billedBy"
                                 value={formData.bookingSlip.billedBy}
+                                required
                                 onChange={(e) =>
                                     setFormData((prevData) => ({
                                         ...prevData,
@@ -967,6 +982,7 @@ const Booking = () => {
                                 type="date"
                                 name="bookingSlip.date"
                                 value={formData.bookingSlip.date}
+                                required
                                 onChange={(e) =>
                                     setFormData((prevData) => ({
                                         ...prevData,
@@ -990,6 +1006,7 @@ const Booking = () => {
                                 type="time"
                                 name="bookingSlip.time"
                                 value={formData.bookingSlip.time}
+                                required
                                 onChange={(e) =>
                                     setFormData((prevData) => ({
                                         ...prevData,
@@ -1012,6 +1029,7 @@ const Booking = () => {
                             <select
                                 name="bookingSlip.centerCode"
                                 value={formData.bookingSlip.centerCode}
+                                required
                                 onChange={(e) =>
                                     setFormData((prevData) => ({
                                         ...prevData,
@@ -1033,10 +1051,18 @@ const Booking = () => {
                 </div>
 
                 {/* Submit Button */}
-                <div className="mt-4">
+                <div className="mt-4 flex justify-end">
+                     {isEdit && (
+                        <button
+                        type="button" onClick={()=>onClose()}
+                        className=" py-2 bg-pink-500 mr-1 hover:bg-pink-600 text-white px-4 rounded-lg"
+                    >
+                        Cancel
+                    </button>
+                     )}
                     <button
                         type="submit"
-                        className="w-full py-2 bg-blue-500 hover:bg-blue-600 text-white px-4 rounded-lg"
+                        className=" py-2 bg-blue-500 ms-1 hover:bg-blue-600 text-white px-4 rounded-lg"
                     >
                         Submit
                     </button>
