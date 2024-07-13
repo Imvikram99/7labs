@@ -53,13 +53,17 @@ export default function EmployeeList() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-gray-100 w-full">
-      <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 w-full max-w-4xl">
-        <button className="mb-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={() => setModalOpen(true)}>
-          Add Employee
-        </button>
-        <AddEmployeeModal isOpen={modalOpen} onClose={() => setModalOpen(false)} onSave={handleAddEmployee} />
+      <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 w-full">
+        <div className="flex justify-end">
+          <button
+              className="mb-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+              onClick={() => setModalOpen(true)}>
+            Add Employee
+          </button>
+        </div>
+        <AddEmployeeModal isOpen={modalOpen} onClose={() => setModalOpen(false)} onSave={handleAddEmployee}/>
         {loading ? (
-          <div>Loading...</div>
+            <div>Loading...</div>
         ) : employees.length > 0 ? (
           <table className="table-auto w-full">
             <thead>
