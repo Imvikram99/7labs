@@ -5,13 +5,14 @@ import {faFileUpload} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 
-const FileUpload = ({center}) => {
+const FileUpload = ({center,apiFunction,type}) => {
     const [imagePreviewUrl, setImagePreviewUrl] = useState('');
     const [isLoadingImage, setIsLoadingImage] = useState(false);
 
     useEffect(() => {
-        if (center.letterHeadUrl) {
-            downloadFile(center.letterHeadUrl);
+        const key =  type == "employee" ? 'signatureUrl' :'letterHeadUrl'
+        if (center[key]) {
+            downloadFile(center[key]);
         }
     }, [center]);
 
@@ -23,15 +24,27 @@ const FileUpload = ({center}) => {
         }
     }
 
+    async function fetchedEmployees() {
+        try {
+            return await specificApis.fetchEmployeeList()
+        } catch (error) {
+            console.error('Failed to fetch center information:', error);
+        }
+    }
+
     const handleFileChange = async (e) => {
         const selectedFile = e.target.files[0];
         if (selectedFile && selectedFile.size < 3 * 1024 * 1024) {
             try {
                 if (confirm('Are you sure you want to upload this file?')) {
-                    await specificApis.addLetterHeadToCenter(selectedFile, center.id);
-                    const centers = await fetchCenters();
-                    const findNewLetterHeadUrl = await centers.find(item => item.id === center.id);
-                    await downloadFile(findNewLetterHeadUrl['letterHeadUrl']);
+                    console.log(center);
+                    const key = type == "employee" ? 'empId' : 'id'
+                    await specificApis[apiFunction ?? 'addLetterHeadToCenter'](selectedFile, center[key]);
+                    const centers =  type == "employee" ? await fetchedEmployees() : await fetchCenters();
+                    console.log(centers);
+                    const findNewLetterHeadUrl = await centers.find(item => item[key] === center[key]);
+                    console.log(findNewLetterHeadUrl);
+                    await downloadFile(findNewLetterHeadUrl[ type == "employee" ? 'signatureUrl' : 'letterHeadUrl']);
                 }
             } catch (error) {
                 console.error('Error uploading file:', error);
@@ -42,6 +55,7 @@ const FileUpload = ({center}) => {
     };
 
     const downloadFile = async (fileId) => {
+        console.log(fileId);
         setIsLoadingImage(true);
         try {
             const response = await specificApis.downloadFile(fileId);

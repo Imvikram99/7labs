@@ -9,11 +9,16 @@ import {formatDate} from "@/helper/globalFunctions";
 import {CustomModal} from "@/app/components/CustomModal";
 import html2canvas from "html2canvas";
 import toast from "react-hot-toast";
+import Booking from "./Booking";
 
-const TestComponent = ({data}) => {
+export const TestComponent = ({data}) => {
     const [selectedTests, setSelectedTests] = useState([]);
     const [reportType, setReportType] = useState(null);
     const [showEditReportModal, setShowEditReportModal] = useState(false);
+    const [centers, setCenters] = useState([]);
+    const [employees, setEmployees] = useState([]);
+    const [selectedEmployees, setselectedEmployees] = useState({});
+    const [imagePreviewUrl, setImagePreviewUrl] = useState('/logoreport1.png');
 
     const [inputValues, setInputValues] = useState({});
     const [ultraInputValues, setUltraInputValues] = useState({});
@@ -29,6 +34,51 @@ const TestComponent = ({data}) => {
             [testReportId]: e.target.value
         });
     };
+    useEffect(()=>{
+        fetchCenters()
+        fetchEmployees()
+    },[])
+
+    async function fetchCenters() {
+        try {
+            const fetchedCenters = await specificApis.fetchCenters();
+            const find = fetchedCenters.find((e)=>e.id == data.bookingSlip.centerCode)
+            if(find){
+                setCenters(find);
+            }
+        } catch (error) {
+            console.error('Failed to fetch center information:', error);
+        }
+    }
+
+    async function getImgUrl(id){
+        if(id == undefined){
+            setImagePreviewUrl("/logoreport1.png")
+            return 
+        }
+        const response = await specificApis.downloadFile(id);
+        const url  = URL.createObjectURL(response);
+        setImagePreviewUrl(url)
+    }
+
+    function setEmployeesData(id){
+      const find = (employees || []).find((a)=> a.empId == id)
+      setselectedEmployees(find ?? {})
+      getImgUrl(find?.signatureUrl)
+    }
+
+    const fetchEmployees = async () => {
+        try {
+          const fetchedEmployees = await specificApis.fetchEmployeeList();
+          if (Array.isArray(fetchedEmployees)) {
+            setEmployees(fetchedEmployees);
+          } else {
+            setEmployees([]);
+          }
+        } catch (error) {
+          console.error('Failed to fetch employees:', error);
+        }
+      };
 
     const handleUltraInputChange = (e, testReportId, field) => {
         const {value} = e.target;
@@ -156,13 +206,21 @@ const TestComponent = ({data}) => {
                     <tr>
                         <td className="capitalize">{testMaster.testMasterName}</td>
                         {Object.entries(testMaster.testReport)
-                            .filter(([key, _]) => key === "investigation" || key === 'value' || key === 'unit' || key === 'minReferenceValue' || key === 'maxReferenceValue')
+                            .filter(([key, _]) => key === "investigation" || key == 'isRatio' || key === 'value' || key === 'unit' || key === 'minReferenceValue' || key === 'maxReferenceValue')
                             .map(([key, value]) => {
 
                                 return (
                                     <td key={key}>
+                                        {key == 'value' && testMaster.testReport?.isRatio ? (
+                                            <>
+                                             {(value - testMaster.testReport.minReferenceValue) / (testMaster.testReport.maxReferenceValue - testMaster.testReport.minReferenceValue)}
+                                            </>
+                                        ) : (
+                                            <>
                                         {key === 'investigation' ? <span
                                             className="capitalize">{value}</span> : key === 'testReportDate' ? formatDate(value) : value}
+                                            </>
+                                        ) }
                                     </td>
                                 );
                             })
@@ -320,7 +378,7 @@ const TestComponent = ({data}) => {
             payload = updatedTestsData[0].testPanelReport;
 
         }
-
+        payload.verifiedByEmpId = selectedEmployees.empId ? [selectedEmployees.empId] : payload.verifiedByEmpId
         specificApis.updateTestResult(data.bookingSlip.receiptId, selectedTests[0].id, payload)
             .then(response => {
                 setSelectedTests(updatedTestsData);
@@ -339,7 +397,7 @@ const TestComponent = ({data}) => {
                         <td className="capitalize">{testMaster.testMasterName}</td>
                         {Object.entries(testMaster.testReport).filter(([key, _]) => key === "investigation" || key === "value").map(([key, value]) => (
                             <td key={key}>{key === 'value' ?
-                                <input type="text" value={inputValues[testMaster.testReport.testReportId] || value}
+                                <input type="text" value={inputValues[testMaster.testReport.testReportId] ?? value}
                                        onChange={(e) => handleInputChange(e, testMaster.testReport.testReportId)}/> : value}</td>))}
                     </tr>
                 )}
@@ -361,17 +419,28 @@ const TestComponent = ({data}) => {
     return (
         <div className="report-modal-container">
             <div className="report-modal-header">
-                <div className="flex justify-center items-center">
+                <div className="grid grid-cols-2 gap-3">
+                    <div className="w-full">
                     <label className="block text-sm flex-grow whitespace-nowrap mr-2">Select a Test</label>
                     <select name="test-dropdown" id="test-dropdown" className="flex-grow"
                             onChange={(e) => filterTestById(e.target.value)}>
                         <option value="">--- Select a Test ---</option>
                         {
-                            data.bookingSlip.tests.map((test) =>
+                            (data.bookingSlip.tests || []).map((test) =>
                                 <option key={test.id} value={test.id}>{test.name}</option>
                             )
                         }
                     </select>
+                    </div>
+                    <div  className="w-full">
+                    <label className="block text-sm flex-grow whitespace-nowrap mr-2">Verified By</label>
+                   <select onChange={(e)=> setEmployeesData(e.target.value)}>
+                        <option>Select Value</option>
+                        {(employees || []).map((a,i)=>{
+                            return  <option key={i} value={a.empId}>{a.firstName} {a.lastName}</option>
+                        })}
+                    </select>
+                    </div>
                 </div>
                 <hr/>
                 {
@@ -502,8 +571,8 @@ const TestComponent = ({data}) => {
                 <div id="report-main-body" className="report-main-body">
                     <div className="address-part">
                         <div className="a-left">
-                            <h5 className="hos-name">Hospital Name</h5>
-                            <p>19/C, East Noyatola, Moghbazar</p>
+                            <h5 className="hos-name">{centers.name}</h5>
+                            <p>{centers.address}</p>
                         </div>
                         <div className="a-right">
                             <img style={{width: "100px"}} src="/logoreport1.png" alt="logo"/>
@@ -547,12 +616,14 @@ const TestComponent = ({data}) => {
                                 view
                                 report</p>
                     }
-
                     <div className="signature-part">
                         <p>Digitally signed by</p>
-                        <p><strong>Dr. Alfaz Uddin</strong></p>
-                        <p>GNU Public Key</p>
+                        <p><strong>{selectedEmployees?.firstName} {selectedEmployees?.lastName}</strong></p>
+                        <p>{selectedEmployees?.designation}</p>
                         <p>&nbsp;</p>
+                        <div className="a-right">
+                            <img style={{width: "100px"}} src={imagePreviewUrl} alt="logo"/>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -565,9 +636,14 @@ const AllBooking = () => {
     const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
     const [showModal, setShowModal] = useState(false);
     const [selectedBooking, setSelectedBooking] = useState(null);
+    const [editBooking,setEditBooking] = useState(false)
 
 
     useEffect(() => {
+        getBooking()
+    }, [date]);
+
+    function getBooking(){
         specificApis.getBookings(date, "")
             .then(response => {
                 setBookings(response);
@@ -575,7 +651,7 @@ const AllBooking = () => {
             .catch(error => {
                 console.error('Failed to fetch bookings:', error);
             });
-    }, [date]);
+    }
 
     const handleOpenModal = (booking) => {
         setSelectedBooking(booking)
@@ -587,7 +663,15 @@ const AllBooking = () => {
         setSelectedBooking(null);
     };
 
+    function onClose(){
+        setEditBooking(false)
+        setSelectedBooking(null)
+        getBooking()
+    }
+
     return (
+        <>
+        {editBooking ?  <Booking isEdit={true} data={selectedBooking} onClose={onClose}/> : (
         <div className="max-w-7xl mx-auto">
             <h6 className="uppercase font-extrabold text-xl"><FontAwesomeIcon icon={faRestroom}/> | ALL
                 Bookings</h6>
@@ -607,10 +691,17 @@ const AllBooking = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {bookings.map((booking) => (
                         <div key={booking.id} className="card overflow-hidden shadow rounded-lg">
-                            <div className="card-body">
+                            <div className="card-body flex justify-between">
                                 <h2 className="text-lg card-title font-bold">
                                     {booking.patientDetails.firstName} {booking.patientDetails.lastName}
                                 </h2>
+                                <span>
+                                <FontAwesomeIcon className="f-aw-edit me-1" icon={faEdit}
+                                                                         onClick={() => {
+                                                                            setEditBooking(booking.bookingSlip.receiptId)
+                                                                            setSelectedBooking(booking)
+                                                                        }}/>
+                                </span>
                             </div>
                             <div className="card-body-out">
                                 <p className="mt-1 max-w-2xl text-sm">
@@ -641,6 +732,8 @@ const AllBooking = () => {
                 {selectedBooking && <TestComponent data={selectedBooking}/>}
             </CustomModal>
         </div>
+        )}
+        </>
     );
 };
 

@@ -1,30 +1,14 @@
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
-  Box,
-  Button,
-  FormControl,
-  FormLabel,
-  Input,
-  Stack,
-  Select,
-  Flex,
-  IconButton,
-  useDisclosure,
-  Text,
-  Divider,
-  Textarea,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalCloseButton,
-  ModalBody,
-  ModalFooter,
-  Container,
+  useDisclosure
 } from "@chakra-ui/react";
-import { AddIcon } from "@chakra-ui/icons";
 import { specificApis } from "../data/SpecificApis";
 import NewBill from "./NewBill";
+import { ActiveComponent } from "./SidebarWithHeader";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faRestroom } from "@fortawesome/free-solid-svg-icons";
+import { CustomModal } from "./CustomModal";
+import { TestComponent } from "./AllBooking";
 
 export default function RegisterCustomer() {
   const [formData, setFormData] = useState({
@@ -38,22 +22,18 @@ export default function RegisterCustomer() {
     addressLine1: "",
     addressLine2: "",
     addressLine3: "",
-    pincode: "",
-    age: "",
-    ageType: "Years",
-    sampleCollector: "",
-    organisation: "",
-    sampleCollectedAt: "",
-    referralType: "",
-    doctorHospitalName: "",
-    degree: "",
-    complements: "",
-    searchQuery: "",
+    pinCode: "",
+    ageInMonths:0,
+    ageInDays:0,
+    ageInYears:0,
+    dob:""
   });
 
   const [patientList, setPatientList] = useState([]);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [activeModal, setActiveModal] = useState(null);
+  const [activeScreen, setactiveScreen] = useState(1);
+  const context = useContext(ActiveComponent);  
 
   const openModal = (modalType) => {
     setActiveModal(modalType);
@@ -67,6 +47,18 @@ export default function RegisterCustomer() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    if(name == 'dob'){
+    const age =  calculateAge(value)
+    setFormData((prev) => ({ ...prev, [name]: value,ageInMonths:age.months,
+      ageInDays:age.days,
+      ageInYears:age.years }));
+    return
+    }
+
+    if(name == 'designation'){
+      setFormData((prev) => ({ ...prev, [name]: value,gender: value == 'Mr' ? 'MALE' : 'FEMALE' }));
+      return
+      }
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
   const handleSearch = (event) => {
@@ -83,7 +75,7 @@ export default function RegisterCustomer() {
       addressLine1: "",
       addressLine2: "",
       addressLine3: "",
-      pincode: "",
+      pinCode: "",
       age: "",
       ageType: "Years", // Default to 'Years'
       sampleCollector: "",
@@ -93,6 +85,10 @@ export default function RegisterCustomer() {
       doctorHospitalName: "",
       degree: "",
       complements: "",
+      ageInMonths:0,
+      ageInDays:0,
+      ageInYears:0,
+      dob:"",
       searchQuery: formData.searchQuery, // Keep the search query for re-display or further use
     });
     specificApis
@@ -152,12 +148,36 @@ export default function RegisterCustomer() {
       addressLine1: patient.addressLine1,
       addressLine2: patient.addressLine2,
       addressLine3: patient.addressLine3,
-      pincode: patient.pincode,
-      age: patient.age, // Make sure the age is in the correct format or converted if needed
-      ageType: patient.ageType,
+      pinCode: patient.pinCode,
     });
     closeModal();
   };
+
+  function calculateAge(birthdate) {
+    const today = new Date();
+    const birthDate = new Date(birthdate);
+
+    let years = today.getFullYear() - birthDate.getFullYear();
+    let months = today.getMonth() - birthDate.getMonth();
+    let days = today.getDate() - birthDate.getDate();
+
+    if (days < 0) {
+        months--;
+        const prevMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+        days += prevMonth.getDate();
+    }
+
+    if (months < 0) {
+        years--;
+        months += 12;
+    }
+
+    return {
+        years: years,
+        months: months,
+        days: days
+    };
+}
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -184,6 +204,8 @@ export default function RegisterCustomer() {
         .registerPatient(fieldsToSend)
         .then((response) => {
           console.log("Patient registered, ID:", response.patientId);
+          setFormData((prev) => ({ ...prev,patientId:response.patientId }))
+          setactiveScreen(2)
           openNewBill(response.patientId, {
             ...formData,
             patientId: response.patientId,
@@ -202,11 +224,13 @@ export default function RegisterCustomer() {
   };
 
   return (
-    <main className="flex flex-col items-center justify-center shadow-lg w-full">
-      <form onSubmit={handleSubmit} className="w-full max-w-4xl p-8">
+    <>
+    {activeScreen == 1 ? (
+    <main className="flex flex-col items-center justify-center w-full">
+      <form onSubmit={handleSubmit} className="w-full max-w-4xl card mx-auto p-4 bg-white shadow-md rounded-lg mb-4">
         <div className="space-y-8">
           <h2 className="text-2xl font-bold mb-4">Register Customer</h2>
-          <div className="flex flex-col sm:flex-row items-center">
+          {/* <div className="flex flex-col sm:flex-row items-center">
             <input
               name="searchQuery"
               className="border border-gray-300 rounded p-2 w-full sm:w-2/3 text-gray-700"
@@ -220,10 +244,9 @@ export default function RegisterCustomer() {
             >
               Search
             </button>
-          </div>
-          <hr />
+          </div> */}
           <div className="space-y-4">
-            <div className="flex flex-col sm:flex-row sm:space-x-4">
+            {/* <div className="flex flex-col sm:flex-row sm:space-x-4">
               <div className="w-full sm:w-1/3">
                 <label className="block text-gray-700">Patient ID</label>
                 <input
@@ -233,15 +256,16 @@ export default function RegisterCustomer() {
                   readOnly
                 />
               </div>
-            </div>
-            <div className="flex flex-col sm:flex-row sm:space-x-4">
-              <div className="w-full sm:w-1/4">
+            </div> */}
+            <div className="grid grid-cols-4 gap-2">
+              <div className="w-full">
                 <label className="block text-gray-700">Designation</label>
                 <select
                   name="designation"
                   className="border border-gray-300 rounded p-2 w-full text-gray-700"
                   value={formData.designation}
                   onChange={handleInputChange}
+                  required
                 >
                   <option value="">Select designation</option>
                   <option value="Mr">Mr.</option>
@@ -249,28 +273,31 @@ export default function RegisterCustomer() {
                   <option value="Ms">Ms.</option>
                 </select>
               </div>
-              <div className="w-full sm:w-1/4">
+              <div className="w-full">
                 <label className="block text-gray-700">First Name</label>
                 <input
                   name="firstName"
+                  required
                   className="border border-gray-300 rounded p-2 w-full text-gray-700"
                   value={formData.firstName}
                   onChange={handleInputChange}
                 />
               </div>
-              <div className="w-full sm:w-1/4">
+              <div className="w-full">
                 <label className="block text-gray-700">Last Name</label>
                 <input
                   name="lastName"
+                  required
                   className="border border-gray-300 rounded p-2 w-full text-gray-700"
                   value={formData.lastName}
                   onChange={handleInputChange}
                 />
               </div>
-              <div className="w-full sm:w-1/4">
+              <div className="w-full">
                 <label className="block text-gray-700">Phone Number</label>
                 <input
                   name="phone"
+                  required
                   type="tel"
                   className="border border-gray-300 rounded p-2 w-full text-gray-700"
                   value={formData.phone}
@@ -278,60 +305,100 @@ export default function RegisterCustomer() {
                 />
               </div>
             </div>
-            <div className="flex flex-col sm:flex-row sm:space-x-4">
-              <div className="w-full sm:w-1/3">
+            <div className="grid grid-cols-4 gap-2">
+              <div className="w-full col-span-2">
                 <label className="block text-gray-700">Email ID</label>
                 <input
                   name="email"
                   type="email"
+                  required
                   className="border border-gray-300 rounded p-2 w-full text-gray-700"
                   value={formData.email}
                   onChange={handleInputChange}
                 />
               </div>
-              <div className="w-full sm:w-1/4">
-                <label className="block text-gray-700">Age</label>
-                <div className="flex items-center">
-                  <input
-                    name="age"
-                    type="number"
-                    className="border border-gray-300 rounded p-2 w-full text-gray-700"
-                    value={formData.age}
-                    onChange={handleInputChange}
-                  />
-                  <select
-                    name="ageType"
-                    className="border border-gray-300 rounded p-2 w-full text-gray-700 ml-2"
-                    value={formData.ageType}
-                    onChange={handleInputChange}
-                  >
-                    <option value="Years">Years</option>
-                    <option value="Months">Months</option>
-                  </select>
-                </div>
-              </div>
-              <div className="w-full sm:w-1/4">
+             
+              <div className="w-full">
                 <label className="block text-gray-700">Gender</label>
                 <select
                   name="gender"
+                  required
                   className="border border-gray-300 rounded p-2 w-full text-gray-700"
                   value={formData.gender}
                   onChange={handleInputChange}
                 >
                   <option value="">Select gender</option>
-                  <option value="Male">Male</option>
-                  <option value="Female">Female</option>
-                  <option value="Other">Other</option>
+                  <option value="MALE">Male</option>
+                  <option value="FEMALE">Female</option>
+                  <option value="OTHER">Other</option>
                 </select>
               </div>
+              <div className="w-full">
+                <label className="block text-gray-700">Pincode</label>
+                <input
+                  name="pinCode"
+                  required
+                  className="border border-gray-300 rounded p-2 w-full text-gray-700"
+                  value={formData.pinCode}
+                  onChange={handleInputChange}
+                />
+              </div>
             </div>
-
+            <div className="">
+            <div className="grid grid-cols-4 gap-2">
+                <div className="">
+                <label className="block text-gray-700">Age</label>
+                  <input
+                    name="dob"
+                    type="date"
+                    required
+                    className="border border-gray-300 rounded p-2 w-full text-gray-700"
+                    value={formData.dob}
+                    onChange={handleInputChange}
+                  />
+                  </div>
+                  <div className="w-full">
+                  <label className="block text-gray-700">age In Years</label>
+                  <input
+                    name="ageInYears"
+                    type="number"
+                    disabled
+                    className="border border-gray-300 rounded p-2 w-full text-gray-700"
+                    value={formData.ageInYears}
+                    onChange={handleInputChange}
+                  />
+                  </div>
+                  <div className="w-full">
+                <label className="block text-gray-700">age In Months</label>
+                  <input
+                    name="ageInMonths"
+                    type="number"
+                    disabled
+                    className="border border-gray-300 rounded p-2 w-full text-gray-700"
+                    value={formData.ageInMonths}
+                    onChange={handleInputChange}
+                  />
+                  </div>
+                  <div className="w-full">
+                <label className="block text-gray-700">age In Days</label>
+                   <input
+                    name="ageInDays"
+                    type="number"
+                    disabled
+                    className="border border-gray-300 rounded p-2 w-full text-gray-700"
+                    value={formData.ageInDays}
+                    onChange={handleInputChange}
+                  />
+                  </div>
+                </div>
+              </div>  
             <div className="flex flex-col sm:flex-row sm:space-x-4 flex-wrap">
               <div className="w-full sm:w-1/4 mb-4">
                 <label className="block text-gray-700">Address Line 1</label>
                 <textarea
                   name="addressLine1"
                   className="border border-gray-300 rounded p-2 w-full text-gray-700"
+                  required
                   value={formData.addressLine1}
                   onChange={handleInputChange}
                 />
@@ -341,6 +408,7 @@ export default function RegisterCustomer() {
                 <textarea
                   name="addressLine2"
                   className="border border-gray-300 rounded p-2 w-full text-gray-700"
+                  required
                   value={formData.addressLine2}
                   onChange={handleInputChange}
                 />
@@ -350,21 +418,13 @@ export default function RegisterCustomer() {
                 <textarea
                   name="addressLine3"
                   className="border border-gray-300 rounded p-2 w-full text-gray-700"
+                  required
                   value={formData.addressLine3}
                   onChange={handleInputChange}
                 />
               </div>
-              <div className="w-full sm:w-1/4 mb-4 margin-left-0">
-                <label className="block text-gray-700">Pincode</label>
-                <input
-                  name="pincode"
-                  className="border border-gray-300 rounded p-2 w-full text-gray-700"
-                  value={formData.pincode}
-                  onChange={handleInputChange}
-                />
-              </div>
             </div>
-            <div className="flex flex-col sm:flex-row sm:space-x-4">
+            {/* <div className="flex flex-col sm:flex-row sm:space-x-4">
               <div className="w-full sm:w-1/3">
                 <label className="block text-gray-700">Sample Collector</label>
                 <div className="flex items-center">
@@ -374,7 +434,7 @@ export default function RegisterCustomer() {
                     value={formData.sampleCollector}
                     onChange={handleInputChange}
                   >
-                    {/* Add options dynamically here */}
+                  
                   </select>
                   <button
                     type="button"
@@ -394,7 +454,7 @@ export default function RegisterCustomer() {
                     value={formData.organisation}
                     onChange={handleInputChange}
                   >
-                    {/* Add options dynamically here */}
+                    
                   </select>
                   <button
                     type="button"
@@ -416,7 +476,7 @@ export default function RegisterCustomer() {
                     value={formData.sampleCollectedAt}
                     onChange={handleInputChange}
                   >
-                    {/* Add options dynamically here */}
+                   
                   </select>
                   <button
                     type="button"
@@ -427,7 +487,7 @@ export default function RegisterCustomer() {
                   </button>
                 </div>
               </div>
-            </div>
+            </div> */}
             <button
               type="submit"
               className="bg-blue-500 text-white p-2 rounded w-full mt-4"
@@ -550,5 +610,600 @@ export default function RegisterCustomer() {
         </div>
       )}
     </main>
+    ) : (
+    <Booking patientData={formData} />
+  )}
+    </>
   );
 }
+
+const Booking = ({patientData}) => {
+  const initialTest = {
+      // id: "",
+      name: "",
+      barCode: "",
+      cost: 0.0,
+      code: "",
+  };
+  const [testPanel, setTestPanel] = useState([]);
+  const [pdfData, setPdfData] = useState([]);
+  const [updateProfile, setUpdateProfile] = useState(false);
+  const [centers, setCenters] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedBooking, setSelectedBooking] = useState(null);
+  const context = useContext(ActiveComponent);  
+
+  useEffect(()=>{
+      fetchCenters();
+  },[])
+
+  async function fetchCenters() {
+      try {
+          const fetchedCenters = await specificApis.fetchCenters();
+          setCenters(fetchedCenters);
+      } catch (error) {
+          console.error('Failed to fetch center information:', error);
+      }
+  }
+
+  const handleOpenModal = (booking) => {
+      setSelectedBooking(booking)
+      setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+      setShowModal(false);
+      setSelectedBooking(null);
+      context.handleComponentChange('All Booking')
+  };
+
+  const [formData, setFormData] = useState({
+      bookingSlip: {
+          tests: [initialTest],
+          patientId:patientData.patientId,
+          referralSourceId: "",
+          paymentMode: "Credit",
+          net: 0.0,
+          paid: 0.0,
+          balance: 0.0,
+          sampleBy: "",
+          billedBy: "",
+          date: "",
+          time: "",
+          centerCode: "",
+      },
+      patientDetails:patientData
+  });
+
+  useEffect(() => {
+      const fetchTestPanel = async () => {
+          try {
+              const response = await fetch(
+                  "http://ec2-13-233-207-62.ap-south-1.compute.amazonaws.com:8080/api/v1/lab/testpanel",
+                  {
+                      headers: {
+                          "X-API-KEY": "test123",
+                          "X-PARTNER-ID": "PYTHONMAN2",
+                      },
+                  }
+              );
+              const data = await response.json();
+              setTestPanel(data);
+          } catch (error) {
+              console.error("Error fetching test panel data:", error);
+          }
+      };
+
+      fetchTestPanel();
+  }, []);
+
+  console.log(testPanel, "data");
+
+  function getTestTotal(){
+      let sum = 0;
+      (formData?.bookingSlip?.tests || []).map((e)=>{
+          sum += Number(e.cost) ?? 0
+      })
+      return sum
+  }
+
+  const handleChange = (e, index) => {
+      const {name, value} = e.target;
+      setFormData((prevState) => {
+          const updatedTests = [...prevState.bookingSlip.tests];
+          if (name === "name") {
+              const selectedTest = testPanel.find((test) => test.name === value);
+              if (selectedTest) {
+                  updatedTests[index] = {
+                      // ...updatedTests[index],
+                      name: selectedTest.name,
+                      cost: parseFloat(selectedTest.cost), // Ensure cost is a number
+                      code: selectedTest.testPanelCode, // Set code to testPanelCode
+                  };
+              }
+          } else if (name === "barCode") {
+              updatedTests[index] = {
+                  ...updatedTests[index],
+                  barCode: value,
+              };
+          } else {
+              updatedTests[index] = {
+                  ...updatedTests[index],
+                  [name]: name === "cost" ? parseFloat(value) : value,
+              };
+          }
+          return {
+              ...prevState,
+              bookingSlip: {
+                  ...prevState.bookingSlip,
+                  tests: updatedTests,
+              },
+          };
+      });
+  };
+
+  const addTest = () => {
+      setFormData((prevData) => ({
+          ...prevData,
+          bookingSlip: {
+              ...prevData.bookingSlip,
+              tests: [...prevData.bookingSlip.tests, initialTest],
+          },
+      }));
+  };
+
+  const removeTest = (index) => {
+      const updatedTests = [...formData.bookingSlip.tests];
+      updatedTests.splice(index, 1);
+      setFormData((prevData) => ({
+          ...prevData,
+          bookingSlip: {
+              ...prevData.bookingSlip,
+              tests: updatedTests,
+          },
+      }));
+  };
+
+  const handleSubmit = async (e) => {
+      e.preventDefault();
+      if (updateProfile) {
+          const response = await fetch(
+              "http://ec2-13-233-207-62.ap-south-1.compute.amazonaws.com:8080/api/v1/lab/bookings?updateProfile=true",
+              {
+                  method: "POST",
+                  headers: {
+                      "Content-Type": "application/json",
+                      "X-API-KEY": "test123",
+                      "X-PARTNER-ID": "PYTHONMAN2",
+                  },
+                  //   body: JSON.stringify(formData),
+                  body: JSON.stringify({
+                      ...formData,
+                      patientId: searchResults.patientId, // Adding patientId to the formData
+                  }),
+              }
+          );
+          const result = await response.json();
+          setPdfData(result);
+          console.log(result);
+      } else {
+          const response = await fetch(
+              "http://ec2-13-233-207-62.ap-south-1.compute.amazonaws.com:8080/api/v1/lab/bookings",
+              {
+                  method: "POST",
+                  headers: {
+                      "Content-Type": "application/json",
+                      "X-API-KEY": "test123",
+                      "X-PARTNER-ID": "PYTHONMAN2",
+                  },
+                  body: JSON.stringify(formData),
+              }
+          );
+          const result = await response.json();
+         if(result.error == undefined){
+          handleOpenModal({bookingSlip:result,patientDetails:patientData})
+         }
+          setPdfData(result);
+          console.log(result);
+      }
+  };
+
+  return (
+      <div className="max-w-7xl mx-auto">
+          <h6 className="uppercase font-extrabold text-xl text-white"><FontAwesomeIcon icon={faRestroom}/> | Create
+              Bookings</h6>
+          <hr/>
+          <form
+              onSubmit={handleSubmit}
+              className="card mx-auto p-4 bg-white shadow-md rounded-lg mb-4"
+          >
+              <h2 className="text-2xl font-bold mb-4">Booking Form</h2>
+              {/* Tests */}
+              <div className="mb-4">
+                  <h3 className="text-xl font-bolder mb-2">Tests</h3>
+                  {formData.bookingSlip.tests.map((test, index) => (
+                      <div
+                          key={index}
+                          className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4"
+                      >
+                          <div>
+                              <label
+                                  className="block text-sm mb-2"
+                                  htmlFor={`testName-${index}`}
+                              >
+                                  Test Name
+                              </label>
+                              <select
+                                  name="name"
+                                  required
+                                  value={test.name}
+                                  //   onChange={(e) => handleChange(e, index)}
+                                  onChange={(e) => handleChange(e, index)}
+                                  // onChange={(e)=>{
+
+                                  // }}
+                                  className="w-full"
+                              >
+                                  <option value="">Select a test</option>
+                                  {testPanel?.map((testOption,i) => (
+                                      <option key={i} value={testOption.name}>
+                                          {testOption.name}
+                                      </option>
+                                  ))}
+                              </select>
+                          </div>
+
+                          <div>
+                              <label
+                                  className="block text-sm mb-2"
+                                  htmlFor={`testName-${index}`}
+                              >
+                                  Test Name
+                              </label>
+                              <input
+                                  type="text"
+                                  name={`name`}
+                                  value={test.name}
+                                  disabled
+                                  onChange={(e) => handleChange(e, index)}
+                                  className="w-full"
+                              />
+                          </div>
+                          <div>
+                              <label
+                                  className="block text-sm mb-2"
+                                  htmlFor={`barCode-${index}`}
+                              >
+                                  Bar Code
+                              </label>
+                              <input
+                                  type="text"
+                                  name={`barCode`}
+                                  value={test.barCode}
+                                  required
+                                  onChange={(e) => handleChange(e, index)}
+                                  className="w-full"
+                              />
+                          </div>
+                          <div>
+                              <label
+                                  className="block text-sm mb-2"
+                                  htmlFor={`cost-${index}`}
+                              >
+                                  Cost
+                              </label>
+                              <input
+                                  type="number"
+                                  name={`cost`}
+                                  value={test.cost}
+                                  required
+                                  onChange={(e) => handleChange(e, index)}
+                                  className="w-full"
+                              />
+                          </div>
+                          <div>
+                              <label
+                                  className="block text-sm mb-2"
+                                  htmlFor={`code-${index}`}
+                              >
+                                  Code
+                              </label>
+                              <input
+                                  type="text"
+                                  name={`code`}
+                                  value={test.code}
+                                  disabled
+                                  onChange={(e) => handleChange(e, index)}
+                                  className="w-full"
+                              />
+                          </div>
+                          <div className="flex items-end">
+                              {index === formData.bookingSlip.tests.length - 1 && (
+                                  <button
+                                      type="button"
+                                      onClick={addTest}
+                                      className="ml-2 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md bg-blue-500 hover:bg-blue-600 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                                  >
+                                      Add Test
+                                  </button>
+                              )}
+                              {formData.bookingSlip.tests.length > 1 && (
+                                  <button
+                                      type="button"
+                                      onClick={() => removeTest(index)}
+                                      className="ml-2 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                                  >
+                                      Remove Test
+                                  </button>
+                              )}
+                          </div>
+                      </div>
+                  ))}
+              </div>
+
+              {/* Additional Booking Slip Details */}
+              <div className="mb-4">
+                  <h3 className="text-xl font-bolder mb-2">Booking Slip Details</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                          <label
+                              className="block text-sm mb-2"
+                              htmlFor="referralDoctorId"
+                          >
+                              Referral Doctor ID
+                          </label>
+                          <input
+                              type="text"
+                              required
+                              name="bookingSlip.referralDoctorId"
+                              value={formData.bookingSlip.referralSourceId}
+                              onChange={(e) =>
+                                  setFormData((prevData) => ({
+                                      ...prevData,
+                                      bookingSlip: {
+                                          ...prevData.bookingSlip,
+                                          referralSourceId: e.target.value,
+                                      },
+                                  }))
+                              }
+                              className="w-full"
+                          />
+                      </div>
+                      <div>
+                          <label
+                              className="block text-sm mb-2"
+                              htmlFor="paymentMode"
+                          >
+                              Payment Mode
+                          </label>
+                          <input
+                              type="text"
+                              name="bookingSlip.paymentMode"
+                              required
+                              value={formData.bookingSlip.paymentMode}
+                              onChange={(e) =>
+                                  setFormData((prevData) => ({
+                                      ...prevData,
+                                      bookingSlip: {
+                                          ...prevData.bookingSlip,
+                                          paymentMode: e.target.value,
+                                      },
+                                  }))
+                              }
+                              className="w-full"
+                          />
+                      </div>
+                      <div>
+                          <label
+                              className="block text-sm mb-2"
+                              htmlFor="net"
+                          >
+                              Net Amount
+                          </label>
+                          <input
+                              type="number"
+                              name="bookingSlip.net"
+                              disabled
+                              value={getTestTotal()}
+                              onChange={(e) =>
+                                  setFormData((prevData) => ({
+                                      ...prevData,
+                                      bookingSlip: {
+                                          ...prevData.bookingSlip,
+                                          net: parseFloat(e.target.value),
+                                      },
+                                  }))
+                              }
+                              className="w-full"
+                          />
+                      </div>
+                      <div>
+                          <label
+                              className="block text-sm mb-2"
+                              htmlFor="paid"
+                          >
+                              Paid Amount
+                          </label>
+                          <input
+                              type="number"
+                              name="bookingSlip.paid"
+                              value={formData.bookingSlip.paid}
+                              onChange={(e) =>
+                                  setFormData((prevData) => ({
+                                      ...prevData,
+                                      bookingSlip: {
+                                          ...prevData.bookingSlip,
+                                          paid: parseFloat(e.target.value),
+                                      },
+                                  }))
+                              }
+                              className="w-full"
+                          />
+                      </div>
+                      <div>
+                          <label
+                              className="block text-sm mb-2"
+                              htmlFor="balance"
+                          >
+                              Balance Amount
+                          </label>
+                          <input
+                              type="number"
+                              name="bookingSlip.balance"
+                              disabled
+                              value={getTestTotal() - formData.bookingSlip.paid}
+                              onChange={(e) =>
+                                  setFormData((prevData) => ({
+                                      ...prevData,
+                                      bookingSlip: {
+                                          ...prevData.bookingSlip,
+                                          balance: parseFloat(e.target.value),
+                                      },
+                                  }))
+                              }
+                              className="w-full"
+                          />
+                      </div>
+                      <div>
+                          <label
+                              className="block text-sm mb-2"
+                              htmlFor="sampleBy"
+                          >
+                              Sample By
+                          </label>
+                          <input
+                              type="text"
+                              name="bookingSlip.sampleBy"
+                              value={formData.bookingSlip.sampleBy}
+                              required
+                              onChange={(e) =>
+                                  setFormData((prevData) => ({
+                                      ...prevData,
+                                      bookingSlip: {
+                                          ...prevData.bookingSlip,
+                                          sampleBy: e.target.value,
+                                      },
+                                  }))
+                              }
+                              className="w-full"
+                          />
+                      </div>
+                      <div>
+                          <label
+                              className="block text-sm mb-2"
+                              htmlFor="billedBy"
+                          >
+                              Billed By
+                          </label>
+                          <input
+                              type="text"
+                              name="bookingSlip.billedBy"
+                              value={formData.bookingSlip.billedBy}
+                              required
+                              onChange={(e) =>
+                                  setFormData((prevData) => ({
+                                      ...prevData,
+                                      bookingSlip: {
+                                          ...prevData.bookingSlip,
+                                          billedBy: e.target.value,
+                                      },
+                                  }))
+                              }
+                              className="w-full"
+                          />
+                      </div>
+                      <div>
+                          <label
+                              className="block text-sm mb-2"
+                              htmlFor="date"
+                          >
+                              Date
+                          </label>
+                          <input
+                              type="date"
+                              name="bookingSlip.date"
+                              value={formData.bookingSlip.date}
+                              required
+                              onChange={(e) =>
+                                  setFormData((prevData) => ({
+                                      ...prevData,
+                                      bookingSlip: {
+                                          ...prevData.bookingSlip,
+                                          date: e.target.value,
+                                      },
+                                  }))
+                              }
+                              className="w-full"
+                          />
+                      </div>
+                      <div>
+                          <label
+                              className="block text-sm mb-2"
+                              htmlFor="time"
+                          >
+                              Time
+                          </label>
+                          <input
+                              type="time"
+                              name="bookingSlip.time"
+                              value={formData.bookingSlip.time}
+                              required
+                              onChange={(e) =>
+                                  setFormData((prevData) => ({
+                                      ...prevData,
+                                      bookingSlip: {
+                                          ...prevData.bookingSlip,
+                                          time: e.target.value,
+                                      },
+                                  }))
+                              }
+                              className="w-full"
+                          />
+                      </div>
+                      <div>
+                          <label
+                              className="block text-sm mb-2"
+                              htmlFor="centerCode"
+                          >
+                              Center Code
+                          </label>
+                          <select
+                              name="bookingSlip.centerCode"
+                              value={formData.bookingSlip.centerCode}
+                              required
+                              onChange={(e) =>
+                                  setFormData((prevData) => ({
+                                      ...prevData,
+                                      bookingSlip: {
+                                          ...prevData.bookingSlip,
+                                          centerCode: e.target.value,
+                                      },
+                                  }))
+                              }
+                              className="w-full"
+                          >
+                              <option value={""}>Select Center</option>
+                              {centers.map((e,i)=>{
+                                  return <option key={e.id+i} value={e.id}>{e.name}</option>
+                              })}
+                          </select>
+                      </div>
+                  </div>
+              </div>
+
+              {/* Submit Button */}
+              <div className="mt-4">
+                  <button
+                      type="submit"
+                      className="w-full py-2 bg-blue-500 hover:bg-blue-600 text-white px-4 rounded-lg"
+                  >
+                      Submit
+                  </button>
+              </div>
+          </form>
+          <CustomModal showModal={showModal} handleClose={handleCloseModal}>
+              {selectedBooking && <TestComponent data={selectedBooking}/>}
+          </CustomModal>
+      </div>
+  );
+};

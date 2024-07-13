@@ -132,6 +132,23 @@ class SpecificApis {
     }
   }
 
+  async addEmployeeSignature(file,employeeId) {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      const response = await apiService.putData(`api/v1/lab/employees/signature/upload?empId=${encodeURIComponent(employeeId)}`,formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      }
+    );
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching center information:', error);
+      throw error;
+    }
+  }
+
   async addReportToPatient(patientId, date, report) {
     try {
         const url = `api/v1/lab/upload/${encodeURIComponent(patientId)}/report/upload?date=${encodeURIComponent(date)}`;
@@ -209,12 +226,52 @@ class SpecificApis {
     }
   }
 
+  async updateBooking(updateBooking) {
+    try {
+      const response = await apiService.putData(`api/v1/lab/bookings/${updateBooking.bookingSlip.receiptId}`, updateBooking);
+      return response.data;
+    } catch (error) {
+              console.error('Error creating booking:', error);
+      throw error;
+    }
+  }
+
+  async getTestPanel() {
+    try {
+      const response = await apiService.fetchData('api/v1/lab/testpanel');
+      return response.data;
+    } catch (error) {
+              console.error('Error creating booking:', error);
+      throw error;
+    }
+  }
+
+  async updateTestPanel(updateTestPanel,id) {
+    try {
+      const response = await apiService.putData(`api/v1/lab/testpanel?testPanelId=${id}`, updateTestPanel);
+      return response.data;
+    } catch (error) {
+              console.error('Error creating booking:', error);
+      throw error;
+    }
+  }
+
   async updateTestResult(receiptId, testId, updatedTestReport) {
     try {
       const response = await apiService.putData(`api/v1/lab/bookings/${receiptId}/tests/${testId}`, updatedTestReport);
       return response.data;
     } catch (error) {
       console.error('Error updating test result:', error);
+      throw error;
+    }
+  }
+
+  async updateTest(updatedTest){
+    try {
+      const response = await apiService.putData(`api/v1/lab/labtest?id=${updatedTest.id}`, updatedTest);
+      return response.data;
+    } catch (error) {
+      console.error('Error updating test:', error);
       throw error;
     }
   }
@@ -250,7 +307,6 @@ class SpecificApis {
   };
 
   async addTestUnits(formData) {
-    console.log(formData);
     try {
         const response = await apiService.postData(`api/v1/lab/testpanel/testunit`,formData);
         return response.data;

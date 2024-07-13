@@ -1,9 +1,13 @@
-import React, {useState, useEffect} from "react";
+import React, {useState, useEffect, useContext} from "react";
 import {IoSearchOutline} from "react-icons/io5";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faRestroom} from "@fortawesome/free-solid-svg-icons";
+import { specificApis } from "../data/SpecificApis";
+import { CustomModal } from "./CustomModal";
+import { TestComponent } from "./AllBooking";
+import { ActiveComponent } from "./SidebarWithHeader";
 
-const Booking = () => {
+const Booking = ({isEdit,data,onClose}) => {
     const initialTest = {
         // id: "",
         name: "",
@@ -16,11 +20,42 @@ const Booking = () => {
     const [updateProfile, setUpdateProfile] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
     const [searchResults, setSearchResults] = useState({});
+    const [centers, setCenters] = useState([]);
+    const [showModal, setShowModal] = useState(false);
+    const [selectedBooking, setSelectedBooking] = useState(null);
+    const context = useContext(ActiveComponent);  
+
+    useEffect(()=>{
+        fetchCenters();
+        if(isEdit){
+            setFormData(data)  
+        }
+    },[])
+
+    async function fetchCenters() {
+        try {
+            const fetchedCenters = await specificApis.fetchCenters();
+            setCenters(fetchedCenters);
+        } catch (error) {
+            console.error('Failed to fetch center information:', error);
+        }
+    }
+
+    const handleOpenModal = (booking) => {
+        setSelectedBooking(booking)
+        setShowModal(true);
+    };
+
+    const handleCloseModal = () => {
+        setShowModal(false);
+        setSelectedBooking(null);
+        context.handleComponentChange('All Booking')
+    };
 
     const handleSearch = async (event) => {
-        event.preventDefault();
-
+        event?.preventDefault();
         // let url;
+
         let searchQueryType;
         if (/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/.test(searchQuery)) {
             searchQueryType = "email";
@@ -32,7 +67,7 @@ const Booking = () => {
         }
 
         const url = `http://ec2-13-233-207-62.ap-south-1.compute.amazonaws.com:8080/api/v1/lab/patient?searchQuery=${encodeURIComponent(
-            searchQuery
+           searchQuery
         )}&searchQueryType=${encodeURIComponent(searchQueryType)}`;
         const response = await fetch(url, {
             method: "GET",
@@ -43,17 +78,21 @@ const Booking = () => {
             },
             //   body: JSON.stringify({}),
         });
-
+         
         const data = await response.json();
-
+        window.history.pushState({}, document.title, window.location.pathname);
         // setSearchResults(data[0]);
         // console.log(searchResults, "search");
         if (data.length > 0) {
             setSearchResults(data[0]);
             setFormData((prevState) => ({
-                ...prevState,
+                bookingSlip:{
+                    patientId:data[0].patientId,
+                    ...prevState.bookingSlip
+                },
                 patientDetails: {
                     designation: data[0].designation,
+
                     firstName: data[0].firstName,
                     lastName: data[0].lastName,
                     phone: data[0].phone,
@@ -79,7 +118,7 @@ const Booking = () => {
     const [formData, setFormData] = useState({
         bookingSlip: {
             tests: [initialTest],
-            referralDoctorId: "",
+            referralSourceId: "",
             paymentMode: "Credit",
             net: 0.0,
             paid: 0.0,
@@ -130,6 +169,15 @@ const Booking = () => {
         fetchTestPanel();
     }, []);
 
+    console.log(testPanel, "data");
+
+    function getTestTotal(){
+        let sum = 0;
+        (formData?.bookingSlip?.tests || []).map((e)=>{
+            sum += Number(e.cost) ?? 0
+        })
+        return sum
+    }
 
     const handleChange = (e, index) => {
         const {name, value} = e.target;
@@ -210,7 +258,7 @@ const Booking = () => {
             const result = await response.json();
             setPdfData(result);
             console.log(result);
-        } else {
+        } else if(!isEdit) {
             const response = await fetch(
                 "http://ec2-13-233-207-62.ap-south-1.compute.amazonaws.com:8080/api/v1/lab/bookings",
                 {
@@ -224,14 +272,25 @@ const Booking = () => {
                 }
             );
             const result = await response.json();
+           if(result.message == undefined){
+            handleOpenModal({bookingSlip:result,patientDetails:formData.patientDetails})
+           }
             setPdfData(result);
             console.log(result);
+        }else{
+           await specificApis.updateBooking(formData)
+            .then(response => {
+                onClose()
+            })
+            .catch(error => {
+                console.error('Failed to Update bookings:', error);
+            });
         }
     };
 
     return (
         <div className="max-w-7xl mx-auto">
-            <h6 className="uppercase font-extrabold text-xl"><FontAwesomeIcon icon={faRestroom}/> | Create
+            <h6 className="uppercase font-extrabold text-xl text-white"><FontAwesomeIcon icon={faRestroom}/> | Create
                 Bookings</h6>
             <hr/>
             <form
@@ -262,7 +321,7 @@ const Booking = () => {
                 <div className="mb-4">
                     <div className="flex justify-between mt-4">
                         {" "}
-                        <h3 className="text-xl font-bolder mb-2 base-blue">Patient Details</h3>
+                        <h3 className="text-xl font-bolder mb-2 ">Patient Details</h3>
                         {Object.keys(searchResults).length > 0 && (
                             <button
                                 className=" py-2 px-3 bg-blue-500 hover:bg-blue-600 text-white rounded-md"
@@ -619,7 +678,7 @@ const Booking = () => {
 
                 {/* Tests */}
                 <div className="mb-4">
-                    <h3 className="text-xl font-bolder mb-2 base-blue">Tests</h3>
+                    <h3 className="text-xl font-bolder mb-2">Tests</h3>
                     {formData.bookingSlip.tests.map((test, index) => (
                         <div
                             key={index}
@@ -635,6 +694,7 @@ const Booking = () => {
                                 <select
                                     name="name"
                                     value={test.name}
+                                    required
                                     //   onChange={(e) => handleChange(e, index)}
                                     onChange={(e) => handleChange(e, index)}
                                     // onChange={(e)=>{
@@ -643,8 +703,8 @@ const Booking = () => {
                                     className="w-full"
                                 >
                                     <option value="">Select a test</option>
-                                    {testPanel?.map((testOption) => (
-                                        <option key={testOption.id} value={testOption.name}>
+                                    {testPanel?.map((testOption,i) => (
+                                        <option key={i} value={testOption.name}>
                                             {testOption.name}
                                         </option>
                                     ))}
@@ -662,6 +722,7 @@ const Booking = () => {
                                     type="text"
                                     name={`name`}
                                     value={test.name}
+                                    disabled
                                     onChange={(e) => handleChange(e, index)}
                                     className="w-full"
                                 />
@@ -677,6 +738,7 @@ const Booking = () => {
                                     type="text"
                                     name={`barCode`}
                                     value={test.barCode}
+                                    required
                                     onChange={(e) => handleChange(e, index)}
                                     className="w-full"
                                 />
@@ -691,6 +753,7 @@ const Booking = () => {
                                 <input
                                     type="number"
                                     name={`cost`}
+                                    required
                                     value={test.cost}
                                     onChange={(e) => handleChange(e, index)}
                                     className="w-full"
@@ -707,6 +770,7 @@ const Booking = () => {
                                     type="text"
                                     name={`code`}
                                     value={test.code}
+                                    required
                                     onChange={(e) => handleChange(e, index)}
                                     className="w-full"
                                 />
@@ -737,7 +801,7 @@ const Booking = () => {
 
                 {/* Additional Booking Slip Details */}
                 <div className="mb-4">
-                    <h3 className="text-xl font-bolder mb-2 base-blue">Booking Slip Details</h3>
+                    <h3 className="text-xl font-bolder mb-2">Booking Slip Details</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label
@@ -749,13 +813,14 @@ const Booking = () => {
                             <input
                                 type="text"
                                 name="bookingSlip.referralDoctorId"
-                                value={formData.bookingSlip.referralDoctorId}
+                                required
+                                value={formData.bookingSlip.referralSourceId}
                                 onChange={(e) =>
                                     setFormData((prevData) => ({
                                         ...prevData,
                                         bookingSlip: {
                                             ...prevData.bookingSlip,
-                                            referralDoctorId: e.target.value,
+                                            referralSourceId: e.target.value,
                                         },
                                     }))
                                 }
@@ -773,6 +838,7 @@ const Booking = () => {
                                 type="text"
                                 name="bookingSlip.paymentMode"
                                 value={formData.bookingSlip.paymentMode}
+                                required
                                 onChange={(e) =>
                                     setFormData((prevData) => ({
                                         ...prevData,
@@ -795,7 +861,8 @@ const Booking = () => {
                             <input
                                 type="number"
                                 name="bookingSlip.net"
-                                value={formData.bookingSlip.net}
+                                value={getTestTotal()}
+                                required
                                 onChange={(e) =>
                                     setFormData((prevData) => ({
                                         ...prevData,
@@ -819,6 +886,7 @@ const Booking = () => {
                                 type="number"
                                 name="bookingSlip.paid"
                                 value={formData.bookingSlip.paid}
+                                required
                                 onChange={(e) =>
                                     setFormData((prevData) => ({
                                         ...prevData,
@@ -841,7 +909,8 @@ const Booking = () => {
                             <input
                                 type="number"
                                 name="bookingSlip.balance"
-                                value={formData.bookingSlip.balance}
+                                value={getTestTotal() - formData.bookingSlip.paid}
+                                required
                                 onChange={(e) =>
                                     setFormData((prevData) => ({
                                         ...prevData,
@@ -865,6 +934,7 @@ const Booking = () => {
                                 type="text"
                                 name="bookingSlip.sampleBy"
                                 value={formData.bookingSlip.sampleBy}
+                                required
                                 onChange={(e) =>
                                     setFormData((prevData) => ({
                                         ...prevData,
@@ -888,6 +958,7 @@ const Booking = () => {
                                 type="text"
                                 name="bookingSlip.billedBy"
                                 value={formData.bookingSlip.billedBy}
+                                required
                                 onChange={(e) =>
                                     setFormData((prevData) => ({
                                         ...prevData,
@@ -911,6 +982,7 @@ const Booking = () => {
                                 type="date"
                                 name="bookingSlip.date"
                                 value={formData.bookingSlip.date}
+                                required
                                 onChange={(e) =>
                                     setFormData((prevData) => ({
                                         ...prevData,
@@ -934,6 +1006,7 @@ const Booking = () => {
                                 type="time"
                                 name="bookingSlip.time"
                                 value={formData.bookingSlip.time}
+                                required
                                 onChange={(e) =>
                                     setFormData((prevData) => ({
                                         ...prevData,
@@ -953,10 +1026,10 @@ const Booking = () => {
                             >
                                 Center Code
                             </label>
-                            <input
-                                type="text"
+                            <select
                                 name="bookingSlip.centerCode"
                                 value={formData.bookingSlip.centerCode}
+                                required
                                 onChange={(e) =>
                                     setFormData((prevData) => ({
                                         ...prevData,
@@ -967,21 +1040,37 @@ const Booking = () => {
                                     }))
                                 }
                                 className="w-full"
-                            />
+                            >
+                                <option value={""}>Select Center</option>
+                                {centers.map((e,i)=>{
+                                    return <option key={e.id+i} value={e.id}>{e.name}</option>
+                                })}
+                            </select>
                         </div>
                     </div>
                 </div>
 
                 {/* Submit Button */}
-                <div className="mt-4">
+                <div className="mt-4 flex justify-end">
+                     {isEdit && (
+                        <button
+                        type="button" onClick={()=>onClose()}
+                        className=" py-2 bg-pink-500 mr-1 hover:bg-pink-600 text-white px-4 rounded-lg"
+                    >
+                        Cancel
+                    </button>
+                     )}
                     <button
                         type="submit"
-                        className="w-full py-2 bg-blue-500 hover:bg-blue-600 text-white px-4 rounded-lg"
+                        className=" py-2 bg-blue-500 ms-1 hover:bg-blue-600 text-white px-4 rounded-lg"
                     >
                         Submit
                     </button>
                 </div>
             </form>
+            <CustomModal showModal={showModal} handleClose={handleCloseModal}>
+                {selectedBooking && <TestComponent data={selectedBooking}/>}
+            </CustomModal>
         </div>
     );
 };
