@@ -52,7 +52,7 @@ export const TestComponent = ({data}) => {
     }
 
     async function getImgUrl(id){
-        if(id == undefined){
+        if(id == undefined || id == ""){
             setImagePreviewUrl("/logoreport1.png")
             return 
         }
@@ -689,8 +689,8 @@ const AllBooking = () => {
                     />
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {bookings.map((booking) => (
-                        <div key={booking.id} className="card overflow-hidden shadow rounded-lg">
+                    {bookings.map((booking,i) => (
+                        <div key={booking.id+i} className="card overflow-hidden shadow rounded-lg">
                             <div className="card-body flex justify-between">
                                 <h2 className="text-lg card-title font-bold">
                                     {booking.patientDetails.firstName} {booking.patientDetails.lastName}

@@ -16,13 +16,11 @@ const initialState = {
   joiningDate: ''
 };
 
-function AddEmployeeModal({ isOpen, onClose, onSave }) {
+function AddEmployeeModal({ isOpen, onClose, onSave,data,isEdit }) {
   const [formData, setFormData] = useState(initialState);
 
   useEffect(() => {
-    if (!isOpen) {
-      setFormData(initialState);
-    }
+    setFormData(data ?? initialState);
   }, [isOpen]);
 
   const handleChange = (e) => {
@@ -39,7 +37,7 @@ function AddEmployeeModal({ isOpen, onClose, onSave }) {
   return (
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center overflow-auto justify-center p-4">
       <div className="bg-white rounded-lg p-6 w-6/12">
-        <h2 className="text-xl font-bold mb-3">Add New Employee</h2>
+        <h2 className="text-xl font-bold mb-3">{isEdit ? 'Edit' : 'Add New'} Employee</h2>
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-2 gap-3 items-center">
             <input
