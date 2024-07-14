@@ -364,6 +364,16 @@ class SpecificApis {
     }
   }
 
+  async updateReportTemplate(data,id) {
+    try {
+      const response = await apiService.putData(`api/v1/lab/reports/template/${id}`,data);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching lab profile:', error);
+      throw error;
+    }
+  }
+
 
 }
 
