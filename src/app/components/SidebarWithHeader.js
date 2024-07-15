@@ -192,6 +192,11 @@ function SidebarContent({handleComponentChange}) {
             icon: faRestroom,
             subItems: [
                 {
+                    label: "Register New Customer",
+                    icon: faUserTie,
+                    subItems: null
+                },
+                {
                     label: "Create Booking",
                     icon: faHome,
                     subItems: null
@@ -236,11 +241,6 @@ function SidebarContent({handleComponentChange}) {
         },
         {
             label: "Lab Profile",
-            icon: faUserTie,
-            subItems: null
-        },
-        {
-            label: "Register New Customer",
             icon: faUserTie,
             subItems: null
         },

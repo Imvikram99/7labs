@@ -197,6 +197,8 @@ export default function RegisterCustomer() {
     // Check if a patientId already exists
     if (patientId) {
       console.log("Patient is already registered.");
+      setFormData((prev) => ({ ...prev,patientId }))
+      setactiveScreen(2)
       openNewBill(patientId, formData);
     } else {
       console.log(fieldsToSend); // Show fields sent for registration in console
@@ -230,7 +232,7 @@ export default function RegisterCustomer() {
       <form onSubmit={handleSubmit} className="w-full max-w-4xl card mx-auto p-4 bg-white shadow-md rounded-lg mb-4">
         <div className="space-y-8">
           <h2 className="text-2xl font-bold mb-4">Register Customer</h2>
-          {/* <div className="flex flex-col sm:flex-row items-center">
+          <div className="flex flex-col sm:flex-row items-center">
             <input
               name="searchQuery"
               className="border border-gray-300 rounded p-2 w-full sm:w-2/3 text-gray-700"
@@ -244,7 +246,7 @@ export default function RegisterCustomer() {
             >
               Search
             </button>
-          </div> */}
+          </div>
           <div className="space-y-4">
             {/* <div className="flex flex-col sm:flex-row sm:space-x-4">
               <div className="w-full sm:w-1/3">
@@ -631,11 +633,26 @@ const Booking = ({patientData}) => {
   const [centers, setCenters] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState(null);
+  const [employees, setEmployees] = useState([]);
   const context = useContext(ActiveComponent);  
 
   useEffect(()=>{
       fetchCenters();
+      fetchEmployees();
   },[])
+
+  const fetchEmployees = async () => {
+    try {
+      const fetchedEmployees = await specificApis.fetchEmployeeList();
+      if (Array.isArray(fetchedEmployees)) {
+        setEmployees(fetchedEmployees);
+      } else {
+        setEmployees([]);
+      }
+    } catch (error) {
+      console.error('Failed to fetch employees:', error);
+    }
+  };
 
   async function fetchCenters() {
       try {
@@ -1071,22 +1088,21 @@ const Booking = ({patientData}) => {
                           >
                               Sample By
                           </label>
-                          <input
-                              type="text"
-                              name="bookingSlip.sampleBy"
-                              value={formData.bookingSlip.sampleBy}
-                              required
-                              onChange={(e) =>
-                                  setFormData((prevData) => ({
-                                      ...prevData,
-                                      bookingSlip: {
-                                          ...prevData.bookingSlip,
-                                          sampleBy: e.target.value,
-                                      },
-                                  }))
-                              }
-                              className="w-full"
-                          />
+                          <select  name="bookingSlip.sampleBy" required
+                                value={formData.bookingSlip.sampleBy}   onChange={(e) =>
+                                    setFormData((prevData) => ({
+                                        ...prevData,
+                                        bookingSlip: {
+                                            ...prevData.bookingSlip,
+                                            sampleBy: e.target.value,
+                                        },
+                                    }))
+                                }>
+                                <option>Select Option</option>
+                                {(employees || []).map((e,i)=>{
+                                    return <option value={e.empId} key={i}>{e.firstName} {e.lastName}</option>
+                                })}
+                            </select>
                       </div>
                       <div>
                           <label
@@ -1095,22 +1111,21 @@ const Booking = ({patientData}) => {
                           >
                               Billed By
                           </label>
-                          <input
-                              type="text"
-                              name="bookingSlip.billedBy"
-                              value={formData.bookingSlip.billedBy}
-                              required
-                              onChange={(e) =>
-                                  setFormData((prevData) => ({
-                                      ...prevData,
-                                      bookingSlip: {
-                                          ...prevData.bookingSlip,
-                                          billedBy: e.target.value,
-                                      },
-                                  }))
-                              }
-                              className="w-full"
-                          />
+                          <select  name="bookingSlip.billedBy" required
+                                value={formData.bookingSlip.billedBy}   onChange={(e) =>
+                                    setFormData((prevData) => ({
+                                        ...prevData,
+                                        bookingSlip: {
+                                            ...prevData.bookingSlip,
+                                            billedBy: e.target.value,
+                                        },
+                                    }))
+                                }>
+                                <option>Select Option</option>
+                                {(employees || []).map((e,i)=>{
+                                    return <option value={e.empId} key={i}>{e.firstName} {e.lastName}</option>
+                                })}
+                            </select>
                       </div>
                       <div>
                           <label
