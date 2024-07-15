@@ -105,6 +105,16 @@ class SpecificApis {
     }
   }
 
+  async updateEmployee(updateEmployee,id){
+    try {
+      const response = await apiService.putData(`api/v1/lab/employees/${id}`,updateEmployee);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching center information:', error);
+      throw error;
+    }
+  }
+
   async fetchCenters() {
     try {
       const response = await apiService.fetchData('api/v1/lab/labcenter');
@@ -340,6 +350,26 @@ class SpecificApis {
       return response.data;
     } catch (error) {
       console.error('Error sending test panel:', error);
+      throw error;
+    }
+  }
+
+  async fetchReportTemplate() {
+    try {
+      const response = await apiService.fetchData('api/v1/lab/reports/template');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching lab profile:', error);
+      throw error;
+    }
+  }
+
+  async updateReportTemplate(data,id) {
+    try {
+      const response = await apiService.putData(`api/v1/lab/reports/template/${id}`,data);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching lab profile:', error);
       throw error;
     }
   }

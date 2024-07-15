@@ -10,6 +10,7 @@ import {CustomModal} from "@/app/components/CustomModal";
 import html2canvas from "html2canvas";
 import toast from "react-hot-toast";
 import Booking from "./Booking";
+import { useForm } from "react-hook-form";
 
 export const TestComponent = ({data}) => {
     const [selectedTests, setSelectedTests] = useState([]);
@@ -26,7 +27,9 @@ export const TestComponent = ({data}) => {
 
     const [primarySampleType, setPrimarySampleType] = useState(null);
     const [testReportDate, setTestReportDate] = useState(null);
-
+    const [reportTemplate, setReportTemplate] = useState([]);
+    const [currentTemplate, setCurrentTemplate] = useState("");
+    const [ModalOpen, setModalOpen] = useState(false);
 
     const handleInputChange = (e, testReportId) => {
         setInputValues({
@@ -37,6 +40,7 @@ export const TestComponent = ({data}) => {
     useEffect(()=>{
         fetchCenters()
         fetchEmployees()
+        fetchReportTemplate()
     },[])
 
     async function fetchCenters() {
@@ -51,8 +55,13 @@ export const TestComponent = ({data}) => {
         }
     }
 
+    function onClose(){
+        setModalOpen(false)
+        fetchReportTemplate()
+    }
+
     async function getImgUrl(id){
-        if(id == undefined){
+        if(id == undefined || id == ""){
             setImagePreviewUrl("/logoreport1.png")
             return 
         }
@@ -61,11 +70,16 @@ export const TestComponent = ({data}) => {
         setImagePreviewUrl(url)
     }
 
-    function setEmployeesData(id){
-      const find = (employees || []).find((a)=> a.empId == id)
-      setselectedEmployees(find ?? {})
-      getImgUrl(find?.signatureUrl)
+    function setTempleteData(id){
+      const find = (reportTemplate || []).find((a)=> a.testReportId == id)
+      setCurrentTemplate(find ?? "")
     }
+
+    function setEmployeesData(id){
+        const find = (employees || []).find((a)=> a.empId == id)
+        setselectedEmployees(find ?? {})
+        getImgUrl(find?.signatureUrl)
+      }
 
     const fetchEmployees = async () => {
         try {
@@ -79,6 +93,26 @@ export const TestComponent = ({data}) => {
           console.error('Failed to fetch employees:', error);
         }
       };
+
+      const fetchReportTemplate = async () => {
+        try {
+          const fetchedTemplate = await specificApis.fetchReportTemplate();
+          if (Array.isArray(fetchedTemplate)) {
+            setReportTemplate(fetchedTemplate);
+            if(currentTemplate !== ""){
+                const find = fetchedTemplate.find((e)=>e.testReportId == currentTemplate?.testReportId)
+                if(find){
+                    setCurrentTemplate(find)
+                }
+            }
+          } else {
+            setReportTemplate([]);
+          }
+        } catch (error) {
+          console.error('Failed to fetch employees:', error);
+        }
+      };
+
 
     const handleUltraInputChange = (e, testReportId, field) => {
         const {value} = e.target;
@@ -168,6 +202,7 @@ export const TestComponent = ({data}) => {
     };
 
     const filterTestById = (testId) => {
+        setCurrentTemplate("")
         if (testId === '') {
             setSelectedTests([]);
             setReportType('');
@@ -274,6 +309,10 @@ export const TestComponent = ({data}) => {
 
         pdf.save('report.pdf');
     };
+
+    function showTemplate(){
+     return   selectedTests[0] && selectedTests[0]?.testPanelReport?.testMasterReportList[0]?.testReport?.report_type == "UltraSoundReport"
+    }
 
     const updateTestData = () => {
         let payload = {}
@@ -419,7 +458,7 @@ export const TestComponent = ({data}) => {
     return (
         <div className="report-modal-container">
             <div className="report-modal-header">
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-3 gap-3">
                     <div className="w-full">
                     <label className="block text-sm flex-grow whitespace-nowrap mr-2">Select a Test</label>
                     <select name="test-dropdown" id="test-dropdown" className="flex-grow"
@@ -441,6 +480,24 @@ export const TestComponent = ({data}) => {
                         })}
                     </select>
                     </div>
+                    {showTemplate() && (
+                    <div  className="w-full flex items-end">
+                    <div className="w-full mr-2">
+                    <label className="block text-sm flex-grow whitespace-nowrap">Template</label>
+                   <select onChange={(e)=> setTempleteData(e.target.value)} value={currentTemplate?.testReportId}>
+                        <option>Select Value</option>
+                        {(reportTemplate || []).map((a,i)=>{
+                            return  <option key={i} value={a.testReportId}>{a.header}</option>
+                        })}
+                    </select>    
+                    </div> 
+                    {currentTemplate !== "" && (
+                    <div className="edit-icon">
+                            <FontAwesomeIcon icon={faEdit} onClick={() => setModalOpen(true)}/>
+                    </div>
+                    )}
+                    </div>
+                    )}
                 </div>
                 <hr/>
                 {
@@ -627,9 +684,86 @@ export const TestComponent = ({data}) => {
                     </div>
                 </div>
             </div>
+          {ModalOpen && (  <EditTemplate data={currentTemplate} onClose={onClose}/> )}
         </div>
     );
 };
+
+const EditTemplate=({data,onClose})=>{
+    const { register, control, watch, handleSubmit,reset } = useForm({
+        defaultValues: data ?? {}
+      });
+      async function onSubmit(updateData){
+        try {
+            await specificApis.updateReportTemplate(updateData,data.testReportId);
+            onClose()
+        } catch (error) {
+            console.error('Error updating test:', error);
+        }
+      }
+    return(
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center overflow-auto justify-center p-4">
+      <div className="bg-white p-5 rounded-lg shadow-lg w-full">
+        <h2 className="text-xl font-bold text-gray-700 mb-4"> Edit Template</h2>
+        <form onSubmit={handleSubmit(onSubmit)}>
+         <div className="grid grid-cols-2 gap-2">
+         <div className="mb-3">
+            <label className="block  text-sm font-bold mb-2">Template Code:</label>
+            <input
+                type="text" name="name" placeholder="Template Code" {...register(`templateCode`)} required
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            />
+          </div>
+          <div>
+            <label className="block  text-sm font-bold mb-2">header:</label>
+            <input
+                type="text" name="code" placeholder="header" {...register(`header`)} required
+                className="shadow mb-3 appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            />
+          </div>
+         </div>
+         {/* <div className="grid grid-cols-3 gap-2">
+         <div className="mb-3">
+            <label className="block  text-sm font-bold mb-2">Template Code</label>
+            <input
+                type="text" name="name" placeholder="Template Code" {...register(`investigationValueMap`)}
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            />
+          </div>
+          <div>
+            <label className="block  text-sm font-bold mb-2">header</label>
+            <input
+                type="text" name="code" placeholder="header" {...register(`header`)}
+                className="shadow mb-3 appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            />
+          </div>
+          <div>
+            <label className="block  text-sm font-bold mb-2">header</label>
+            <input
+                type="text" name="code" placeholder="header" {...register(`header`)}
+                className="shadow mb-3 appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            />
+          </div>
+         </div> */}
+        <div>
+        <div>
+          <label className="block  text-sm font-bold mb-2">Body</label>
+          <textarea  {...register(`body`)} required className="shadow appearance-none border border-black rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"></textarea>
+         </div>
+         <div>
+          <label className="block  text-sm font-bold mb-2">Impression</label>
+          <textarea  {...register(`impression`)} required className="shadow appearance-none border border-black rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"></textarea>
+         </div>
+        </div> 
+          <div className="flex justify-end items-center mt-4 gap-3">
+            <button type="button" onClick={onClose} className="bg-pink-500 hover:bg-pink-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Cancel</button>
+            <button type="submit" className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Save Template</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    )
+}
 
 const AllBooking = () => {
     const [bookings, setBookings] = useState([]);
@@ -689,8 +823,8 @@ const AllBooking = () => {
                     />
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {bookings.map((booking) => (
-                        <div key={booking.id} className="card overflow-hidden shadow rounded-lg">
+                    {bookings.map((booking,i) => (
+                        <div key={booking.id+i} className="card overflow-hidden shadow rounded-lg">
                             <div className="card-body flex justify-between">
                                 <h2 className="text-lg card-title font-bold">
                                     {booking.patientDetails.firstName} {booking.patientDetails.lastName}

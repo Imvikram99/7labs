@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { specificApis } from '../data/SpecificApis'; // Import API handling class
 import AddEmployeeModal from './AddEmployeeModal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFileUpload } from '@fortawesome/free-solid-svg-icons';
+import { faEdit, faFileUpload } from '@fortawesome/free-solid-svg-icons';
 import FileUpload from './FileUpload/FileUpload';
 import { CustomModal } from './CustomModal';
 import toast from "react-hot-toast";
@@ -12,7 +12,8 @@ export default function EmployeeList() {
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
-  const [selectedCenter, setSelectedCenter] = useState({});
+  const [selectedCenter, setSelectedCenter] = useState(null);
+  const [isEdit, setIsEdit] = useState(null);
   
 
   useEffect(() => {
@@ -39,6 +40,12 @@ export default function EmployeeList() {
     setShowDetailsModal(prevState => !prevState);
 };
 
+function onClose(){
+  setSelectedCenter(null)
+  setIsEdit(null)
+  setModalOpen(false)
+}
+
   const handleAddEmployee = async (newEmployee) => {
     try {
       await specificApis.addEmployee(newEmployee).then(()=>{
@@ -48,6 +55,18 @@ export default function EmployeeList() {
       })
     } catch (error) {
       console.error('Error adding employee:', error);
+    }
+  };
+
+  const handleUpdateEmployee = async (newEmployee) => {
+    try {
+      await specificApis.updateEmployee(newEmployee,isEdit).then(()=>{
+        toast.success('Employee Updated successfully.')
+        fetchEmployees();
+        onClose();
+      })
+    } catch (error) {
+      console.error('Error Updateing employee:', error);
     }
   };
 
@@ -61,7 +80,7 @@ export default function EmployeeList() {
             Add Employee
           </button>
         </div>
-        <AddEmployeeModal isOpen={modalOpen} onClose={() => setModalOpen(false)} onSave={handleAddEmployee}/>
+        <AddEmployeeModal isOpen={modalOpen} onClose={() => onClose()} onSave={isEdit ? handleUpdateEmployee : handleAddEmployee} data={selectedCenter} isEdit={isEdit}/>
         {loading ? (
             <div>Loading...</div>
         ) : employees.length > 0 ? (
@@ -96,6 +115,12 @@ export default function EmployeeList() {
                         handleDetailsModal();
                         setSelectedCenter(employee)
                       }} />
+                       <FontAwesomeIcon className="f-aw-edit me-1" icon={faEdit}
+                                                                     onClick={() => {
+                                                                      setSelectedCenter(employee)
+                                                                      setIsEdit(employee.empId)
+                                                                      setModalOpen(true);
+                                                                    }}/>
                   </td>
                 </tr>
               ))}
