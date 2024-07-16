@@ -384,6 +384,16 @@ class SpecificApis {
     }
   }
 
+  async addReferralSources(data) {
+    try {
+      const response = await apiService.postData('api/v1/lab/referral-sources',data);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching lab profile:', error);
+      throw error;
+    }
+  }
+
 }
 
 

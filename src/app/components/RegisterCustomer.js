@@ -9,6 +9,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRestroom } from "@fortawesome/free-solid-svg-icons";
 import { CustomModal } from "./CustomModal";
 import { TestComponent } from "./AllBooking";
+import { getDate } from "@/helper/globalFunctions";
 
 export default function RegisterCustomer() {
   const [formData, setFormData] = useState({
@@ -685,7 +686,7 @@ const Booking = ({patientData}) => {
           balance: 0.0,
           sampleBy: "",
           billedBy: "",
-          date: "",
+          date: getDate(),
           time: "",
           centerCode: "",
       },
@@ -804,6 +805,13 @@ const Booking = ({patientData}) => {
           setPdfData(result);
           console.log(result);
       } else {
+        setFormData((prevData) => ({
+          ...prevData,
+          bookingSlip: {
+              ...prevData.bookingSlip,
+              time: getDate('time'),
+          },
+      }))
           const response = await fetch(
               "http://ec2-13-233-207-62.ap-south-1.compute.amazonaws.com:8080/api/v1/lab/bookings",
               {
