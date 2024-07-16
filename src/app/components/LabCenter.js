@@ -15,19 +15,19 @@ export default function LabCenter() {
 
 
     useEffect(() => {
-        async function fetchCenters() {
-            try {
-                const fetchedCenters = await specificApis.fetchCenters();
-                setCenters(fetchedCenters);
-                setLoading(false);
-            } catch (error) {
-                console.error('Failed to fetch center information:', error);
-                setLoading(false);
-            }
-        }
-
         fetchCenters();
     }, []);
+
+    async function fetchCenters() {
+        try {
+            const fetchedCenters = await specificApis.fetchCenters();
+            setCenters(fetchedCenters);
+            setLoading(false);
+        } catch (error) {
+            console.error('Failed to fetch center information:', error);
+            setLoading(false);
+        }
+    }
 
     const handleAddCenter = async (centerDetails) => {
         try {
@@ -40,6 +40,7 @@ export default function LabCenter() {
 
     const handleDetailsModal = () => {
         setShowDetailsModal(prevState => !prevState);
+        fetchCenters()
     };
 
     return (
