@@ -213,7 +213,7 @@ const Booking = ({ isEdit, data, onClose }) => {
 
     function getTestTotal() {
         let sum = 0;
-        (formData?.bookingSlip?.tests || []).map((e) => {
+        (formData?.bookingSlip?.tests || []).forEach((e) => {
             sum += Number(e.cost) ?? 0
         })
         return sum
