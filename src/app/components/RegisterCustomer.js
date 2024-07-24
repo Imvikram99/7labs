@@ -197,6 +197,7 @@ export default function RegisterCustomer() {
       specificApis
         .registerPatient(fieldsToSend)
         .then((response) => {
+          toast.success('Patient registered successfully')
           console.log("Patient registered, ID:", response.patientId);
           setFormData((prev) => ({ ...prev,patientId:response.patientId }))
           setactiveScreen(2)
@@ -207,6 +208,7 @@ export default function RegisterCustomer() {
         })
         .catch((error) => {
           console.error("Error registering patient:", error);
+          toast.error('Referral Added successfully')
         });
     }
   };
@@ -331,6 +333,7 @@ export default function RegisterCustomer() {
                 <label className="block text-gray-700">Pincode</label>
                 <input
                   name="pinCode"
+                  type="number"
                   required
                   className="border border-gray-300 rounded p-2 w-full text-gray-700"
                   value={formData.pinCode}
@@ -1145,54 +1148,6 @@ const Booking = ({patientData}) => {
                       <div>
                           <label
                               className="block text-sm mb-2"
-                              htmlFor="date"
-                          >
-                              Date
-                          </label>
-                          <input
-                              type="date"
-                              name="bookingSlip.date"
-                              value={formData.bookingSlip.date}
-                              required
-                              onChange={(e) =>
-                                  setFormData((prevData) => ({
-                                      ...prevData,
-                                      bookingSlip: {
-                                          ...prevData.bookingSlip,
-                                          date: e.target.value,
-                                      },
-                                  }))
-                              }
-                              className="w-full"
-                          />
-                      </div>
-                      <div>
-                          <label
-                              className="block text-sm mb-2"
-                              htmlFor="time"
-                          >
-                              Time
-                          </label>
-                          <input
-                              type="time"
-                              name="bookingSlip.time"
-                              value={formData.bookingSlip.time}
-                              required
-                              onChange={(e) =>
-                                  setFormData((prevData) => ({
-                                      ...prevData,
-                                      bookingSlip: {
-                                          ...prevData.bookingSlip,
-                                          time: e.target.value,
-                                      },
-                                  }))
-                              }
-                              className="w-full"
-                          />
-                      </div>
-                      <div>
-                          <label
-                              className="block text-sm mb-2"
                               htmlFor="centerCode"
                           >
                               Center Code
@@ -1232,7 +1187,7 @@ const Booking = ({patientData}) => {
               </div>
           </form>
           <CustomModal showModal={showModal} handleClose={handleCloseModal}>
-              {selectedBooking && <TestComponent data={selectedBooking}/>}
+              {selectedBooking && <TestComponent data={selectedBooking} type={"bill"}/>}
           </CustomModal>
       </div>
   );

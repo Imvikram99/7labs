@@ -13,7 +13,7 @@ import Booking from "./Booking";
 import { useForm } from "react-hook-form";
 import Select from "react-select";
 
-export const TestComponent = ({ data }) => {
+export const TestComponent = ({ data,type }) => {
     const [selectedTests, setSelectedTests] = useState([]);
     const [reportType, setReportType] = useState(null);
     const [showEditReportModal, setShowEditReportModal] = useState(false);
@@ -454,7 +454,9 @@ export const TestComponent = ({ data }) => {
             </React.Fragment>
         ));
     };
-
+    if(type == 'bill'){
+        return <Invoice data={data} centers={centers} generatePdf={generatePdf}/>
+    }  
     return (
         <div className="report-modal-container">
             <div className="report-modal-header">
@@ -491,24 +493,6 @@ export const TestComponent = ({ data }) => {
                             }}
                         />
                     </div>
-                    {showTemplate() && (
-                        <div className="w-full flex items-end">
-                            <div className="w-full mr-2">
-                                <label className="block text-sm flex-grow whitespace-nowrap">Template</label>
-                                <select onChange={(e) => setTempleteData(e.target.value)} value={currentTemplate?.testReportId}>
-                                    <option>Select Value</option>
-                                    {(reportTemplate || []).map((a, i) => {
-                                        return <option key={i} value={a.testReportId}>{a.header}</option>
-                                    })}
-                                </select>
-                            </div>
-                            {currentTemplate !== "" && (
-                                <div className="edit-icon">
-                                    <FontAwesomeIcon icon={faEdit} onClick={() => setModalOpen(true)} />
-                                </div>
-                            )}
-                        </div>
-                    )}
                 </div>
                 <hr />
                 {
@@ -556,13 +540,31 @@ export const TestComponent = ({ data }) => {
                                                                     className="block text-sm mb-2 capitalize">{field}</label>
                                                                 <span className="report-value">
                                                                     <input className="w-full mb-3 text-black"
-                                                                        type="text"
+                                                                        type="text" required
                                                                         value={ultraInputValues[testMaster.testReport.testReportId]?.[field] || testMaster.testReport[field]}
                                                                         onChange={(e) => handleUltraInputChange(e, testMaster.testReport.testReportId, field)}
                                                                     />
                                                                 </span>
                                                             </p>
                                                         ))}
+                                                        {showTemplate() && (
+                                                            <div className="w-full flex items-end mb-3">
+                                                                <div className="w-full mr-2">
+                                                                    <label className="block text-sm flex-grow whitespace-nowrap">Template</label>
+                                                                    <select onChange={(e) => setTempleteData(e.target.value)} value={currentTemplate?.testReportId}>
+                                                                        <option>Select Value</option>
+                                                                        {(reportTemplate || []).map((a, i) => {
+                                                                            return <option key={i} value={a.testReportId}>{a.header}</option>
+                                                                        })}
+                                                                    </select>
+                                                                </div>
+                                                                {currentTemplate !== "" && (
+                                                                    <div className="edit-icon">
+                                                                        <FontAwesomeIcon icon={faEdit} onClick={() => setModalOpen(true)} />
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 );
                                             })
@@ -704,6 +706,130 @@ export const TestComponent = ({ data }) => {
     );
 };
 
+
+const Invoice = ({data,centers,generatePdf}) => {
+    const booking = data.bookingSlip
+    const patient   = data.patientDetails
+    return (
+        <div>
+        <div id="report-main-body-pdf" className="max-w-2xl">
+          <div className="text-center">
+                  <h2 className="font-bold text-2xl">Invoice</h2>
+          </div>
+           <div className="flex justify-between px-20 mt-10">
+           <ul className="">
+             <li className="flex text-xs mb-1">
+                <div className="w-14 font-bold">Name :</div>
+                <div>{patient.firstName} {patient.lastName}</div>
+             </li>
+             <li className="flex text-xs  mb-1">
+                <div className="w-14 font-bold">Phone :</div>
+                <div> {patient.phone}</div>
+             </li>
+             <li className="flex text-xs  mb-1">
+                <div className="w-14 font-bold">Email :</div>
+                <div> {patient.email}</div>
+             </li>
+             <li className="flex text-xs  mb-1">
+                <div className="w-14 font-bold">Age :</div>
+                <div>{patient.ageInYears} year {patient.ageInMonths} Months {patient.ageInMonths} Days</div>
+             </li>
+          </ul>
+
+          <div className="">
+            <h2 className="font-bold text-base mb-2">Center</h2>
+             <ul>
+             <li className="flex text-xs mb-1">
+                <div className="w-14 font-bold">Name :</div>
+                <div>{centers.name}</div>
+             </li>
+             <li className="flex text-xs  mb-1">
+                <div className="w-14 font-bold">Address :</div>
+                <div> {centers.address}</div>
+             </li>
+             <li className="flex text-xs  mb-1">
+                <div className="w-14 font-bold">Phone :</div>
+                <div> {centers.phone}</div>
+             </li>
+             </ul>
+          </div>
+           </div>
+
+          <div className="px-20 mt-5 mb-5">
+            <h2 className="font-bold text-base mb-2">Test List</h2>
+             <ul>
+             {booking.tests.map((e)=>{
+                return(
+                    <li className="flex text-xs mb-1">
+                    <div className=" font-bold mr-2">{e.name} : </div>
+                    <div>$ {e.cost}</div>
+                 </li>
+                )
+             })}
+             </ul>
+          </div>
+
+            <table className="body-wrap">
+                <tbody>
+                    <tr>
+                        <td></td>
+                        <td className="container p-0" width="600">
+                            <div className="content">
+                                <table className="main" width="100%" cellpadding="0" cellspacing="0">
+                                    <tbody>
+                                        <tr>
+                                            <td className="content-wrap aligncenter p-0">
+                                                <table width="100%" cellpadding="0" cellspacing="0">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td className="content-block">
+                                                                <table className="invoice">
+                                                                    <tbody>
+                                                                        <tr>
+                                                                            <td>
+                                                                                <table className="invoice-items" cellpadding="0"
+                                                                                    cellspacing="0">
+                                                                                    <tbody>
+                                                                                        <tr>
+                                                                                            <td className="text-left">Net Amount</td>
+                                                                                            <td className="alignright">$ {booking.net}</td>
+                                                                                        </tr>
+                                                                                        <tr>
+                                                                                            <td className="text-left">Paid Amount</td>
+                                                                                            <td className="alignright">$ {booking.paid}</td>
+                                                                                        </tr>
+                                                                                        <tr>
+                                                                                            <td className="text-left">Payable Amount
+                                                                                          </td>
+                                                                                            <td className="alignright">$ {booking.balance}</td>
+                                                                                        </tr>
+                                                                                    </tbody>
+                                                                                </table>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </tbody>
+                                                                </table>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div className="download-pdf-icon absolute right-4 top-5"><FontAwesomeIcon onClick={generatePdf} icon={faFilePdf} />
+        </div>
+        </div>
+    )
+}
+
 const EditTemplate = ({ data, onClose }) => {
     const { register, control, watch, handleSubmit, reset } = useForm({
         defaultValues: data ?? {}
@@ -717,7 +843,7 @@ const EditTemplate = ({ data, onClose }) => {
         }
     }
     return (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center overflow-auto justify-center p-4">
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 z-50 flex items-center overflow-auto justify-center p-4">
             <div className="bg-white p-5 rounded-lg shadow-lg w-full">
                 <h2 className="text-xl font-bold text-gray-700 mb-4"> Edit Template</h2>
                 <form onSubmit={handleSubmit(onSubmit)}>
@@ -725,7 +851,7 @@ const EditTemplate = ({ data, onClose }) => {
                         <div className="mb-3">
                             <label className="block  text-sm font-bold mb-2">Template Code:</label>
                             <input
-                                type="text" name="name" placeholder="Template Code" {...register(`templateCode`)} required
+                                type="text" name="name" placeholder="Template Code" {...register(`templateCode`)} required={true}
                                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                             />
                         </div>
@@ -810,6 +936,7 @@ const AllBooking = () => {
     const handleCloseModal = () => {
         setShowModal(false);
         setSelectedBooking(null);
+        getBooking()
     };
 
     function onClose() {

@@ -8,9 +8,11 @@ const AddReferral = ({ onClose, data }) => {
     async function onSubmit(submitData) {
         try {
             await specificApis.addReferralSources(submitData);
+            toast.success('Referral Added successfully')
             onClose()
         } catch (error) {
             console.error('Error updating test:', error);
+            toast.error('Error  Addeding Referral')
         }
     }
     return (

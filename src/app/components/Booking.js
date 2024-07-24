@@ -8,6 +8,7 @@ import { TestComponent } from "./AllBooking";
 import { ActiveComponent } from "./SidebarWithHeader";
 import { getDate } from "@/helper/globalFunctions";
 import AddReferral from "../components/AddReferral"
+import toast from "react-hot-toast";
 
 const Booking = ({ isEdit, data, onClose }) => {
     const initialTest = {
@@ -104,7 +105,7 @@ const Booking = ({ isEdit, data, onClose }) => {
             return;
         }
 
-        const url = `http://ec2-13-233-207-62.ap-south-1.compute.amazonaws.com:8080/api/v1/lab/patient?searchQuery=${encodeURIComponent(
+        const url = `http://ec2-35-154-212-144.ap-south-1.compute.amazonaws.com:8080/api/v1/lab/patient?searchQuery=${encodeURIComponent(
             searchQuery
         )}&searchQueryType=${encodeURIComponent(searchQueryType)}`;
         const response = await fetch(url, {
@@ -191,7 +192,7 @@ const Booking = ({ isEdit, data, onClose }) => {
         const fetchTestPanel = async () => {
             try {
                 const response = await fetch(
-                    "http://ec2-13-233-207-62.ap-south-1.compute.amazonaws.com:8080/api/v1/lab/testpanel",
+                    "http://ec2-35-154-212-144.ap-south-1.compute.amazonaws.com:8080/api/v1/lab/testpanel",
                     {
                         headers: {
                             "X-API-KEY": "test123",
@@ -280,7 +281,7 @@ const Booking = ({ isEdit, data, onClose }) => {
         e.preventDefault();
         if (updateProfile) {
             const response = await fetch(
-                "http://ec2-13-233-207-62.ap-south-1.compute.amazonaws.com:8080/api/v1/lab/bookings?updateProfile=true",
+                "http://ec2-35-154-212-144.ap-south-1.compute.amazonaws.com:8080/api/v1/lab/bookings?updateProfile=true",
                 {
                     method: "POST",
                     headers: {
@@ -307,7 +308,7 @@ const Booking = ({ isEdit, data, onClose }) => {
                 },
             }))
             const response = await fetch(
-                "http://ec2-13-233-207-62.ap-south-1.compute.amazonaws.com:8080/api/v1/lab/bookings",
+                "http://ec2-35-154-212-144.ap-south-1.compute.amazonaws.com:8080/api/v1/lab/bookings",
                 {
                     method: "POST",
                     headers: {
@@ -1074,7 +1075,7 @@ const Booking = ({ isEdit, data, onClose }) => {
                     </div>
                 </form>
                 <CustomModal showModal={showModal} handleClose={handleCloseModal}>
-                    {selectedBooking && <TestComponent data={selectedBooking} />}
+                    {selectedBooking && <TestComponent data={selectedBooking} type={'bill'}/>}
                 </CustomModal>
                 {ModalOpen && <AddReferral onClose={onModalClose}/>}
             </div>
