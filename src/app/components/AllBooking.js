@@ -758,9 +758,9 @@ const Invoice = ({data,centers,generatePdf}) => {
           <div className="px-20 mt-5 mb-5">
             <h2 className="font-bold text-base mb-2">Test List</h2>
              <ul>
-             {booking.tests.map((e)=>{
+             {booking.tests.map((e,i)=>{
                 return(
-                    <li className="flex text-xs mb-1">
+                    <li className="flex text-xs mb-1" key={i}>
                     <div className=" font-bold mr-2">{e.name} : </div>
                     <div>$ {e.cost}</div>
                  </li>
