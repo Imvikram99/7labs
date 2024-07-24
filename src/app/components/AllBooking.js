@@ -12,6 +12,7 @@ import toast from "react-hot-toast";
 import Booking from "./Booking";
 import { useForm } from "react-hook-form";
 import Select from "react-select";
+import Image from "next/image";
 
 export const TestComponent = ({ data,type }) => {
     const [selectedTests, setSelectedTests] = useState([]);
@@ -645,7 +646,7 @@ export const TestComponent = ({ data,type }) => {
                             <p>{centers.address}</p>
                         </div>
                         <div className="a-right">
-                            <img style={{ width: "100px" }} src="/logoreport1.png" alt="logo" />
+                            <Image style={{ width: "100px" }} src="/logoreport1.png" alt="logo" />
                         </div>
                     </div>
                     <h3 id="report-title" className="report-title">Laboratory Report</h3>
@@ -694,7 +695,7 @@ export const TestComponent = ({ data,type }) => {
                                 <p>{e?.designation}</p>
                                 <p>&nbsp;</p>
                                 <div className="a-right">
-                                    <img style={{ width: "100px" }} src={e.url} alt="logo" />
+                                    <Image style={{ width: "100px" }} src={e.url} alt="logo" />
                                 </div>
                             </div>
                         )
