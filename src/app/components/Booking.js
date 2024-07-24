@@ -8,7 +8,6 @@ import { TestComponent } from "./AllBooking";
 import { ActiveComponent } from "./SidebarWithHeader";
 import { getDate } from "@/helper/globalFunctions";
 import AddReferral from "../components/AddReferral"
-import toast from "react-hot-toast";
 
 const Booking = ({ isEdit, data, onClose }) => {
     const initialTest = {
