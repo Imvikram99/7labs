@@ -77,15 +77,6 @@ export default function RegisterCustomer() {
       addressLine2: "",
       addressLine3: "",
       pinCode: "",
-      age: "",
-      ageType: "Years", // Default to 'Years'
-      sampleCollector: "",
-      organisation: "",
-      sampleCollectedAt: "",
-      referralType: "",
-      doctorHospitalName: "",
-      degree: "",
-      complements: "",
       ageInMonths:0,
       ageInDays:0,
       ageInYears:0,
@@ -635,12 +626,27 @@ const Booking = ({patientData}) => {
   const [showModal, setShowModal] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [employees, setEmployees] = useState([]);
+  const [referralSources, setReferralSources] = useState([]);
   const context = useContext(ActiveComponent);  
 
   useEffect(()=>{
       fetchCenters();
       fetchEmployees();
+      fetchReferralSources()
   },[])
+
+  const fetchReferralSources = async () => {
+      try {
+          const fetchedEmployees = await specificApis.fetchReferralSources();
+          if (Array.isArray(fetchedEmployees)) {
+              setReferralSources(fetchedEmployees);
+          } else {
+              setReferralSources([]);
+          }
+      } catch (error) {
+          console.error('Failed to fetch referral-sources:', error);
+      }
+  };
 
   const fetchEmployees = async () => {
     try {
@@ -697,7 +703,7 @@ const Booking = ({patientData}) => {
       const fetchTestPanel = async () => {
           try {
               const response = await fetch(
-                  "http://ec2-13-233-207-62.ap-south-1.compute.amazonaws.com:8080/api/v1/lab/testpanel",
+                  "http://ec2-35-154-212-144.ap-south-1.compute.amazonaws.com:8080/api/v1/lab/testpanel",
                   {
                       headers: {
                           "X-API-KEY": "test123",
@@ -786,7 +792,7 @@ const Booking = ({patientData}) => {
       e.preventDefault();
       if (updateProfile) {
           const response = await fetch(
-              "http://ec2-13-233-207-62.ap-south-1.compute.amazonaws.com:8080/api/v1/lab/bookings?updateProfile=true",
+              "http://ec2-35-154-212-144.ap-south-1.compute.amazonaws.com:8080/api/v1/lab/bookings?updateProfile=true",
               {
                   method: "POST",
                   headers: {
@@ -812,8 +818,9 @@ const Booking = ({patientData}) => {
               time: getDate('time'),
           },
       }))
+      delete formData.patientDetails.searchQuery
           const response = await fetch(
-              "http://ec2-13-233-207-62.ap-south-1.compute.amazonaws.com:8080/api/v1/lab/bookings",
+              "http://ec2-35-154-212-144.ap-south-1.compute.amazonaws.com:8080/api/v1/lab/bookings",
               {
                   method: "POST",
                   headers: {
@@ -977,22 +984,22 @@ const Booking = ({patientData}) => {
                           >
                               Referral Doctor ID
                           </label>
-                          <input
-                              type="text"
-                              required
-                              name="bookingSlip.referralDoctorId"
-                              value={formData.bookingSlip.referralSourceId}
-                              onChange={(e) =>
-                                  setFormData((prevData) => ({
-                                      ...prevData,
-                                      bookingSlip: {
-                                          ...prevData.bookingSlip,
-                                          referralSourceId: e.target.value,
-                                      },
-                                  }))
-                              }
-                              className="w-full"
-                          />
+                          <select name="bookingSlip.referralDoctorId"
+                                        required
+                                        value={formData.bookingSlip.referralSourceId} onChange={(e) =>
+                                            setFormData((prevData) => ({
+                                                ...prevData,
+                                                bookingSlip: {
+                                                    ...prevData.bookingSlip,
+                                                    referralSourceId: e.target.value,
+                                                },
+                                            }))
+                                        }>
+                                        <option>Select Option</option>
+                                        {(referralSources || []).map((e, i) => {
+                                            return <option value={e.id} key={i}>{e.name}</option>
+                                        })}
+                                    </select>
                       </div>
                       <div>
                           <label
