@@ -236,8 +236,8 @@ export const TestComponent = ({ data,type }) => {
     }
 
     const renderData = (testMasters, parentName = '') => {
-        return testMasters.map((testMaster, index) => (
-            <React.Fragment key={'master-' + index}>
+        return testMasters.forEach((testMaster, index) => (
+            <div key={'master-' + index}>
                 {testMaster.testReport && (
                     <tr>
                         <td className="capitalize">{testMaster.testMasterName}</td>
@@ -274,7 +274,7 @@ export const TestComponent = ({ data,type }) => {
                         {renderData(testMaster.testMasterReports, testMaster.testMasterName)}
                     </>
                 )}
-            </React.Fragment>
+            </div>
         ));
     };
 
@@ -321,7 +321,7 @@ export const TestComponent = ({ data,type }) => {
 
         if (reportType === 'BloodReport') {
             const updateReports = (reports) => {
-                return reports.map(report => {
+                return reports.forEach(report => {
                     if (report.testReport && inputValues[report.testReport.testReportId]) {
                         return {
                             ...report,
@@ -341,7 +341,7 @@ export const TestComponent = ({ data,type }) => {
                 });
             };
 
-            updatedTestsData = selectedTests.map(test => {
+            updatedTestsData = selectedTests.forEach(test => {
                 return {
                     ...test,
                     testPanelReport: {
@@ -355,12 +355,12 @@ export const TestComponent = ({ data,type }) => {
 
         } else if (reportType === 'UltraSoundReport') {
 
-            updatedTestsData = selectedTests.map(test => {
+            updatedTestsData = selectedTests.forEach(test => {
                 return {
                     ...test,
                     testPanelReport: {
                         ...test.testPanelReport,
-                        testMasterReportList: test.testPanelReport.testMasterReportList.map(masterReport => {
+                        testMasterReportList: test.testPanelReport.testMasterReportList.forEach(masterReport => {
                             if (masterReport.testReport.testReportId in ultraInputValues) {
                                 const updatedReport = {
                                     ...masterReport.testReport,
@@ -381,7 +381,7 @@ export const TestComponent = ({ data,type }) => {
 
         } else if (reportType === 'MatrixTestReportTemplate') {
 
-            updatedTestsData = selectedTests.map(test => {
+            updatedTestsData = selectedTests.forEach(test => {
                 return {
                     ...test,
                     testPanelReport: {
@@ -430,8 +430,8 @@ export const TestComponent = ({ data,type }) => {
     }
 
     const renderEditedData = (testMasters, parentName = '') => {
-        return testMasters.map((testMaster, testIndex) => (
-            <React.Fragment key={'master-' + testIndex}>
+        return testMasters.forEach((testMaster, testIndex) => (
+            <div key={'master-' + testIndex}>
                 {testMaster.testReport && (
                     <tr>
                         <td className="capitalize">{testMaster.testMasterName}</td>
@@ -452,7 +452,7 @@ export const TestComponent = ({ data,type }) => {
                         {renderEditedData(testMaster.testMasterReports, testMaster.testMasterName)}
                     </>
                 )}
-            </React.Fragment>
+            </div>
         ));
     };
     if(type == 'bill'){
