@@ -688,9 +688,9 @@ export const TestComponent = ({ data,type }) => {
                                 report</p>
                     }
                     <p>Digitally signed by</p>
-                    {selectedEmployees.map((e) => {
+                    {selectedEmployees.map((e,index) => {
                         return (
-                            <div className="signature-part">
+                            <div className="signature-part" key={index}>
                                 <p><strong>{e?.firstName} {e?.lastName}</strong></p>
                                 <p>{e?.designation}</p>
                                 <p>&nbsp;</p>
