@@ -9,6 +9,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRestroom } from "@fortawesome/free-solid-svg-icons";
 import { CustomModal } from "./CustomModal";
 import { TestComponent } from "./AllBooking";
+import { getDate } from "@/helper/globalFunctions";
 
 export default function RegisterCustomer() {
   const [formData, setFormData] = useState({
@@ -76,15 +77,6 @@ export default function RegisterCustomer() {
       addressLine2: "",
       addressLine3: "",
       pinCode: "",
-      age: "",
-      ageType: "Years", // Default to 'Years'
-      sampleCollector: "",
-      organisation: "",
-      sampleCollectedAt: "",
-      referralType: "",
-      doctorHospitalName: "",
-      degree: "",
-      complements: "",
       ageInMonths:0,
       ageInDays:0,
       ageInYears:0,
@@ -205,6 +197,7 @@ export default function RegisterCustomer() {
       specificApis
         .registerPatient(fieldsToSend)
         .then((response) => {
+          toast.success('Patient registered successfully')
           console.log("Patient registered, ID:", response.patientId);
           setFormData((prev) => ({ ...prev,patientId:response.patientId }))
           setactiveScreen(2)
@@ -215,6 +208,7 @@ export default function RegisterCustomer() {
         })
         .catch((error) => {
           console.error("Error registering patient:", error);
+          toast.error('Referral Added successfully')
         });
     }
   };
@@ -339,6 +333,7 @@ export default function RegisterCustomer() {
                 <label className="block text-gray-700">Pincode</label>
                 <input
                   name="pinCode"
+                  type="number"
                   required
                   className="border border-gray-300 rounded p-2 w-full text-gray-700"
                   value={formData.pinCode}
@@ -634,12 +629,27 @@ const Booking = ({patientData}) => {
   const [showModal, setShowModal] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [employees, setEmployees] = useState([]);
+  const [referralSources, setReferralSources] = useState([]);
   const context = useContext(ActiveComponent);  
 
   useEffect(()=>{
       fetchCenters();
       fetchEmployees();
+      fetchReferralSources()
   },[])
+
+  const fetchReferralSources = async () => {
+      try {
+          const fetchedEmployees = await specificApis.fetchReferralSources();
+          if (Array.isArray(fetchedEmployees)) {
+              setReferralSources(fetchedEmployees);
+          } else {
+              setReferralSources([]);
+          }
+      } catch (error) {
+          console.error('Failed to fetch referral-sources:', error);
+      }
+  };
 
   const fetchEmployees = async () => {
     try {
@@ -685,7 +695,7 @@ const Booking = ({patientData}) => {
           balance: 0.0,
           sampleBy: "",
           billedBy: "",
-          date: "",
+          date: getDate(),
           time: "",
           centerCode: "",
       },
@@ -696,7 +706,7 @@ const Booking = ({patientData}) => {
       const fetchTestPanel = async () => {
           try {
               const response = await fetch(
-                  "http://ec2-13-233-207-62.ap-south-1.compute.amazonaws.com:8080/api/v1/lab/testpanel",
+                  "http://ec2-35-154-212-144.ap-south-1.compute.amazonaws.com:8080/api/v1/lab/testpanel",
                   {
                       headers: {
                           "X-API-KEY": "test123",
@@ -785,7 +795,7 @@ const Booking = ({patientData}) => {
       e.preventDefault();
       if (updateProfile) {
           const response = await fetch(
-              "http://ec2-13-233-207-62.ap-south-1.compute.amazonaws.com:8080/api/v1/lab/bookings?updateProfile=true",
+              "http://ec2-35-154-212-144.ap-south-1.compute.amazonaws.com:8080/api/v1/lab/bookings?updateProfile=true",
               {
                   method: "POST",
                   headers: {
@@ -804,8 +814,16 @@ const Booking = ({patientData}) => {
           setPdfData(result);
           console.log(result);
       } else {
+        setFormData((prevData) => ({
+          ...prevData,
+          bookingSlip: {
+              ...prevData.bookingSlip,
+              time: getDate('time'),
+          },
+      }))
+      delete formData.patientDetails.searchQuery
           const response = await fetch(
-              "http://ec2-13-233-207-62.ap-south-1.compute.amazonaws.com:8080/api/v1/lab/bookings",
+              "http://ec2-35-154-212-144.ap-south-1.compute.amazonaws.com:8080/api/v1/lab/bookings",
               {
                   method: "POST",
                   headers: {
@@ -969,22 +987,22 @@ const Booking = ({patientData}) => {
                           >
                               Referral Doctor ID
                           </label>
-                          <input
-                              type="text"
-                              required
-                              name="bookingSlip.referralDoctorId"
-                              value={formData.bookingSlip.referralSourceId}
-                              onChange={(e) =>
-                                  setFormData((prevData) => ({
-                                      ...prevData,
-                                      bookingSlip: {
-                                          ...prevData.bookingSlip,
-                                          referralSourceId: e.target.value,
-                                      },
-                                  }))
-                              }
-                              className="w-full"
-                          />
+                          <select name="bookingSlip.referralDoctorId"
+                                        required
+                                        value={formData.bookingSlip.referralSourceId} onChange={(e) =>
+                                            setFormData((prevData) => ({
+                                                ...prevData,
+                                                bookingSlip: {
+                                                    ...prevData.bookingSlip,
+                                                    referralSourceId: e.target.value,
+                                                },
+                                            }))
+                                        }>
+                                        <option>Select Option</option>
+                                        {(referralSources || []).map((e, i) => {
+                                            return <option value={e.id} key={i}>{e.name}</option>
+                                        })}
+                                    </select>
                       </div>
                       <div>
                           <label
@@ -1130,54 +1148,6 @@ const Booking = ({patientData}) => {
                       <div>
                           <label
                               className="block text-sm mb-2"
-                              htmlFor="date"
-                          >
-                              Date
-                          </label>
-                          <input
-                              type="date"
-                              name="bookingSlip.date"
-                              value={formData.bookingSlip.date}
-                              required
-                              onChange={(e) =>
-                                  setFormData((prevData) => ({
-                                      ...prevData,
-                                      bookingSlip: {
-                                          ...prevData.bookingSlip,
-                                          date: e.target.value,
-                                      },
-                                  }))
-                              }
-                              className="w-full"
-                          />
-                      </div>
-                      <div>
-                          <label
-                              className="block text-sm mb-2"
-                              htmlFor="time"
-                          >
-                              Time
-                          </label>
-                          <input
-                              type="time"
-                              name="bookingSlip.time"
-                              value={formData.bookingSlip.time}
-                              required
-                              onChange={(e) =>
-                                  setFormData((prevData) => ({
-                                      ...prevData,
-                                      bookingSlip: {
-                                          ...prevData.bookingSlip,
-                                          time: e.target.value,
-                                      },
-                                  }))
-                              }
-                              className="w-full"
-                          />
-                      </div>
-                      <div>
-                          <label
-                              className="block text-sm mb-2"
                               htmlFor="centerCode"
                           >
                               Center Code
@@ -1217,7 +1187,7 @@ const Booking = ({patientData}) => {
               </div>
           </form>
           <CustomModal showModal={showModal} handleClose={handleCloseModal}>
-              {selectedBooking && <TestComponent data={selectedBooking}/>}
+              {selectedBooking && <TestComponent data={selectedBooking} type={"bill"}/>}
           </CustomModal>
       </div>
   );

@@ -12,7 +12,7 @@ export const CustomModal = ({showModal, handleClose, children}) => {
                 <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
                 <div
                     className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:align-middle w-7/10"
-                    style={{minWidth: '50%', maxWidth: '70%'}}>
+                    >
                     <div className="card" style={{marginBottom: '0'}}>
                         <div className="card-body">
                             {children}

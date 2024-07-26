@@ -1,24 +1,26 @@
-import React, {useState, useEffect, Fragment} from "react";
-import {FaDownload} from "react-icons/fa6";
+import React, { useState, useEffect, Fragment } from "react";
+import { FaDownload } from "react-icons/fa6";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
-import {specificApis} from '../data/SpecificApis';
-import {faArrowLeft, faEdit, faFilePdf, faRestroom} from "@fortawesome/free-solid-svg-icons";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {formatDate} from "@/helper/globalFunctions";
-import {CustomModal} from "@/app/components/CustomModal";
+import { specificApis } from '../data/SpecificApis';
+import { faArrowLeft, faEdit, faFilePdf, faRestroom } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { formatDate } from "@/helper/globalFunctions";
+import { CustomModal } from "@/app/components/CustomModal";
 import html2canvas from "html2canvas";
 import toast from "react-hot-toast";
 import Booking from "./Booking";
 import { useForm } from "react-hook-form";
+import Select from "react-select";
+import Image from "next/image";
 
-export const TestComponent = ({data}) => {
+export const TestComponent = ({ data,type }) => {
     const [selectedTests, setSelectedTests] = useState([]);
     const [reportType, setReportType] = useState(null);
     const [showEditReportModal, setShowEditReportModal] = useState(false);
     const [centers, setCenters] = useState([]);
     const [employees, setEmployees] = useState([]);
-    const [selectedEmployees, setselectedEmployees] = useState({});
+    const [selectedEmployees, setselectedEmployees] = useState([]);
     const [imagePreviewUrl, setImagePreviewUrl] = useState('/logoreport1.png');
 
     const [inputValues, setInputValues] = useState({});
@@ -37,17 +39,17 @@ export const TestComponent = ({data}) => {
             [testReportId]: e.target.value
         });
     };
-    useEffect(()=>{
+    useEffect(() => {
         fetchCenters()
         fetchEmployees()
         fetchReportTemplate()
-    },[])
+    }, [])
 
     async function fetchCenters() {
         try {
             const fetchedCenters = await specificApis.fetchCenters();
-            const find = fetchedCenters.find((e)=>e.id == data.bookingSlip.centerCode)
-            if(find){
+            const find = fetchedCenters.find((e) => e.id == data.bookingSlip.centerCode)
+            if (find) {
                 setCenters(find);
             }
         } catch (error) {
@@ -55,67 +57,66 @@ export const TestComponent = ({data}) => {
         }
     }
 
-    function onClose(){
+    function onClose() {
         setModalOpen(false)
         fetchReportTemplate()
     }
 
-    async function getImgUrl(id){
-        if(id == undefined || id == ""){
-            setImagePreviewUrl("/logoreport1.png")
-            return 
+    async function getImgUrl(id) {
+        if (id == undefined || id == "") {
+            return "/logoreport1.png"
         }
         const response = await specificApis.downloadFile(id);
-        const url  = URL.createObjectURL(response);
-        setImagePreviewUrl(url)
+        const url = URL.createObjectURL(response);
+        return url
     }
 
-    function setTempleteData(id){
-      const find = (reportTemplate || []).find((a)=> a.testReportId == id)
-      setCurrentTemplate(find ?? "")
+    function setTempleteData(id) {
+        const find = (reportTemplate || []).find((a) => a.testReportId == id)
+        setCurrentTemplate(find ?? "")
     }
 
-    function setEmployeesData(id){
-        const find = (employees || []).find((a)=> a.empId == id)
+    function setEmployeesData(id) {
+        const find = (employees || []).find((a) => a.empId == id)
         setselectedEmployees(find ?? {})
         getImgUrl(find?.signatureUrl)
-      }
+    }
 
     const fetchEmployees = async () => {
         try {
-          const fetchedEmployees = await specificApis.fetchEmployeeList();
-          if (Array.isArray(fetchedEmployees)) {
-            setEmployees(fetchedEmployees);
-          } else {
-            setEmployees([]);
-          }
-        } catch (error) {
-          console.error('Failed to fetch employees:', error);
-        }
-      };
-
-      const fetchReportTemplate = async () => {
-        try {
-          const fetchedTemplate = await specificApis.fetchReportTemplate();
-          if (Array.isArray(fetchedTemplate)) {
-            setReportTemplate(fetchedTemplate);
-            if(currentTemplate !== ""){
-                const find = fetchedTemplate.find((e)=>e.testReportId == currentTemplate?.testReportId)
-                if(find){
-                    setCurrentTemplate(find)
-                }
+            const fetchedEmployees = await specificApis.fetchEmployeeList();
+            if (Array.isArray(fetchedEmployees)) {
+                setEmployees(fetchedEmployees);
+            } else {
+                setEmployees([]);
             }
-          } else {
-            setReportTemplate([]);
-          }
         } catch (error) {
-          console.error('Failed to fetch employees:', error);
+            console.error('Failed to fetch employees:', error);
         }
-      };
+    };
+
+    const fetchReportTemplate = async () => {
+        try {
+            const fetchedTemplate = await specificApis.fetchReportTemplate();
+            if (Array.isArray(fetchedTemplate)) {
+                setReportTemplate(fetchedTemplate);
+                if (currentTemplate !== "") {
+                    const find = fetchedTemplate.find((e) => e.testReportId == currentTemplate?.testReportId)
+                    if (find) {
+                        setCurrentTemplate(find)
+                    }
+                }
+            } else {
+                setReportTemplate([]);
+            }
+        } catch (error) {
+            console.error('Failed to fetch employees:', error);
+        }
+    };
 
 
     const handleUltraInputChange = (e, testReportId, field) => {
-        const {value} = e.target;
+        const { value } = e.target;
         setUltraInputValues(prevValues => ({
             ...prevValues,
             [testReportId]: {
@@ -136,17 +137,17 @@ export const TestComponent = ({data}) => {
                                     <h2 className="text-lg font-bold mb-2 text-center uppercase">{test.name}</h2>
                                     <table className="table-auto w-full mb-4">
                                         <thead>
-                                        <tr>
-                                            <th className="px-4 py-2">Test Name</th>
-                                            <th className="px-4 py-2">Investigation</th>
-                                            <th className="px-4 py-2">Value</th>
-                                            <th className="px-4 py-2">Unit</th>
-                                            <th className="px-4 py-2">Min</th>
-                                            <th className="px-4 py-2">Max</th>
-                                        </tr>
+                                            <tr>
+                                                <th className="px-4 py-2">Test Name</th>
+                                                <th className="px-4 py-2">Investigation</th>
+                                                <th className="px-4 py-2">Value</th>
+                                                <th className="px-4 py-2">Unit</th>
+                                                <th className="px-4 py-2">Min</th>
+                                                <th className="px-4 py-2">Max</th>
+                                            </tr>
                                         </thead>
                                         <tbody>
-                                        {renderData(test.testPanelReport.testMasterReportList)}
+                                            {renderData(test.testPanelReport.testMasterReportList)}
                                         </tbody>
                                     </table>
                                 </div>
@@ -178,20 +179,20 @@ export const TestComponent = ({data}) => {
                     <h2 className="test-title">{data.name}</h2>
                     <table className="text-start w-100">
                         <thead>
-                        <tr>
-                            <th>Week</th>
-                            <th>Growth Measurement</th>
-                            <th>Comments</th>
-                        </tr>
+                            <tr>
+                                <th>Week</th>
+                                <th>Growth Measurement</th>
+                                <th>Comments</th>
+                            </tr>
                         </thead>
                         <tbody>
-                        {Object.entries(data.testPanelReport.testMasterReportList[0].testReport.columns).map(([week, data]) => (
-                            <tr key={week}>
-                                <td className="capitalize text-blue-700" style={{textAlign: 'center'}}>{week}</td>
-                                <td>{data.growth_measurement}</td>
-                                <td>{data.comments}</td>
-                            </tr>
-                        ))}
+                            {Object.entries(data.testPanelReport.testMasterReportList[0].testReport.columns).map(([week, data]) => (
+                                <tr key={week}>
+                                    <td className="capitalize text-blue-700" style={{ textAlign: 'center' }}>{week}</td>
+                                    <td>{data.growth_measurement}</td>
+                                    <td>{data.comments}</td>
+                                </tr>
+                            ))}
                         </tbody>
                     </table>
                 </div>
@@ -235,8 +236,8 @@ export const TestComponent = ({data}) => {
     }
 
     const renderData = (testMasters, parentName = '') => {
-        return testMasters.map((testMaster, index) => (
-            <React.Fragment key={'master-' + index}>
+        return testMasters.forEach((testMaster, index) => (
+            <div key={'master-' + index}>
                 {testMaster.testReport && (
                     <tr>
                         <td className="capitalize">{testMaster.testMasterName}</td>
@@ -248,14 +249,14 @@ export const TestComponent = ({data}) => {
                                     <td key={key}>
                                         {key == 'value' && testMaster.testReport?.isRatio ? (
                                             <>
-                                             {(value - testMaster.testReport.minReferenceValue) / (testMaster.testReport.maxReferenceValue - testMaster.testReport.minReferenceValue)}
+                                                {(value - testMaster.testReport.minReferenceValue) / (testMaster.testReport.maxReferenceValue - testMaster.testReport.minReferenceValue)}
                                             </>
                                         ) : (
                                             <>
-                                        {key === 'investigation' ? <span
-                                            className="capitalize">{value}</span> : key === 'testReportDate' ? formatDate(value) : value}
+                                                {key === 'investigation' ? <span
+                                                    className="capitalize">{value}</span> : key === 'testReportDate' ? formatDate(value) : value}
                                             </>
-                                        ) }
+                                        )}
                                     </td>
                                 );
                             })
@@ -264,16 +265,16 @@ export const TestComponent = ({data}) => {
                 )}
                 {testMaster.testMasterReports && (
                     <>
-                        <tr style={{backgroundColor: '#484848', color: 'white', border: '1px solid aliceblue'}}>
+                        <tr style={{ backgroundColor: '#484848', color: 'white', border: '1px solid aliceblue' }}>
                             <td colSpan="100%"
-                                style={{textAlign: 'center', textTransform: 'capitalize', paddingBottom: '10px'}}>
+                                style={{ textAlign: 'center', textTransform: 'capitalize', paddingBottom: '10px' }}>
                                 <strong>{parentName ? `${parentName} - ${testMaster.testMasterName}` : testMaster.testMasterName}</strong>
                             </td>
                         </tr>
                         {renderData(testMaster.testMasterReports, testMaster.testMasterName)}
                     </>
                 )}
-            </React.Fragment>
+            </div>
         ));
     };
 
@@ -310,8 +311,8 @@ export const TestComponent = ({data}) => {
         pdf.save('report.pdf');
     };
 
-    function showTemplate(){
-     return   selectedTests[0] && selectedTests[0]?.testPanelReport?.testMasterReportList[0]?.testReport?.report_type == "UltraSoundReport"
+    function showTemplate() {
+        return selectedTests[0] && selectedTests[0]?.testPanelReport?.testMasterReportList[0]?.testReport?.report_type == "UltraSoundReport"
     }
 
     const updateTestData = () => {
@@ -320,7 +321,7 @@ export const TestComponent = ({data}) => {
 
         if (reportType === 'BloodReport') {
             const updateReports = (reports) => {
-                return reports.map(report => {
+                return reports.forEach(report => {
                     if (report.testReport && inputValues[report.testReport.testReportId]) {
                         return {
                             ...report,
@@ -340,7 +341,7 @@ export const TestComponent = ({data}) => {
                 });
             };
 
-            updatedTestsData = selectedTests.map(test => {
+            updatedTestsData = selectedTests.forEach(test => {
                 return {
                     ...test,
                     testPanelReport: {
@@ -354,12 +355,12 @@ export const TestComponent = ({data}) => {
 
         } else if (reportType === 'UltraSoundReport') {
 
-            updatedTestsData = selectedTests.map(test => {
+            updatedTestsData = selectedTests.forEach(test => {
                 return {
                     ...test,
                     testPanelReport: {
                         ...test.testPanelReport,
-                        testMasterReportList: test.testPanelReport.testMasterReportList.map(masterReport => {
+                        testMasterReportList: test.testPanelReport.testMasterReportList.forEach(masterReport => {
                             if (masterReport.testReport.testReportId in ultraInputValues) {
                                 const updatedReport = {
                                     ...masterReport.testReport,
@@ -380,7 +381,7 @@ export const TestComponent = ({data}) => {
 
         } else if (reportType === 'MatrixTestReportTemplate') {
 
-            updatedTestsData = selectedTests.map(test => {
+            updatedTestsData = selectedTests.forEach(test => {
                 return {
                     ...test,
                     testPanelReport: {
@@ -429,84 +430,79 @@ export const TestComponent = ({data}) => {
     }
 
     const renderEditedData = (testMasters, parentName = '') => {
-        return testMasters.map((testMaster, testIndex) => (
-            <React.Fragment key={'master-' + testIndex}>
+        return testMasters.forEach((testMaster, testIndex) => (
+            <div key={'master-' + testIndex}>
                 {testMaster.testReport && (
                     <tr>
                         <td className="capitalize">{testMaster.testMasterName}</td>
                         {Object.entries(testMaster.testReport).filter(([key, _]) => key === "investigation" || key === "value").map(([key, value]) => (
                             <td key={key}>{key === 'value' ?
                                 <input type="text" value={inputValues[testMaster.testReport.testReportId] ?? value}
-                                       onChange={(e) => handleInputChange(e, testMaster.testReport.testReportId)}/> : value}</td>))}
+                                    onChange={(e) => handleInputChange(e, testMaster.testReport.testReportId)} /> : value}</td>))}
                     </tr>
                 )}
                 {testMaster.testMasterReports && (
                     <>
-                        <tr style={{backgroundColor: '#484848', color: 'white', border: '1px solid aliceblue'}}>
+                        <tr style={{ backgroundColor: '#484848', color: 'white', border: '1px solid aliceblue' }}>
                             <td colSpan="100%"
-                                style={{textAlign: 'center', textTransform: 'capitalize', paddingBottom: '10px'}}>
+                                style={{ textAlign: 'center', textTransform: 'capitalize', paddingBottom: '10px' }}>
                                 <strong>{parentName ? `${parentName} - ${testMaster.testMasterName}` : testMaster.testMasterName}</strong>
                             </td>
                         </tr>
                         {renderEditedData(testMaster.testMasterReports, testMaster.testMasterName)}
                     </>
                 )}
-            </React.Fragment>
+            </div>
         ));
     };
-
+    if(type == 'bill'){
+        return <Invoice data={data} centers={centers} generatePdf={generatePdf}/>
+    }  
     return (
         <div className="report-modal-container">
             <div className="report-modal-header">
                 <div className="grid grid-cols-3 gap-3">
                     <div className="w-full">
-                    <label className="block text-sm flex-grow whitespace-nowrap mr-2">Select a Test</label>
-                    <select name="test-dropdown" id="test-dropdown" className="flex-grow"
+                        <label className="block text-sm flex-grow whitespace-nowrap mr-2">Select a Test</label>
+                        <select name="test-dropdown" id="test-dropdown" className="flex-grow"
                             onChange={(e) => filterTestById(e.target.value)}>
-                        <option value="">--- Select a Test ---</option>
-                        {
-                            (data.bookingSlip.tests || []).map((test) =>
-                                <option key={test.id} value={test.id}>{test.name}</option>
-                            )
-                        }
-                    </select>
+                            <option value="">--- Select a Test ---</option>
+                            {
+                                (data.bookingSlip.tests || []).map((test) =>
+                                    <option key={test.id} value={test.id}>{test.name}</option>
+                                )
+                            }
+                        </select>
                     </div>
-                    <div  className="w-full">
-                    <label className="block text-sm flex-grow whitespace-nowrap mr-2">Verified By</label>
-                   <select onChange={(e)=> setEmployeesData(e.target.value)}>
-                        <option>Select Value</option>
-                        {(employees || []).map((a,i)=>{
-                            return  <option key={i} value={a.empId}>{a.firstName} {a.lastName}</option>
-                        })}
-                    </select>
+                    <div className="w-full">
+                        <label className="block text-sm flex-grow whitespace-nowrap mr-2">Verified By</label>
+                        <Select
+                            className="w-full"
+                            options={(employees || []).map((e) => { return { value: e.empId, label: e.firstName + ' ' + e.lastName } }) ?? []}
+                            isMulti
+                            // value={value}
+                            onChange={async (selectedOptions, selected) => {
+                                if (selected.action == 'remove-value') {
+                                    const newData = selectedEmployees.filter((a) => a.empId !== selected.removedValue?.value)
+                                    setselectedEmployees(newData)
+                                } else {
+                                    const findData = employees.find((a) => a.empId == selected.option?.value)
+                                    if (findData) {
+                                        setselectedEmployees([...selectedEmployees, { ...findData, url: await getImgUrl(findData?.signatureUrl) }])
+                                    }
+                                }
+                            }}
+                        />
                     </div>
-                    {showTemplate() && (
-                    <div  className="w-full flex items-end">
-                    <div className="w-full mr-2">
-                    <label className="block text-sm flex-grow whitespace-nowrap">Template</label>
-                   <select onChange={(e)=> setTempleteData(e.target.value)} value={currentTemplate?.testReportId}>
-                        <option>Select Value</option>
-                        {(reportTemplate || []).map((a,i)=>{
-                            return  <option key={i} value={a.testReportId}>{a.header}</option>
-                        })}
-                    </select>    
-                    </div> 
-                    {currentTemplate !== "" && (
-                    <div className="edit-icon">
-                            <FontAwesomeIcon icon={faEdit} onClick={() => setModalOpen(true)}/>
-                    </div>
-                    )}
-                    </div>
-                    )}
                 </div>
-                <hr/>
+                <hr />
                 {
                     reportType !== null && reportType.length > 0 &&
                     <div className="editable-icon-block flex justify-end">
                         <div className="edit-icon mr-4">
-                            <FontAwesomeIcon icon={faEdit} onClick={() => setShowEditReportModal(true)}/>
+                            <FontAwesomeIcon icon={faEdit} onClick={() => setShowEditReportModal(true)} />
                         </div>
-                        <div className="download-pdf-icon"><FontAwesomeIcon onClick={generatePdf} icon={faFilePdf}/>
+                        <div className="download-pdf-icon"><FontAwesomeIcon onClick={generatePdf} icon={faFilePdf} />
                         </div>
                     </div>
                 }
@@ -525,7 +521,7 @@ export const TestComponent = ({data}) => {
                                                 <h2 className="text-lg font-bold mb-2 text-center uppercase">{test.name}</h2>
                                                 <table className="table-auto w-full mb-4">
                                                     <tbody>
-                                                    {renderEditedData(test.testPanelReport.testMasterReportList)}
+                                                        {renderEditedData(test.testPanelReport.testMasterReportList)}
                                                     </tbody>
                                                 </table>
                                             </div>
@@ -545,34 +541,52 @@ export const TestComponent = ({data}) => {
                                                                     className="block text-sm mb-2 capitalize">{field}</label>
                                                                 <span className="report-value">
                                                                     <input className="w-full mb-3 text-black"
-                                                                           type="text"
-                                                                           value={ultraInputValues[testMaster.testReport.testReportId]?.[field] || testMaster.testReport[field]}
-                                                                           onChange={(e) => handleUltraInputChange(e, testMaster.testReport.testReportId, field)}
+                                                                        type="text" required
+                                                                        value={ultraInputValues[testMaster.testReport.testReportId]?.[field] || testMaster.testReport[field]}
+                                                                        onChange={(e) => handleUltraInputChange(e, testMaster.testReport.testReportId, field)}
                                                                     />
                                                                 </span>
                                                             </p>
                                                         ))}
+                                                        {showTemplate() && (
+                                                            <div className="w-full flex items-end mb-3">
+                                                                <div className="w-full mr-2">
+                                                                    <label className="block text-sm flex-grow whitespace-nowrap">Template</label>
+                                                                    <select onChange={(e) => setTempleteData(e.target.value)} value={currentTemplate?.testReportId}>
+                                                                        <option>Select Value</option>
+                                                                        {(reportTemplate || []).map((a, i) => {
+                                                                            return <option key={i} value={a.testReportId}>{a.header}</option>
+                                                                        })}
+                                                                    </select>
+                                                                </div>
+                                                                {currentTemplate !== "" && (
+                                                                    <div className="edit-icon">
+                                                                        <FontAwesomeIcon icon={faEdit} onClick={() => setModalOpen(true)} />
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 );
                                             })
                                         }
                                     </div>
                                 </Fragment> : reportType === 'MatrixTestReportTemplate' ? (
-                                        <div>
-                                            <h2 className="text-lg font-bold mb-2 text-center uppercase">{selectedTests[0].name}</h2>
-                                            <table className="text-start w-100">
-                                                <thead>
+                                    <div>
+                                        <h2 className="text-lg font-bold mb-2 text-center uppercase">{selectedTests[0].name}</h2>
+                                        <table className="text-start w-100">
+                                            <thead>
                                                 <tr>
                                                     <th>Week</th>
                                                     <th>Growth Measurement</th>
                                                     <th>Comments</th>
                                                 </tr>
-                                                </thead>
-                                                <tbody>
+                                            </thead>
+                                            <tbody>
                                                 {Object.entries(selectedTests[0].testPanelReport.testMasterReportList[0].testReport.columns).map(([week, data]) => (
                                                     <tr key={week}>
                                                         <td className="capitalize text-blue-700"
-                                                            style={{textAlign: 'center'}}>{week}</td>
+                                                            style={{ textAlign: 'center' }}>{week}</td>
                                                         <td>
                                                             <input
                                                                 type="text"
@@ -607,16 +621,16 @@ export const TestComponent = ({data}) => {
                                                         </td>
                                                     </tr>
                                                 ))}
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    ) :
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                ) :
                                     <p className="text-gray-600">Please select a test to view the report.</p>}
                             </div>
 
                             <button type="button"
-                                    className="w-full bg-blue-600 hover:bg-blue-700 py-3 text-white rounded-md"
-                                    onClick={updateTestData}>Submit
+                                className="w-full bg-blue-600 hover:bg-blue-700 py-3 text-white rounded-md"
+                                onClick={updateTestData}>Submit
                             </button>
 
                         </form>
@@ -632,7 +646,7 @@ export const TestComponent = ({data}) => {
                             <p>{centers.address}</p>
                         </div>
                         <div className="a-right">
-                            <img style={{width: "100px"}} src="/logoreport1.png" alt="logo"/>
+                            <Image style={{ width: "100px" }} src="/logoreport1.png" alt="logo" />
                         </div>
                     </div>
                     <h3 id="report-title" className="report-title">Laboratory Report</h3>
@@ -665,7 +679,7 @@ export const TestComponent = ({data}) => {
                             }
                         </div>
                     </div>
-                    <hr/>
+                    <hr />
 
                     {
                         setSelectedTests.length > 0 && reportType !== '' ? renderTestPanelReport(selectedTests, reportType) :
@@ -673,56 +687,184 @@ export const TestComponent = ({data}) => {
                                 view
                                 report</p>
                     }
-                    <div className="signature-part">
-                        <p>Digitally signed by</p>
-                        <p><strong>{selectedEmployees?.firstName} {selectedEmployees?.lastName}</strong></p>
-                        <p>{selectedEmployees?.designation}</p>
-                        <p>&nbsp;</p>
-                        <div className="a-right">
-                            <img style={{width: "100px"}} src={imagePreviewUrl} alt="logo"/>
-                        </div>
-                    </div>
+                    <p>Digitally signed by</p>
+                    {selectedEmployees.map((e,index) => {
+                        return (
+                            <div className="signature-part" key={index}>
+                                <p><strong>{e?.firstName} {e?.lastName}</strong></p>
+                                <p>{e?.designation}</p>
+                                <p>&nbsp;</p>
+                                <div className="a-right">
+                                    <Image style={{ width: "100px" }} src={e.url} alt="logo" />
+                                </div>
+                            </div>
+                        )
+                    })}
                 </div>
             </div>
-          {ModalOpen && (  <EditTemplate data={currentTemplate} onClose={onClose}/> )}
+            {ModalOpen && (<EditTemplate data={currentTemplate} onClose={onClose} />)}
         </div>
     );
 };
 
-const EditTemplate=({data,onClose})=>{
-    const { register, control, watch, handleSubmit,reset } = useForm({
+
+const Invoice = ({data,centers,generatePdf}) => {
+    const booking = data.bookingSlip
+    const patient   = data.patientDetails
+    return (
+        <div>
+        <div id="report-main-body-pdf" className="max-w-2xl">
+          <div className="text-center">
+                  <h2 className="font-bold text-2xl">Invoice</h2>
+          </div>
+           <div className="flex justify-between px-20 mt-10">
+           <ul className="">
+             <li className="flex text-xs mb-1">
+                <div className="w-14 font-bold">Name :</div>
+                <div>{patient.firstName} {patient.lastName}</div>
+             </li>
+             <li className="flex text-xs  mb-1">
+                <div className="w-14 font-bold">Phone :</div>
+                <div> {patient.phone}</div>
+             </li>
+             <li className="flex text-xs  mb-1">
+                <div className="w-14 font-bold">Email :</div>
+                <div> {patient.email}</div>
+             </li>
+             <li className="flex text-xs  mb-1">
+                <div className="w-14 font-bold">Age :</div>
+                <div>{patient.ageInYears} year {patient.ageInMonths} Months {patient.ageInMonths} Days</div>
+             </li>
+          </ul>
+
+          <div className="">
+            <h2 className="font-bold text-base mb-2">Center</h2>
+             <ul>
+             <li className="flex text-xs mb-1">
+                <div className="w-14 font-bold">Name :</div>
+                <div>{centers.name}</div>
+             </li>
+             <li className="flex text-xs  mb-1">
+                <div className="w-14 font-bold">Address :</div>
+                <div> {centers.address}</div>
+             </li>
+             <li className="flex text-xs  mb-1">
+                <div className="w-14 font-bold">Phone :</div>
+                <div> {centers.phone}</div>
+             </li>
+             </ul>
+          </div>
+           </div>
+
+          <div className="px-20 mt-5 mb-5">
+            <h2 className="font-bold text-base mb-2">Test List</h2>
+             <ul>
+             {booking.tests.map((e,i)=>{
+                return(
+                    <li className="flex text-xs mb-1" key={i}>
+                    <div className=" font-bold mr-2">{e.name} : </div>
+                    <div>$ {e.cost}</div>
+                 </li>
+                )
+             })}
+             </ul>
+          </div>
+
+            <table className="body-wrap">
+                <tbody>
+                    <tr>
+                        <td></td>
+                        <td className="container p-0" width="600">
+                            <div className="content">
+                                <table className="main" width="100%" cellpadding="0" cellspacing="0">
+                                    <tbody>
+                                        <tr>
+                                            <td className="content-wrap aligncenter p-0">
+                                                <table width="100%" cellpadding="0" cellspacing="0">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td className="content-block">
+                                                                <table className="invoice">
+                                                                    <tbody>
+                                                                        <tr>
+                                                                            <td>
+                                                                                <table className="invoice-items" cellpadding="0"
+                                                                                    cellspacing="0">
+                                                                                    <tbody>
+                                                                                        <tr>
+                                                                                            <td className="text-left">Net Amount</td>
+                                                                                            <td className="alignright">$ {booking.net}</td>
+                                                                                        </tr>
+                                                                                        <tr>
+                                                                                            <td className="text-left">Paid Amount</td>
+                                                                                            <td className="alignright">$ {booking.paid}</td>
+                                                                                        </tr>
+                                                                                        <tr>
+                                                                                            <td className="text-left">Payable Amount
+                                                                                          </td>
+                                                                                            <td className="alignright">$ {booking.balance}</td>
+                                                                                        </tr>
+                                                                                    </tbody>
+                                                                                </table>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </tbody>
+                                                                </table>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div className="download-pdf-icon absolute right-4 top-5"><FontAwesomeIcon onClick={generatePdf} icon={faFilePdf} />
+        </div>
+        </div>
+    )
+}
+
+const EditTemplate = ({ data, onClose }) => {
+    const { register, control, watch, handleSubmit, reset } = useForm({
         defaultValues: data ?? {}
-      });
-      async function onSubmit(updateData){
+    });
+    async function onSubmit(updateData) {
         try {
-            await specificApis.updateReportTemplate(updateData,data.testReportId);
+            await specificApis.updateReportTemplate(updateData, data.testReportId);
             onClose()
         } catch (error) {
             console.error('Error updating test:', error);
         }
-      }
-    return(
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center overflow-auto justify-center p-4">
-      <div className="bg-white p-5 rounded-lg shadow-lg w-full">
-        <h2 className="text-xl font-bold text-gray-700 mb-4"> Edit Template</h2>
-        <form onSubmit={handleSubmit(onSubmit)}>
-         <div className="grid grid-cols-2 gap-2">
-         <div className="mb-3">
-            <label className="block  text-sm font-bold mb-2">Template Code:</label>
-            <input
-                type="text" name="name" placeholder="Template Code" {...register(`templateCode`)} required
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            />
-          </div>
-          <div>
-            <label className="block  text-sm font-bold mb-2">header:</label>
-            <input
-                type="text" name="code" placeholder="header" {...register(`header`)} required
-                className="shadow mb-3 appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            />
-          </div>
-         </div>
-         {/* <div className="grid grid-cols-3 gap-2">
+    }
+    return (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 z-50 flex items-center overflow-auto justify-center p-4">
+            <div className="bg-white p-5 rounded-lg shadow-lg w-full">
+                <h2 className="text-xl font-bold text-gray-700 mb-4"> Edit Template</h2>
+                <form onSubmit={handleSubmit(onSubmit)}>
+                    <div className="grid grid-cols-2 gap-2">
+                        <div className="mb-3">
+                            <label className="block  text-sm font-bold mb-2">Template Code:</label>
+                            <input
+                                type="text" name="name" placeholder="Template Code" {...register(`templateCode`)} required={true}
+                                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            />
+                        </div>
+                        <div>
+                            <label className="block  text-sm font-bold mb-2">header:</label>
+                            <input
+                                type="text" name="code" placeholder="header" {...register(`header`)} required
+                                className="shadow mb-3 appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            />
+                        </div>
+                    </div>
+                    {/* <div className="grid grid-cols-3 gap-2">
          <div className="mb-3">
             <label className="block  text-sm font-bold mb-2">Template Code</label>
             <input
@@ -745,23 +887,23 @@ const EditTemplate=({data,onClose})=>{
             />
           </div>
          </div> */}
-        <div>
-        <div>
-          <label className="block  text-sm font-bold mb-2">Body</label>
-          <textarea  {...register(`body`)} required className="shadow appearance-none border border-black rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"></textarea>
-         </div>
-         <div>
-          <label className="block  text-sm font-bold mb-2">Impression</label>
-          <textarea  {...register(`impression`)} required className="shadow appearance-none border border-black rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"></textarea>
-         </div>
-        </div> 
-          <div className="flex justify-end items-center mt-4 gap-3">
-            <button type="button" onClick={onClose} className="bg-pink-500 hover:bg-pink-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Cancel</button>
-            <button type="submit" className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Save Template</button>
-          </div>
-        </form>
-      </div>
-    </div>
+                    <div>
+                        <div>
+                            <label className="block  text-sm font-bold mb-2">Body</label>
+                            <textarea  {...register(`body`)} required className="shadow appearance-none border border-black rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"></textarea>
+                        </div>
+                        <div>
+                            <label className="block  text-sm font-bold mb-2">Impression</label>
+                            <textarea  {...register(`impression`)} required className="shadow appearance-none border border-black rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"></textarea>
+                        </div>
+                    </div>
+                    <div className="flex justify-end items-center mt-4 gap-3">
+                        <button type="button" onClick={onClose} className="bg-pink-500 hover:bg-pink-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Cancel</button>
+                        <button type="submit" className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Save Template</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     )
 }
 
@@ -770,14 +912,14 @@ const AllBooking = () => {
     const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
     const [showModal, setShowModal] = useState(false);
     const [selectedBooking, setSelectedBooking] = useState(null);
-    const [editBooking,setEditBooking] = useState(false)
+    const [editBooking, setEditBooking] = useState(false)
 
 
     useEffect(() => {
         getBooking()
     }, [date]);
 
-    function getBooking(){
+    function getBooking() {
         specificApis.getBookings(date, "")
             .then(response => {
                 setBookings(response);
@@ -795,9 +937,10 @@ const AllBooking = () => {
     const handleCloseModal = () => {
         setShowModal(false);
         setSelectedBooking(null);
+        getBooking()
     };
 
-    function onClose(){
+    function onClose() {
         setEditBooking(false)
         setSelectedBooking(null)
         getBooking()
@@ -805,68 +948,68 @@ const AllBooking = () => {
 
     return (
         <>
-        {editBooking ?  <Booking isEdit={true} data={selectedBooking} onClose={onClose}/> : (
-        <div className="max-w-7xl mx-auto">
-            <h6 className="uppercase font-extrabold text-xl"><FontAwesomeIcon icon={faRestroom}/> | ALL
-                Bookings</h6>
-            <hr/>
-            <div className="">
-                <h6 className=" font-semibold mb-4">
-                    ALL Bookings of <span className="italic">{date}</span>
-                </h6>
-                <div className="mb-4">
-                    <input
-                        type="date"
-                        value={date}
-                        onChange={(e) => setDate(e.target.value)}
-                        className="w-full px-3 py-2 outline-none"
-                    />
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {bookings.map((booking,i) => (
-                        <div key={booking.id+i} className="card overflow-hidden shadow rounded-lg">
-                            <div className="card-body flex justify-between">
-                                <h2 className="text-lg card-title font-bold">
-                                    {booking.patientDetails.firstName} {booking.patientDetails.lastName}
-                                </h2>
-                                <span>
-                                <FontAwesomeIcon className="f-aw-edit me-1" icon={faEdit}
-                                                                         onClick={() => {
-                                                                            setEditBooking(booking.bookingSlip.receiptId)
-                                                                            setSelectedBooking(booking)
-                                                                        }}/>
-                                </span>
-                            </div>
-                            <div className="card-body-out">
-                                <p className="mt-1 max-w-2xl text-sm">
-                                    Patient ID: {booking.bookingSlip.patientId}
-                                </p>
-                                <p className="mt-1 max-w-2xl text-sm">
-                                    Date: {booking.bookingSlip.date}
-                                </p>
-                                <p className="mt-1 max-w-2xl text-sm">
-                                    Time: {booking.bookingSlip.time}
-                                </p>
-                            </div>
-                            <div className="download-btn-block">
-                                <button
-                                    className="w-100 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-normal text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                                    onClick={() => handleOpenModal(booking)}
-                                >
-                                    <FaDownload className="-ml-1 mr-2 h-5 w-5" aria-hidden="true"/>
-                                    View and Download PDF
-                                </button>
-                            </div>
+            {editBooking ? <Booking isEdit={true} data={selectedBooking} onClose={onClose} /> : (
+                <div className="max-w-7xl mx-auto">
+                    <h6 className="uppercase font-extrabold text-xl"><FontAwesomeIcon icon={faRestroom} /> | ALL
+                        Bookings</h6>
+                    <hr />
+                    <div className="">
+                        <h6 className=" font-semibold mb-4">
+                            ALL Bookings of <span className="italic">{date}</span>
+                        </h6>
+                        <div className="mb-4">
+                            <input
+                                type="date"
+                                value={date}
+                                onChange={(e) => setDate(e.target.value)}
+                                className="w-full px-3 py-2 outline-none"
+                            />
                         </div>
-                    ))}
-                </div>
-            </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {bookings.map((booking, i) => (
+                                <div key={booking.id + i} className="card overflow-hidden shadow rounded-lg">
+                                    <div className="card-body flex justify-between">
+                                        <h2 className="text-lg card-title font-bold">
+                                            {booking.patientDetails.firstName} {booking.patientDetails.lastName}
+                                        </h2>
+                                        <span>
+                                            <FontAwesomeIcon className="f-aw-edit me-1" icon={faEdit}
+                                                onClick={() => {
+                                                    setEditBooking(booking.bookingSlip.receiptId)
+                                                    setSelectedBooking(booking)
+                                                }} />
+                                        </span>
+                                    </div>
+                                    <div className="card-body-out">
+                                        <p className="mt-1 max-w-2xl text-sm">
+                                            Patient ID: {booking.bookingSlip.patientId}
+                                        </p>
+                                        <p className="mt-1 max-w-2xl text-sm">
+                                            Date: {booking.bookingSlip.date}
+                                        </p>
+                                        <p className="mt-1 max-w-2xl text-sm">
+                                            Time: {booking.bookingSlip.time}
+                                        </p>
+                                    </div>
+                                    <div className="download-btn-block">
+                                        <button
+                                            className="w-100 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-normal text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                            onClick={() => handleOpenModal(booking)}
+                                        >
+                                            <FaDownload className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
+                                            View and Download PDF
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
 
-            <CustomModal showModal={showModal} handleClose={handleCloseModal}>
-                {selectedBooking && <TestComponent data={selectedBooking}/>}
-            </CustomModal>
-        </div>
-        )}
+                    <CustomModal showModal={showModal} handleClose={handleCloseModal}>
+                        {selectedBooking && <TestComponent data={selectedBooking} />}
+                    </CustomModal>
+                </div>
+            )}
         </>
     );
 };
